@@ -8,7 +8,7 @@ Inventory of each player consist of:
 3. planes
 4. airlines
 
-Game goes in rounds, each round have 10 stages:
+Game goes in rounds (number will be clarified later), each round have 10 stages:
 1. World map update
 2. Investment
 3. Auction for the turn order
@@ -21,16 +21,16 @@ Game goes in rounds, each round have 10 stages:
 10. Taxes payment
 
 Stages explanation in detail.
-Stages that heppens without players involvement:
+Stages that happens without players involvement:
 1. New airports to use, improvement of old airports, new airlines to rent, new airplanes to buy. Also 3 possible world events are presented to the players.
-7. One world event of the 3 presented at the stage 1 is chosen on random. The effect of it is applied immidietly (if other is not said in the description of the event).
+7. One world event of the 3 presented at the stage 1 is chosen on random. The effect of it is applied immediately (if other is not said in the description of the event).
 9. For each player increase their money by their income (money can become smaller if income is negative).
 10. For each player their income is decreased depending on its size (the bigger the income the greater the loss).
 Stages with player involvement:
-2. Players can issue shares. This insreases money and lowers income.
-3. Players participate in the auction to determine the order of turns. This order is applied until a new order will be established at stage 3 in the next round. Bidding is in money. Auction continues until all players pass. The later player pass the bigger part of their bid they lose (first one to pass gets all their money back, the last one loses all).
-4. In order of turns players chose one special ability. No two players can chose the same ability.
-5. In order of turns players buy planes from available. Sales go in cycles, each player can by only one plane at a cycle, sales continue until all players pass.
+2. Players can issue shares. It insreases money and lowers income.
+3. Players participate in the auction to determine the order of turns. This order is applied until a new order will be established at stage 3 in the next round. Bidding is in money. Auction continues until all players pass. The player who passes later lose the biggest part of his money. (first one to pass gets all their money back, the last one loses all).
+4. In order of turns players choose one special ability. No two players can chose the same ability.
+5. In order of turns players buy planes from available. Sales go in cycles, each player can buy only one plane at a cycle, sales continue until all players pass.
 6. Same as plane sales, but now players buy airlines. One can not buy an airline if it does not fit (amount of gates it uses if greater then the amount of free gates at the airport at one of its end).
 8. In order of turns players perform flights. 
 
@@ -38,17 +38,20 @@ Each player has 6 action points per turn. Each buying of a plane, renting of an 
 
 Detailed rules of flights
 Route for the flight is a non-self-crossing path on the graf. It may contain only thouse airlines that were rent by some player. One flight is done by one plane. All passenger groups participating in the flight should reach their destination. For each airline in the route the holder of the line increases their income by solvency * luxury * yield for each passeng group on board at that moment.
-At every moment all requirments (like "passanger group demands that luxury of the plain must be grater then 1.5") must be satisfied. The sum of sizes of passanger groups should not exceed the capacity of plane at any moment. The total length of airlines should not exceed the plane's fuel reserve. The amount of intermediate airports should not exceed the plane's stations.
+At every moment all requirements (like "passanger group demands that luxury of the plane must be grater than 1.5") must be satisfied. The sum of sizes of passanger groups should not exceed the capacity of plane at any moment. The total length of airlines should not exceed the planes' fuel reserve. The amount of intermediate airports should not exceed the planes' stations.
 
 List of abilities:
 1. Be first to buy planes
 2. Be first to rent airlines
 3. Be first ot perform flights.
 4. +2 action points
-5. An ability to look what will heppen at stage 1 in the next turn
+5. An ability to look what will happen at stage 1 in the next turn
 6. An ability to increase the income by from flights by 1.2
 7. An ability to pass one time in the next turn auction without loosing it
 The list will be continued later
 
 World updates at stage 1 can be generated using procedural generation (by I highly dought it is feasibly to balance) or via presets. I prefer presets.
+
+P. S. Some actions, stages and specifities of each stage of the round can be simplified or deleted during writing the project. Vice versa something can be added in the future in the plans of the project. 
+In general that is not the final version of this project, so some things can be changed in the future. 
 
