@@ -1,4 +1,4 @@
 Technologies we are going to use
 Java as the main language
-JavaFX for grafics and UI
+LibGDX for grafics and UI
 H2 for managing database
