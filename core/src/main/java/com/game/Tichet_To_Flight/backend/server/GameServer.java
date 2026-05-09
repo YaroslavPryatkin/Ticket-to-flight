@@ -13,7 +13,6 @@ public class GameServer {
     public GameServer() {
         server = new Server();
 
-        // Регистрируем наши пакеты
         Network.register(server);
 
         server.addListener(new Listener() {
@@ -28,7 +27,6 @@ public class GameServer {
                     Network.CreateGameRequest req = (Network.CreateGameRequest) object;
                     System.out.println("Игрок " + req.hostName + " создает игру!");
 
-                    // Отправляем ответ
                     Network.GameCreatedResponse res = new Network.GameCreatedResponse();
                     res.success = true;
                     connection.sendTCP(res);

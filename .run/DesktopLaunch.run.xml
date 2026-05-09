@@ -1,7 +1,7 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="DesktopLaunch" type="Application" factoryName="Application">
     <option name="MAIN_CLASS_NAME" value="com.game.Tichet_To_Flight.lwjgl3.Lwjgl3Launcher" />
-    <module name="Ticket_To_Flight.lwjgl3.main" />
+    <module name="Ticket-to-flight.lwjgl3.main" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>
