@@ -1,0 +1,59 @@
+PRAGMA foreign_keys = OFF;
+--runtime tables
+
+DROP TABLE IF EXISTS players;
+CREATE TABLE players (
+                         id INTEGER PRIMARY KEY AUTOINCREMENT,
+                         name varchar(30) NOT NULL,
+                         cash numeric(8,2) NOT NULL CHECK (cash >= 0),
+                         income numeric(6,2) NOT NULL
+);
+
+DROP TABLE IF EXISTS airports;
+CREATE TABLE airports (
+                          id INTEGER PRIMARY KEY AUTOINCREMENT,
+                          type integer NOT NULL REFERENCES airport_types(id),
+                          pos point NOT NULL,
+                          name varchar(30) NOT NULL
+);
+
+DROP TABLE IF EXISTS plane_market;
+CREATE TABLE plane_market (
+                              id INTEGER PRIMARY KEY AUTOINCREMENT,
+                              type integer NOT NULL REFERENCES plane_types(id)
+);
+
+DROP TABLE IF EXISTS planes;
+CREATE TABLE planes (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        type integer NOT NULL REFERENCES plane_types(id),
+                        player integer NOT NULL REFERENCES players(id)
+);
+
+DROP TABLE IF EXISTS available_airlines;
+CREATE TABLE available_airlines (
+                                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                    type integer NOT NULL REFERENCES airline_types(id),
+                                    port_a integer NOT NULL REFERENCES airports(id),
+                                    port_b integer NOT NULL REFERENCES airports(id),
+                                    CONSTRAINT self_loop CHECK(port_a != port_b)
+);
+
+DROP TABLE IF EXISTS sold_airlines;
+CREATE TABLE sold_airlines (
+                               id INTEGER PRIMARY KEY AUTOINCREMENT,
+                               line integer NOT NULL REFERENCES available_airlines(id),
+                               player integer NOT NULL REFERENCES players(id)
+);
+
+DROP TABLE IF EXISTS passengers;
+CREATE TABLE passengers (
+                            id INTEGER PRIMARY KEY AUTOINCREMENT,
+                            type integer NOT NULL REFERENCES passenger_types(id),
+                            origin integer NOT NULL REFERENCES airports(id),
+                            destination_airport integer REFERENCES airports(id),
+                            destination_type integer REFERENCES city_types(id),
+                            CONSTRAINT dest CHECK ((destination_airport IS NULL) != (destination_type IS NULL)) --either to specific airport or to the class of airports
+);
+
+PRAGMA foreign_keys = ON;

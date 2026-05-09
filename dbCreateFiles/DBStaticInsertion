@@ -1,0 +1,37 @@
+PRAGMA foreign_keys = OFF;
+
+-- Очистка всех статических таблиц
+DELETE FROM world_events;
+DELETE FROM abilities;
+DELETE FROM airport_types;
+DELETE FROM city_types;
+DELETE FROM airline_types;
+DELETE FROM plane_types;
+DELETE FROM passenger_types;
+DELETE FROM presets;
+
+DELETE FROM sqlite_sequence WHERE name IN (
+                                           'world_events', 'abilities', 'city_types', 'airport_types',
+                                           'airline_types', 'plane_types', 'passenger_types', 'presets'
+    );
+
+INSERT INTO world_events (path, description) VALUES ('', '');
+
+INSERT INTO abilities (path, description) VALUES ('', '');
+
+INSERT INTO city_types (description) VALUES ('');
+
+INSERT INTO airport_types (cost, gate_amount, city, description) VALUES (1, 1, 1, '');
+
+INSERT INTO airline_types (yield, gate_a, gate_b, min_lux, max_lux, min_cap, max_cap, price, description) VALUES
+    (1, 1, 1, NULL, NULL, NULL, NULL, 1, '');
+
+INSERT INTO plane_types (fuel, stations, luxury, capacity, min_gate, max_gate, min_dist, max_dist, price, description) VALUES
+    (1, 0, 1, 1, NULL, NULL, NULL, NULL, 1, '');
+
+INSERT INTO passenger_types (solvency, size, min_lux, max_lux, min_yield, max_yield, max_cap, max_stations, description) VALUES
+    (1, 1, NULL, NULL, NULL, NULL, NULL, NULL, '');
+
+INSERT INTO presets (path, description) VALUES ('', '');
+
+PRAGMA foreign_keys = ON;

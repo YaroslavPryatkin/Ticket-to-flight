@@ -1,0 +1,86 @@
+PRAGMA foreign_keys = OFF;
+--static data tables
+
+DROP TABLE IF EXISTS world_events;
+CREATE TABLE world_events (
+                              id INTEGER PRIMARY KEY AUTOINCREMENT,
+                              path text NOT NULL,
+                              description text
+);
+
+DROP TABLE IF EXISTS abilities;
+CREATE TABLE abilities (
+                           id INTEGER PRIMARY KEY AUTOINCREMENT ,
+                           path text NOT NULL,
+                           description text
+);
+
+DROP TABLE IF EXISTS city_types;
+create table city_types (
+                            id INTEGER PRIMARY KEY AUTOINCREMENT,
+                            description text
+);
+
+DROP TABLE IF EXISTS airport_types;
+CREATE TABLE airport_types (
+                               id INTEGER PRIMARY KEY AUTOINCREMENT,
+                               cost numeric(6,2) NOT NULL,
+                               gate_amount smallint NOT NULL CHECK(gate_amount>0),
+                               city integer NOT NULL REFERENCES city_types(id),
+                               description text
+);
+
+DROP TABLE IF EXISTS airline_types;
+CREATE TABLE airline_types (
+                               id INTEGER PRIMARY KEY AUTOINCREMENT,
+                               yield numeric(6,2) NOT NULL,
+                               gate_a smallint NOT NULL CHECK(gate_a>0),
+                               gate_b smallint NOT NULL CHECK(gate_b>0),
+                               min_lux numeric(6,2) CHECK(min_lux > 0),
+                               max_lux numeric(6,2) CHECK(max_lux > 0),
+                               min_cap smallint CHECK(min_cap > 0),
+                               max_cap smallint CHECK(max_cap > 0),
+                               price numeric(6,2) CHECK(price > 0),
+                               description text,
+                               CONSTRAINT min_max CHECK(min_lux < max_lux AND min_cap < max_cap)
+);
+
+DROP TABLE IF EXISTS plane_types;
+CREATE TABLE plane_types (
+                             id INTEGER PRIMARY KEY AUTOINCREMENT,
+                             fuel numeric(6,2) NOT NULL CHECK(fuel > 0),
+                             stations smallint NOT NULL CHECK(stations >= 0),
+                             luxury numeric(6,2) NOT NULL CHECK(luxury > 0),
+                             capacity smallint NOT NULL CHECK(capacity > 0),
+                             min_gate smallint CHECK(min_gate > 0),
+                             max_gate smallint CHECK(max_gate > 0),
+                             min_dist numeric(6,2) CHECK(min_dist > 0),
+                             max_dist numeric(6,2) CHECK(max_dist > 0),
+                             price numeric(6,2) CHECK(price >= 0),
+                             description text,
+                             CONSTRAINT min_max CHECK(min_gate < max_gate AND min_dist < max_dist)
+);
+
+DROP TABLE IF EXISTS passenger_types;
+CREATE TABLE passenger_types (
+                                 id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                 solvency numeric(6,2) NOT NULL CHECK(solvency > 0),
+                                 size smallint NOT NULL CHECK(size > 0),
+                                 min_lux numeric(6,2) CHECK(min_lux > 0),
+                                 max_lux numeric(6,2) CHECK(max_lux > 0),
+                                 min_yield numeric(6,2) CHECK(min_yield > 0),
+                                 max_yield numeric(6,2) CHECK(max_yield > 0),
+                                 max_cap smallint CHECK(max_cap > 0),
+                                 max_stations smallint CHECK(max_stations >= 0),
+                                 description text,
+                                 CONSTRAINT min_max CHECK(min_lux < max_lux AND min_yield < max_yield)
+);
+
+DROP TABLE IF EXISTS presets;
+CREATE TABLE presets (
+                         id INTEGER PRIMARY KEY AUTOINCREMENT,
+                         path text NOT NULL, -- path to SQL script with functions to add new stuff while game progresses
+                         description text
+);
+
+PRAGMA foreign_keys = ON;
