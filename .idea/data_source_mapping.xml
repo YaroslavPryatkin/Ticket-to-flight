@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project version="4">
-  <component name="DataSourcePerFileMappings">
-    <file url="file://$PROJECT_DIR$/dbCreateFiles/DBRuntimeSchema" value="29c67172-6ca0-44ac-aac8-cb8016d5e673" />
-    <file url="file://$PROJECT_DIR$/dbCreateFiles/DBStaticInsertion" value="29c67172-6ca0-44ac-aac8-cb8016d5e673" />
-    <file url="file://$PROJECT_DIR$/dbCreateFiles/DBStaticSchema" value="29c67172-6ca0-44ac-aac8-cb8016d5e673" />
-  </component>
-</project>
