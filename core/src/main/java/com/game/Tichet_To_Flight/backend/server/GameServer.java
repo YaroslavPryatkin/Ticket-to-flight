@@ -18,14 +18,14 @@ public class GameServer {
         server.addListener(new Listener() {
             @Override
             public void connected(Connection connection) {
-                System.out.println("Новый игрок подключился: " + connection.getRemoteAddressTCP());
+                System.out.println("The new client connected: " + connection.getRemoteAddressTCP());
             }
 
             @Override
             public void received(Connection connection, Object object) {
                 if (object instanceof Network.CreateGameRequest) {
                     Network.CreateGameRequest req = (Network.CreateGameRequest) object;
-                    System.out.println("Игрок " + req.hostName + " создает игру!");
+                    System.out.println("Client " + req.hostName + " creates the game!");
 
                     Network.GameCreatedResponse res = new Network.GameCreatedResponse();
                     res.success = true;

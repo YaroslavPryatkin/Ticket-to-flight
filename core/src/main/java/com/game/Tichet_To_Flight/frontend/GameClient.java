@@ -18,7 +18,7 @@ public class GameClient {
             @Override
             public void received(Connection connection, Object object) {
                 if (object instanceof Network.GameCreatedResponse) {
-                    System.out.println("Подключение к игре прошло успешно!");
+                    System.out.println("Connection is successful!");
                 }
             }
         });
