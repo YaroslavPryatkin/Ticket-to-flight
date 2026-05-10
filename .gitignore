@@ -58,16 +58,9 @@ www-test/
 
 ## IntelliJ, Android Studio:
 .idea/
-!.idea/dataSources/
-!.idea/data_source_mapping.xml
-!.idea/sqldialects.xml
 *.ipr
 *.iws
 *.iml
-
-##ready db files
-dbFiles/*.db
-dbFiles/*.sqlite
 
 ## Eclipse:
 .classpath
