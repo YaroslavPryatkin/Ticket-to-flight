@@ -1,4 +1,4 @@
-package com.game.Tichet_To_Flight;
+package com.game.Ticket_To_Flight;
 
 import com.badlogic.gdx.Screen;
 

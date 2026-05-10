@@ -1,14 +1,17 @@
-package com.game.Tichet_To_Flight.backend.server;
+package com.game.Ticket_To_Flight.backend.server;
 
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
-import com.game.Tichet_To_Flight.network.Network;
+import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airport;
+import com.game.Ticket_To_Flight.network.Network;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class GameServer {
-    private Server server;
+    private final Server server;
 
     public GameServer() {
         server = new Server();
@@ -23,14 +26,7 @@ public class GameServer {
 
             @Override
             public void received(Connection connection, Object object) {
-                if (object instanceof Network.CreateGameRequest) {
-                    Network.CreateGameRequest req = (Network.CreateGameRequest) object;
-                    System.out.println("Client " + req.hostName + " creates the game!");
 
-                    Network.GameCreatedResponse res = new Network.GameCreatedResponse();
-                    res.success = true;
-                    connection.sendTCP(res);
-                }
             }
         });
     }
@@ -39,7 +35,7 @@ public class GameServer {
         try {
             server.bind(Network.TCP_PORT, Network.UDP_PORT);
             server.start();
-            System.out.println("Сервер запущен!");
+            System.out.println("Server launched!");
         } catch (IOException e) {
             e.printStackTrace();
         }

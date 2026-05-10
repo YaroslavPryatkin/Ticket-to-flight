@@ -1,4 +1,4 @@
-package com.game.Tichet_To_Flight.frontend;
+package com.game.Ticket_To_Flight.frontend;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;

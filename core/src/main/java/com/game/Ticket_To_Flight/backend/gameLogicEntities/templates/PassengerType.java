@@ -1,4 +1,4 @@
-package com.game.Tichet_To_Flight.backend.models.templates;
+package com.game.Ticket_To_Flight.backend.gameLogicEntities.templates;
 
 public class PassengerType {
     public int id;

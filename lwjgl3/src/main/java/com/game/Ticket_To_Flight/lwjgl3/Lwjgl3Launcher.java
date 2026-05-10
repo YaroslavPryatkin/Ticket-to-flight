@@ -1,8 +1,8 @@
-package com.game.Tichet_To_Flight.lwjgl3;
+package com.game.Ticket_To_Flight.lwjgl3;
 
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
-import com.game.Tichet_To_Flight.Main;
+import com.game.Ticket_To_Flight.Main;
 
 /** Launches the desktop (LWJGL3) application. */
 public class Lwjgl3Launcher {
