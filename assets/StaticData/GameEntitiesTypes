@@ -1,0 +1,35 @@
+{
+  "world_events": [
+    { "id": 0, "path": "", "description": null }
+  ],
+  "abilities": [
+    { "id": 0, "path": "", "description": null }
+  ],
+  "city_types": [
+    { "id": 0, "description": null }
+  ],
+  "airport_types": [
+    { "id": 0, "cost": 0.0, "gate_amount": 1, "city": 0, "description": null }
+  ],
+  "airline_types": [
+    {
+      "id": 0, "yield": 0.0, "gate_a": 1, "gate_b": 1,
+      "min_lux": null, "max_lux": null, "min_cap": null,
+      "max_cap": null, "price": null, "description": null
+    }
+  ],
+  "plane_types": [
+    {
+      "id": 0, "fuel": 0.1, "stations": 0, "luxury": 0.1, "capacity": 1,
+      "min_gate": null, "max_gate": null, "min_dist": null,
+      "max_dist": null, "price": 0.0, "description": null
+    }
+  ],
+  "passenger_types": [
+    {
+      "id": 0, "solvency": 0.1, "size": 1, "min_lux": null, "max_lux": null,
+      "min_yield": null, "max_yield": null, "max_cap": null,
+      "max_stations": 0, "description": null
+    }
+  ]
+}

@@ -1,15 +1,8 @@
 package com.game.Ticket_To_Flight.network;
 
-import com.badlogic.gdx.math.Vector2;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.EndPoint;
-import com.game.Ticket_To_Flight.Utilities.ClosedRange;
-import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airline;
-import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airport;
-import com.game.Ticket_To_Flight.backend.gameLogicEntities.PlayerState;
-import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.AirlineType;
-import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.AirportType;
-import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.PlaneType;
+import com.game.Ticket_To_Flight.backend.gameLogicEntities.Player;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -150,7 +143,7 @@ public class Network {
     }
 
     public static class PlayerStateResponse {
-        PlayerState state;
+
     }
 
     public static class JoinGameRequest {
