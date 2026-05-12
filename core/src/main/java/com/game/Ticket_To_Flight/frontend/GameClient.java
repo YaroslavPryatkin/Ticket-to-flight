@@ -4,6 +4,7 @@ import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.game.Ticket_To_Flight.network.Network;
+import com.game.Ticket_To_Flight.packages.PackageCreateWorldMap;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -12,9 +13,11 @@ import java.net.UnknownHostException;
 
 public class GameClient {
     private final Client client;
+    private final MainClient mainClient;
 
     public GameClient() {
         client = new Client();
+        mainClient = new MainClient();
         Network.register(client);
 
         client.addListener(new Listener() {
@@ -58,6 +61,16 @@ public class GameClient {
             System.err.println("Server with ip = " + ipAddress + " was not found: " + e.getMessage());
             return false;
         }
+    }
+
+    public MainClient getMainClient() {
+        return mainClient;
+    }
+
+    // temporary function
+    public void sendWorldMapPacket() {
+        PackageCreateWorldMap mapPacket = new PackageCreateWorldMap("EuropeMap.png", 1920f, 1080f);
+        mainClient.getPackage(mapPacket);
     }
 
 

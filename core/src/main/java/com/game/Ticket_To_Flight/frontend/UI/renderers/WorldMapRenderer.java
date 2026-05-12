@@ -1,4 +1,4 @@
-package com.game.Ticket_To_Flight.frontend;
+package com.game.Ticket_To_Flight.frontend.UI.renderers;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
@@ -11,16 +11,17 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.game.Ticket_To_Flight.frontend.GameClient;
+import com.game.Ticket_To_Flight.packages.PackageCreateWorldMap;
 
-public class GameScreen extends ScreenAdapter {
-    private final GameClient client;
+public class WorldMapRenderer extends ScreenAdapter {
     private final SpriteBatch batch;
     private final Texture mapTexture;
 
     private final OrthographicCamera camera;
     private final Viewport viewport;
-    private final float WORLD_WIDTH = 1920f;
-    private final float WORLD_HEIGHT = 1080f;
+    private final float WORLD_WIDTH;
+    private final float WORLD_HEIGHT;
     private final Vector3 lastMousePos = new Vector3();
 
     private void clampCamera() {
@@ -40,10 +41,11 @@ public class GameScreen extends ScreenAdapter {
         camera.position.y = MathUtils.clamp(camera.position.y, halfViewHeight, WORLD_HEIGHT - halfViewHeight);
     }
 
-    public GameScreen(GameClient client) {
-        this.client = client;
+    public WorldMapRenderer(PackageCreateWorldMap packet) {
         this.batch = new SpriteBatch();
-        this.mapTexture = new Texture(Gdx.files.internal("EuropeMap.png"));
+        this.WORLD_WIDTH = packet.worldWidth;
+        this.WORLD_HEIGHT = packet.worldHeight;
+        this.mapTexture = new Texture(Gdx.files.internal(packet.mapTextureName));
         this.camera = new OrthographicCamera();
         this.viewport = new ExtendViewport(WORLD_WIDTH, WORLD_HEIGHT, camera);
 
