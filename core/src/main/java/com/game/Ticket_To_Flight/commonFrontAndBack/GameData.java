@@ -2,7 +2,7 @@ package com.game.Ticket_To_Flight.commonFrontAndBack;
 
 import com.game.Ticket_To_Flight.Utilities.SetHolder;
 import com.game.Ticket_To_Flight.Utilities.Identifiable;
-import com.game.Ticket_To_Flight.Utilities.SomethingHolder;
+import com.game.Ticket_To_Flight.Utilities.MapHolder;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airline;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airport;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Passenger;
@@ -11,8 +11,6 @@ import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.*;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.BiFunction;
-import java.util.function.Function;
 
 public class GameData {
     public static SetHolder<AirportType> airportTypes = new SetHolder<>();
@@ -25,36 +23,41 @@ public class GameData {
     public SetHolder<Airline> airlines = new SetHolder<>();
     public SetHolder<Passenger> passengers = new SetHolder<>();
     public SetHolder<Player> players = new SetHolder<>();
-    public SomethingHolder<PlaneType, Integer> availablePlanes = new SomethingHolder<>();
+    public MapHolder<PlaneType, Integer> availablePlanes = new MapHolder<>();
 
     public static class DataChanges extends Identifiable {
         private static final AtomicInteger idGenerator = new AtomicInteger(0);
 
-        public Set<Player> playersToAdd = null;
-        public Set<Player> playersToRemove = null;
-        public Set<Airport> airportsToAdd = null;
-        public Set<Airport> airportsToRemove = null;
-        public Set<Airline> airlinesToAdd = null;
-        public Set<Airline> airlinesToRemove= null;
-        public Map<PlaneType, Integer> availablePlanesToRemove = null;
-        public Map<PlaneType, Integer> availablePlanesToAdd = null;
-        public Set<Passenger> passengersToRemove = null;
-        public Set<Passenger> passengersToAdd= null;
-        public Map<Player, Double> playerIncomeChange = null;
-        public Map<Player, Set<Airline>> ownersAirlinesToAdd = null;
-        public Map<Player, Set<Airline>> ownersAirlinesToRemove = null;
-        public Map<Player, Map<PlaneType, Integer>> ownersPlanesToAdd = null;
-        public Map<Player, Map<PlaneType, Integer>> ownersPlanesToRemove = null;
+        public SetHolder<Player> playersToAdd = null;
+        public SetHolder<Player> playersToRemove = null;
+        public SetHolder<Airport> airportsToAdd = null;
+        public SetHolder<Airport> airportsToRemove = null;
+        public SetHolder<Airline> airlinesToAdd = null;
+        public SetHolder<Airline> airlinesToRemove= null;
+        public MapHolder<PlaneType, Integer> availablePlanesToRemove = null;
+        public MapHolder<PlaneType, Integer> availablePlanesToAdd = null;
+        public SetHolder<Passenger> passengersToRemove = null;
+        public SetHolder<Passenger> passengersToAdd= null;
+        public MapHolder<Player, Double> playerMoneyChange = null;
+        public MapHolder<Player, Double> playerIncomeChange = null;
+        public MapHolder<Player, SetHolder<Airline>> ownersAirlinesToAdd = null;
+        public MapHolder<Player, SetHolder<Airline>> ownersAirlinesToRemove = null;
+        public MapHolder<Player, MapHolder<PlaneType, Integer>> ownersPlanesToAdd = null;
+        public MapHolder<Player, MapHolder<PlaneType, Integer>> ownersPlanesToRemove = null;
 
         public DataChanges(){super(idGenerator.incrementAndGet());}
+
+        public void merge(DataChanges other){
+
+        }
     }
 
     public void applyChangesUnsafe(DataChanges changes){
-        players.change(changes.playersToAdd, changes.playersToRemove);
-        airports.change(changes.airportsToAdd, changes.airportsToRemove);
-        airlines.change(changes.airlinesToAdd, changes.airlinesToRemove);
-        passengers.change(changes.passengersToAdd, changes.passengersToRemove);
-        availablePlanes.change(Arrays.asList(changes.availablePlanesToAdd, changes.availablePlanesToRemove),
+        players.changeSet(changes.playersToAdd, changes.playersToRemove);
+        airports.changeSet(changes.airportsToAdd, changes.airportsToRemove);
+        airlines.changeSet(changes.airlinesToAdd, changes.airlinesToRemove);
+        passengers.changeSet(changes.passengersToAdd, changes.passengersToRemove);
+        availablePlanes.changeElements(Arrays.asList(changes.availablePlanesToAdd, changes.availablePlanesToRemove),
             (current, params)->{
             Integer tmp = current + params.get(0) - params.get(1);
             if(tmp==0) return null;
@@ -62,12 +65,14 @@ public class GameData {
         });
         players.changeAsStructWithSetter(Player::setIncome, Player::getIncome,
             Arrays.asList(changes.playerIncomeChange), (f, s)->f+s.get(0));
+        players.changeAsStructWithSetter(Player::setMoney, Player::getMoney,
+            Arrays.asList(changes.playerMoneyChange), (f, s)->f+s.get(0));
         players.changeAsStruct((pl) -> pl.airlines,
             Arrays.asList(changes.ownersAirlinesToAdd, changes.ownersAirlinesToRemove),
-            (f, s)-> ((SetHolder<Airline>) f).change(s.get(0), s.get(1)) );
+            (f, s)-> ((SetHolder<Airline>) f).changeSet(s.get(0), s.get(1)) );
         players.changeAsStruct((pl) -> pl.planes,
             Arrays.asList(changes.ownersPlanesToAdd, changes.ownersPlanesToRemove),
-            (f, s)-> ((SomethingHolder<PlaneType, Integer>) f).change(s,
+            (f, s)-> f.changeElements(s,
                 (current, params)->{
                     Integer tmp = current + params.get(0) - params.get(1);
                     if(tmp==0) return null;
@@ -76,25 +81,28 @@ public class GameData {
     }
 
     public boolean checkChanges(DataChanges changes){
-        if( !players.checkChange(changes.playersToAdd, changes.playersToRemove) ||
-            !airports.checkChange(changes.airportsToAdd, changes.airportsToRemove) ||
-            !airlines.checkChange(changes.airlinesToAdd, changes.airlinesToRemove) ||
-            !passengers.checkChange(changes.passengersToAdd, changes.passengersToRemove) ||
-            !availablePlanes.checkChange(Arrays.asList(changes.availablePlanesToAdd, changes.availablePlanesToRemove),
+        if( !players.checkChangeSet(changes.playersToAdd, changes.playersToRemove) ||
+            !airports.checkChangeSet(changes.airportsToAdd, changes.airportsToRemove) ||
+            !airlines.checkChangeSet(changes.airlinesToAdd, changes.airlinesToRemove) ||
+            !passengers.checkChangeSet(changes.passengersToAdd, changes.passengersToRemove) ||
+            !availablePlanes.checkChangeElements(Arrays.asList(changes.availablePlanesToAdd, changes.availablePlanesToRemove),
             (current, params)-> current + params.get(0) - params.get(1)>=0)
         ) return false;
         SetHolder<Player> tmpPlayers = new SetHolder<>(players);
-        tmpPlayers.change(changes.playersToAdd, changes.playersToRemove);
+        tmpPlayers.changeSet(changes.playersToAdd, changes.playersToRemove);
         if (!players.checkChangeAsStruct(Player::getIncome,
-            Arrays.asList(changes.playerIncomeChange), (f, s)->true) ||
+                Arrays.asList(changes.playerIncomeChange), (f, s)->true) ||
+            !players.checkChangeAsStruct(Player::getMoney,
+                Arrays.asList(changes.playerMoneyChange), (f, s)->true) ||
             !players.checkChangeAsStruct((pl) -> pl.airlines,
-            Arrays.asList(changes.ownersAirlinesToAdd, changes.ownersAirlinesToRemove),
-            (f, s)-> ((SetHolder<Airline>) f).checkChange(s.get(0), s.get(1)) ) ||
+                Arrays.asList(changes.ownersAirlinesToAdd, changes.ownersAirlinesToRemove),
+                (f, s)-> ((SetHolder<Airline>) f).checkChangeSet(s.get(0), s.get(1)) ) ||
             !players.checkChangeAsStruct((pl) -> pl.planes,
-            Arrays.asList(changes.ownersPlanesToAdd, changes.ownersPlanesToRemove),
-            (f, s)-> ((SomethingHolder<PlaneType, Integer>) f).checkChange(s,
-                (current, params)-> current + params.get(0) - params.get(1)>=0
-            ) )
+                Arrays.asList(changes.ownersPlanesToAdd, changes.ownersPlanesToRemove),
+                (f, s)-> f.checkChangeElements(s,
+                    (current, params)-> current + params.get(0) - params.get(1)>=0
+                )
+            )
         ) return false;
         return true;
     }
@@ -148,8 +156,8 @@ public class GameData {
         if(plane.fuel < amountOfFuel) return null;
 
         DataChanges resultChanges = new DataChanges();
-        resultChanges.playerIncomeChange = new HashMap<>();
-        resultChanges.passengersToRemove = new HashSet<>();
+        resultChanges.playerIncomeChange = new MapHolder<>();
+        resultChanges.passengersToRemove = new SetHolder<>();
 
         Iterator<Airline> airlineIterator = route.listIterator();
         Iterator<Passenger> passengersIterator = passengers.listIterator();

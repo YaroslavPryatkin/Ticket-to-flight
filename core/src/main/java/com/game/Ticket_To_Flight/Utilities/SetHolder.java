@@ -45,13 +45,28 @@ public class SetHolder<T extends Identifiable> implements Set<T> {
         return storage.containsKey(i.getId()) && storage.get(i.getId()) == i;
     }
 
+    public boolean addOnlyNew(T t){
+        if(t==null ) return false;
+        if(storage.containsKey(t.getId())) return false;
+        storage.put(t.getId(), t);
+        return true;
+    }
+
+    /**
+     * Returns an unmodifiable internal map
+     */
+    public Map<Integer, T> getMap(){
+        return Collections.unmodifiableMap(storage);
+    }
+
     // --- Struct Modifier Methods ---
 
     /**
      * Applies a modifying function to a specific field of the objects.
      * Useful for mutable field objects (like internal collections or wrappers).
+     * @return this
      */
-    public <V> void changeAsStruct(
+    public <V> SetHolder<T> changeAsStruct(
         Function<T, V> getField,
         List<Map<T, V>> params,
         BiConsumer<V, List<V>> function
@@ -69,14 +84,16 @@ public class SetHolder<T extends Identifiable> implements Set<T> {
                 function.accept(currentValue, paramValues);
             }
         }
+        return this;
     }
 
     /**
      * Applies a function to calculate a new value for a field,
      * then uses the setter to assign it back to the object.
      * Useful for immutable fields (like Integer, String, Enum).
+     * @return this
      */
-    public <V> void changeAsStructWithSetter(
+    public <V> SetHolder<T> changeAsStructWithSetter(
         BiConsumer<T, V> setter, // Takes the target object and the new value
         Function<T, V> getField,
         List<Map<T, V>> params,
@@ -95,6 +112,7 @@ public class SetHolder<T extends Identifiable> implements Set<T> {
                 setter.accept(realItem, newValue);
             }
         }
+        return this;
     }
 
     /**
@@ -159,13 +177,236 @@ public class SetHolder<T extends Identifiable> implements Set<T> {
         return paramValues;
     }
 
-    // --- Core Logic Methods ---
+    // --- Change Elements Methods ---
+
+    /**
+     * For all elements that exist in both this and other replaces the element in this with replaceFunction(old, otherElem)
+     * @param other - source
+     * @param replaceFunction - function to replace an existing element
+     * @return this
+     */
+    public SetHolder<T> changeElements(Set<T> other, BiFunction<T, T, T> replaceFunction){
+        if (other == null) return this;
+        for (T otherItem : other) {
+            if (otherItem == null) continue;
+            int id = otherItem.getId();
+            T thisItem = this.get(id);
+            if (thisItem != null) {
+                T newItem = replaceFunction.apply(thisItem, otherItem);
+                if (newItem == null) {
+                    storage.remove(id);
+                } else {
+                    this.add(newItem);
+                }
+            }
+        }
+        return this;
+    }
+
+    /**
+     * For every element in the union of extraList a List params is created
+     * For all elements that exists in both this and the other replaces the element in this with replaceFunction(old, params)
+     * @param other - source
+     * @param replaceFunction - function to replace an existing element
+     * @return this
+     */
+    public SetHolder<T> changeElements(List<SetHolder<T>> other, BiFunction<T, List<T>, T> replaceFunction) {
+        if (other == null) return this;
+
+        Set<Integer> otherUnionIds = new HashSet<>();
+        for (SetHolder<T> holder : other) {
+            if (holder != null) {
+                for (T item : holder) {
+                    if (item != null) otherUnionIds.add(item.getId());
+                }
+            }
+        }
+
+        for (Integer id : otherUnionIds) {
+            T thisItem = this.get(id);
+            if (thisItem != null) {
+                List<T> params = new ArrayList<>();
+                for (SetHolder<T> holder : other) {
+                    params.add(holder != null ? holder.get(id) : null);
+                }
+
+                T newItem = replaceFunction.apply(thisItem, params);
+                if (newItem == null) {
+                    storage.remove(id);
+                } else {
+                    this.add(newItem);
+                }
+            }
+        }
+        return this;
+    }
+
+    // --- Merge Methods ---
+
+    /**
+     * Adds all elements that this does not contain
+     * Those elements that already exist in this are not added
+     * @param extra - source
+     * @return this
+     */
+    public SetHolder<T> merge(Set<T> extra) {
+        if (extra == null) return this;
+        for (T item : extra) {
+            if (item != null && !this.contains(item)) {
+                this.add(item);
+            }
+        }
+        return this;
+    }
+
+    /**
+     * Consecutive execution of merge(Set<T> extra)
+     * @param extraList - source list
+     * @return this
+     */
+    public SetHolder<T> merge(List<? extends Set<T>> extraList){
+        if (extraList != null) {
+            for (Set<T> extra : extraList) {
+                this.merge(extra);
+            }
+        }
+        return this;
+    }
+
+    /**
+     * Adds addFunction(otherElem) for all elements not in this
+     * If an element is already contained in this, then replaces it with the result of replaceFunction(old, params)
+     * @param extra - source
+     * @param addFunction - function to get a new element
+     * @param replaceFunction - function to replace an existing element
+     * @return this
+     */
+    public SetHolder<T> merge(Set<T> extra, Function<T, T> addFunction, BiFunction<T, T, T> replaceFunction){
+        if (extra == null) return this;
+        for (T otherItem : extra) {
+            if (otherItem == null) continue;
+            int id = otherItem.getId();
+            T thisItem = this.get(id);
+            if (thisItem == null) {
+                T newItem = addFunction.apply(otherItem);
+                if (newItem != null) this.add(newItem);
+            } else {
+                T newItem = replaceFunction.apply(thisItem, otherItem);
+                if (newItem == null) {
+                    storage.remove(id);
+                } else {
+                    this.add(newItem);
+                }
+            }
+        }
+        return this;
+    }
+
+    /**
+     * For every element in the union of extraList a List params is created
+     * Adds addFunction(params) for all elements not in this
+     * Replaces with replaceFunction(old, params) for all elements already in this
+     * @param extraList - source
+     * @param addFunction - function to get a new element
+     * @param replaceFunction - function to replace an existing element
+     * @return this
+     */
+    public SetHolder<T> merge(List<SetHolder<T>> extraList, Function<List<T>, T> addFunction,  BiFunction<T, List<T>, T> replaceFunction){
+        if (extraList == null) return this;
+
+        Set<Integer> extraUnionIds = new HashSet<>();
+        for (SetHolder<T> holder : extraList) {
+            if (holder != null) {
+                for (T item : holder) {
+                    if (item != null) extraUnionIds.add(item.getId());
+                }
+            }
+        }
+
+        for (Integer id : extraUnionIds) {
+            T thisItem = this.get(id);
+            List<T> params = new ArrayList<>();
+            for (SetHolder<T> holder : extraList) {
+                params.add(holder != null ? holder.get(id) : null);
+            }
+
+            if (thisItem == null) {
+                T newItem = addFunction.apply(params);
+                if (newItem != null) this.add(newItem);
+            } else {
+                T newItem = replaceFunction.apply(thisItem, params);
+                if (newItem == null) {
+                    storage.remove(id);
+                } else {
+                    this.add(newItem);
+                }
+            }
+        }
+        return this;
+    }
+
+    // -- Check functions ---
+
+    /**
+     * Iterates over 'other' and checks pairs (this.get(id), otherElem).
+     * Note: This implementation only checks elements present in 'other'.
+     * @param other - source
+     * @param checkFunction - predicate to validate pairs
+     * @return true if all pairs pass the check, false otherwise
+     */
+    public boolean check(Set<T> other, BiPredicate<T, T> checkFunction) {
+        if (other == null) return true;
+
+        for (T otherItem : other) {
+            if (otherItem == null) continue;
+            T thisItem = this.get(otherItem.getId());
+            if (!checkFunction.test(thisItem, otherItem)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * For every element in the union of all holders in other (and this), a List params is created.
+     * @param other - list of specialized holders
+     * @param checkFunction - predicate to validate (thisItem, params)
+     * @return true if all pairs pass the check, false otherwise
+     */
+    public boolean check(List<SetHolder<T>> other, BiPredicate<T, List<T>> checkFunction) {
+        if (other == null) return true;
+
+        // Collect the union of IDs from 'this' and all holders in 'other'
+        Set<Integer> allIds = new HashSet<>(this.storage.keySet());
+        for (SetHolder<T> holder : other) {
+            if (holder != null) {
+                for (T item : holder) {
+                    if (item != null) allIds.add(item.getId());
+                }
+            }
+        }
+
+        for (Integer id : allIds) {
+            T thisItem = this.get(id);
+            List<T> params = new ArrayList<>();
+            for (SetHolder<T> holder : other) {
+                params.add(holder != null ? holder.get(id) : null);
+            }
+
+            if (!checkFunction.test(thisItem, params)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // --- ChangeSet Methods ---
 
     /**
      * Synchronizes the storage using the 3-step logic.
      * This method creates internal Holder copies to avoid modifying original input sets.
      */
-    public void change(Set<T> toAdd, Set<T> toRemove) {
+    public SetHolder<T> changeSet(Set<T> toAdd, Set<T> toRemove) {
         // We wrap inputs into new Holders to perform logic without side effects
         SetHolder<T> addSetHolder = new SetHolder<>(toAdd);
         SetHolder<T> removeSetHolder = new SetHolder<>(toRemove);
@@ -187,13 +428,13 @@ public class SetHolder<T extends Identifiable> implements Set<T> {
 
         // Step 3: Remaining elements in toAdd are added to storage.
         this.addAll(addSetHolder);
+        return this;
     }
 
     /**
      * Validates if the change can be performed.
-     * Uses standard Set methods since Identifiable implements equals/hashCode via ID and Class.
      */
-    public boolean checkChange(Set<T> toAdd, Set<T> toRemove) {
+    public boolean checkChangeSet(Set<T> toAdd, Set<T> toRemove) {
         if (toRemove != null) {
             for (T item : toRemove) {
                 // Step 1: Must exist in storage OR in toAdd

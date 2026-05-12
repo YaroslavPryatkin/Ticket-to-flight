@@ -3,7 +3,7 @@ package com.game.Ticket_To_Flight.commonFrontAndBack;
 import com.badlogic.gdx.math.Vector2;
 import com.game.Ticket_To_Flight.Utilities.Identifiable;
 import com.game.Ticket_To_Flight.Utilities.SetHolder;
-import com.game.Ticket_To_Flight.Utilities.SomethingHolder;
+import com.game.Ticket_To_Flight.Utilities.MapHolder;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airline;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airport;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Passenger;
@@ -107,6 +107,12 @@ public class DTOHandler {
             this.ownersPlanesToRemove = ownersPlanesToRemove;
         }
     }
+
+    /**
+     *Transforms an object to data transfer object
+     * @param o - object to transform
+     * @return DTO version of object o
+     */
     public static Object toDTO(Object o){
         if(o==null) return null;
         if(o instanceof Airline){
@@ -221,6 +227,13 @@ public class DTOHandler {
         }
         throw new IllegalArgumentException("Could not create data transfer object: unknown class");
     }
+
+    /**
+     * Restores an object, using entities from local GameData
+     * @param o - object to transform
+     * @param data - local GameData. Is required for all types of o except Airport. Airport uses only static tables
+     * @return non-DTO version of object o
+     */
     public static Object fromDTO(Object o, GameData data){
         if(o==null) return null;
         if(o instanceof AirlineDTO){
@@ -268,7 +281,7 @@ public class DTOHandler {
                 if(line == null) return null;
                 lines.add(line);
             }
-            SomethingHolder<PlaneType, Integer> planes = new SomethingHolder<>();
+            MapHolder<PlaneType, Integer> planes = new MapHolder<>();
             for(Map.Entry<Integer, Integer> entry : dto.planes.entrySet()){
                 PlaneType plane = GameData.planeTypes.get(entry.getKey());
                 if(plane == null) return null;
@@ -277,9 +290,10 @@ public class DTOHandler {
             return new Player(dto.id, dto.money, dto.income, planes, lines);
         }
         else if(o instanceof DataChangesDTO){
-            //fuck
+            if(data == null) return null;
+            DataChangesDTO dto = (DataChangesDTO) o;
             return null;
         }
-        throw new IllegalArgumentException("Could not create an object from data transfer object: unknown class.");
+        throw new IllegalArgumentException("Could not recreate an object from data transfer object: unknown class.");
     }
 }
