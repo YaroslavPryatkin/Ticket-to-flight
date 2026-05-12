@@ -21,7 +21,12 @@ INSERT INTO abilities (path, description) VALUES ('', '');
 
 INSERT INTO city_types (description) VALUES ('');
 
-INSERT INTO airport_types (cost, gate_amount, city, description) VALUES (1, 1, 1, '');
+INSERT INTO airport_types (cost, gate_amount, city, description) VALUES
+    (100.00, 1, 1, 'Regional Airfield (Base location, 1 gate only)'),
+    (350.00, 2, 1, 'City Airport (Medium transit hub, 2 gates)'),
+    (1000.00, 3, 1, 'International Hub (Large airport, 3 gates)'),
+    (2500.00, 5, 1, 'Global Megahub (Key continental node, 5 gates)');
+;
 
 INSERT INTO airline_types (yield, gate_a, gate_b, min_lux, max_lux, min_cap, max_cap, price, description) VALUES
     (1, 1, 1, NULL, NULL, NULL, NULL, 1, '');

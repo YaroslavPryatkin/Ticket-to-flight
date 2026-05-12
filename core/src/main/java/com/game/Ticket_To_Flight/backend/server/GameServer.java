@@ -3,12 +3,9 @@ package com.game.Ticket_To_Flight.backend.server;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
-import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airport;
 import com.game.Ticket_To_Flight.network.Network;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 public class GameServer {
     private final Server server;

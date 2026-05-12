@@ -9,14 +9,6 @@ CREATE TABLE players (
                          income numeric(6,2) NOT NULL
 );
 
-DROP TABLE IF EXISTS airports;
-CREATE TABLE airports (
-                          id INTEGER PRIMARY KEY AUTOINCREMENT,
-                          type integer NOT NULL REFERENCES airport_types(id),
-                          pos point NOT NULL,
-                          name varchar(30) NOT NULL
-);
-
 DROP TABLE IF EXISTS plane_market;
 CREATE TABLE plane_market (
                               id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -54,6 +46,14 @@ CREATE TABLE passengers (
                             destination_airport integer REFERENCES airports(id),
                             destination_type integer REFERENCES city_types(id),
                             CONSTRAINT dest CHECK ((destination_airport IS NULL) != (destination_type IS NULL)) --either to specific airport or to the class of airports
+);
+
+DROP TABLE IF EXISTS airports;
+CREATE TABLE airports (
+                          id INTEGER PRIMARY KEY AUTOINCREMENT,
+                          type integer NOT NULL REFERENCES airport_types(id),
+                          pos point NOT NULL,
+                          name varchar(30) NOT NULL
 );
 
 PRAGMA foreign_keys = ON;

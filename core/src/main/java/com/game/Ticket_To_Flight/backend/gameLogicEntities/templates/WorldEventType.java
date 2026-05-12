@@ -1,7 +1,10 @@
 package com.game.Ticket_To_Flight.backend.gameLogicEntities.templates;
 
-public class WorldEventType {
-    public int id;
-    public String path;
+import com.game.Ticket_To_Flight.Utilities.Identifiable;
+
+public class WorldEventType extends Identifiable {
     public String description;
+    public WorldEventType(int id){
+        super(id);
+    }
 }

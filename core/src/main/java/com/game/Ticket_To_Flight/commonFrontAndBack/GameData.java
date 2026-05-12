@@ -18,22 +18,46 @@ public class GameData {
     public static SetHolder<PlaneType> planeTypes = new SetHolder<>();
     public static SetHolder<CityType> cityTypes = new SetHolder<>();
     public static SetHolder<PassengerType> passengerTypes = new SetHolder<>();
+    public static SetHolder<WorldEventType> worldEventTypes = new SetHolder<>();
+    public static SetHolder<AbilityType> abilityTypes = new SetHolder<>();
 
+    public enum State {
+        WORLD_UPDATE,
+        INVESTMENTS,
+        AUCTION,
+        ABILITIES,
+        PLANES,
+        AIRLINES,
+        EVENT,
+        FLIGHTS,
+        INCOME,
+        TAXES
+    }
+    public State currentState;
+    public Integer currentPlayer;
+
+    public SetHolder<WorldEventType> worldEvents = new SetHolder<>();
     public SetHolder<Airport> airports = new SetHolder<>();
     public SetHolder<Airline> airlines = new SetHolder<>();
     public SetHolder<Passenger> passengers = new SetHolder<>();
     public SetHolder<Player> players = new SetHolder<>();
+    public SetHolder<Airline> availableAirlines = new SetHolder<>();
     public MapHolder<PlaneType, Integer> availablePlanes = new MapHolder<>();
+    public MapHolder<Player, Integer> actionPoints = new MapHolder<>();
 
     public static class DataChanges extends Identifiable {
         private static final AtomicInteger idGenerator = new AtomicInteger(0);
 
+        public State currentState = null;
+        public Integer currentPlayer=null;
         public SetHolder<Player> playersToAdd = null;
         public SetHolder<Player> playersToRemove = null;
         public SetHolder<Airport> airportsToAdd = null;
         public SetHolder<Airport> airportsToRemove = null;
         public SetHolder<Airline> airlinesToAdd = null;
         public SetHolder<Airline> airlinesToRemove= null;
+        public SetHolder<Airline> availableAirlinesToAdd = null;
+        public SetHolder<Airline> availableAirlinesToRemove= null;
         public MapHolder<PlaneType, Integer> availablePlanesToRemove = null;
         public MapHolder<PlaneType, Integer> availablePlanesToAdd = null;
         public SetHolder<Passenger> passengersToRemove = null;

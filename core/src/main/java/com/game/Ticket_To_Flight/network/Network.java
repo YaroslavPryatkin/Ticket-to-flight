@@ -123,19 +123,7 @@ public class Network {
     }
 
     public static class GameStateResponse {
-        public enum State {
-            WORLD_UPDATE,
-            INVESTMENTS,
-            AUCTION,
-            ABILITIES,
-            PLANES,
-            AIRLINES,
-            EVENT,
-            FLIGHTS,
-            INCOME,
-            TAXES
-        }
-        public State state;
+
     }
 
     public static class PlayerStateRequest {
