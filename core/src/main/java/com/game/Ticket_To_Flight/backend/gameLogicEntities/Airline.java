@@ -1,13 +1,13 @@
 package com.game.Ticket_To_Flight.backend.gameLogicEntities;
 
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.AirlineType;
+import com.game.Ticket_To_Flight.Utilities.Identifiable;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class Airline {
+public class Airline extends Identifiable {
     private static final AtomicInteger idGenerator = new AtomicInteger(0);
 
-    public final int id;
     public final AirlineType type;
     public final Airport portA;
     public final Airport portB;
@@ -15,7 +15,7 @@ public class Airline {
 
     //for server
     public Airline(AirlineType type, Airport portA, Airport portB) {
-        this.id = idGenerator.incrementAndGet();
+        super(idGenerator.incrementAndGet());
         this.type = type;
         this.portA = portA;
         this.portB = portB;
@@ -23,7 +23,7 @@ public class Airline {
 
     //for client
     public Airline(int id, AirlineType type, Airport portA, Airport portB, Player player) {
-        this.id = id;
+        super(id);
         this.type = type;
         this.portA = portA;
         this.portB = portB;

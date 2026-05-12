@@ -1,36 +1,37 @@
 package com.game.Ticket_To_Flight.backend.gameLogicEntities;
 
+import com.game.Ticket_To_Flight.Utilities.SetHolder;
+import com.game.Ticket_To_Flight.Utilities.SomethingHolder;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.PlaneType;
+import com.game.Ticket_To_Flight.Utilities.Identifiable;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class Player {
+public class Player extends Identifiable {
     private static final AtomicInteger idGenerator = new AtomicInteger(0);
 
-    public final int id;
     public double money=0;
     public double income=0;
-    public List<PlaneType> planes = new ArrayList<>();
-    public List<Airline> airlines = new ArrayList<>();
+    public SomethingHolder<PlaneType, Integer> planes = new SomethingHolder<>();
+    public SetHolder<Airline> airlines = new SetHolder<>();
 
     //for server
-    public Player(int id) {
-        this.id = idGenerator.incrementAndGet();
+    public Player() {
+        super( idGenerator.incrementAndGet());
     }
+    //for server
+    public Player(int id) {super(id);}
 
     //for client
-    public Player(int id, double money, double income, List<PlaneType> planes, List<Airline> airlines){
-        this.id = id;
+    public Player(int id, double money, double income, SomethingHolder<PlaneType, Integer> planes, SetHolder<Airline> airlines){
+        super(id);
         this.money = money;
         this.income=income;
         this.planes = planes;
         this.airlines = airlines;
     }
 
-    @Override
-    public int hashCode(){
-        return id;
-    }
+    public Double getIncome() {return income;}
+    public void setIncome(Double val){income = val;}
 }

@@ -1,9 +1,9 @@
 package com.game.Ticket_To_Flight.backend.gameLogicEntities.templates;
 
 import com.game.Ticket_To_Flight.Utilities.ClosedRange;
+import com.game.Ticket_To_Flight.Utilities.Identifiable;
 
-public class PassengerType {
-    public final int id;
+public class PassengerType extends Identifiable {
     public final double solvency;
     public final int size;
     public final ClosedRange<Double> luxuryRange;
@@ -13,7 +13,7 @@ public class PassengerType {
     public final String description;
 
     public PassengerType(int id, double solvency, int size, ClosedRange<Double> luxuryRange, ClosedRange<Double> yieldRange, ClosedRange<Integer> capacityRange, ClosedRange<Integer> stationsRange, String description) {
-        this.id = id;
+        super(id);
         this.solvency = solvency;
         this.size = size;
         this.luxuryRange = new ClosedRange<>(luxuryRange);

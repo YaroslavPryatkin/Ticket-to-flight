@@ -1,9 +1,9 @@
 package com.game.Ticket_To_Flight.backend.gameLogicEntities.templates;
 
 import com.game.Ticket_To_Flight.Utilities.ClosedRange;
+import com.game.Ticket_To_Flight.Utilities.Identifiable;
 
-public class PlaneType {
-    public final int id;
+public class PlaneType extends Identifiable {
     public final double fuel;
     public final int stations;
     public final double luxury;
@@ -16,7 +16,7 @@ public class PlaneType {
 
     public PlaneType(int id, double fuel, int stations, double luxury, int capacity,
                      ClosedRange<Integer> gateRange, ClosedRange<Double> distRange, double price, String description) {
-        this.id = id;
+        super(id);
         this.fuel = fuel;
         this.stations=stations;
         this.luxury=luxury;
