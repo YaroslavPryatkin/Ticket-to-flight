@@ -11,8 +11,28 @@ import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.*;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class GameData {
+    private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+
+    public void acquireReadLock() {
+        lock.readLock().lock();
+    }
+
+    public void releaseReadLock() {
+        lock.readLock().unlock();
+    }
+
+    public void acquireWriteLock() {
+        lock.writeLock().lock();
+    }
+
+    public void releaseWriteLock() {
+        lock.writeLock().unlock();
+    }
+
+
     public static SetHolder<AirportType> airportTypes = new SetHolder<>();
     public static SetHolder<AirlineType> airlineTypes = new SetHolder<>();
     public static SetHolder<PlaneType> planeTypes = new SetHolder<>();
