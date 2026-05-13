@@ -50,6 +50,7 @@ public class GameData {
 
         public State currentState = null;
         public Integer currentPlayer=null;
+        public SetHolder<WorldEventType> newWorldEvents = null;
         public SetHolder<Player> playersToAdd = null;
         public SetHolder<Player> playersToRemove = null;
         public SetHolder<Airport> airportsToAdd = null;
@@ -64,6 +65,7 @@ public class GameData {
         public SetHolder<Passenger> passengersToAdd= null;
         public MapHolder<Player, Double> playerMoneyChange = null;
         public MapHolder<Player, Double> playerIncomeChange = null;
+        public MapHolder<Player, Integer> playerActionPointsChange = null;
         public MapHolder<Player, SetHolder<Airline>> ownersAirlinesToAdd = null;
         public MapHolder<Player, SetHolder<Airline>> ownersAirlinesToRemove = null;
         public MapHolder<Player, MapHolder<PlaneType, Integer>> ownersPlanesToAdd = null;
@@ -71,12 +73,78 @@ public class GameData {
 
         public DataChanges(){super(idGenerator.incrementAndGet());}
 
-        public void merge(DataChanges other){
+        /**
+         * Merges DataChanges. "other" should not be used after merging
+         * @param other - source
+         * @return this
+         */
+        public DataChanges merge(DataChanges other) {
+            if (other == null) return this;
 
+            if (other.currentState != null) this.currentState = other.currentState;
+            if (other.currentPlayer != null) this.currentPlayer = other.currentPlayer;
+
+            this.newWorldEvents = (this.newWorldEvents == null) ? other.newWorldEvents : this.newWorldEvents.merge(other.newWorldEvents);
+            this.availableAirlinesToAdd = (this.availableAirlinesToAdd == null) ? other.availableAirlinesToAdd : this.availableAirlinesToAdd.merge(other.availableAirlinesToAdd);
+            this.availableAirlinesToRemove = (this.availableAirlinesToRemove == null) ? other.availableAirlinesToRemove : this.availableAirlinesToRemove.merge(other.availableAirlinesToRemove);
+            this.playersToAdd = (this.playersToAdd == null) ? other.playersToAdd : this.playersToAdd.merge(other.playersToAdd);
+            this.playersToRemove = (this.playersToRemove == null) ? other.playersToRemove : this.playersToRemove.merge(other.playersToRemove);
+            this.airportsToAdd = (this.airportsToAdd == null) ? other.airportsToAdd : this.airportsToAdd.merge(other.airportsToAdd);
+            this.airportsToRemove = (this.airportsToRemove == null) ? other.airportsToRemove : this.airportsToRemove.merge(other.airportsToRemove);
+            this.airlinesToAdd = (this.airlinesToAdd == null) ? other.airlinesToAdd : this.airlinesToAdd.merge(other.airlinesToAdd);
+            this.airlinesToRemove = (this.airlinesToRemove == null) ? other.airlinesToRemove : this.airlinesToRemove.merge(other.airlinesToRemove);
+            this.passengersToAdd = (this.passengersToAdd == null) ? other.passengersToAdd : this.passengersToAdd.merge(other.passengersToAdd);
+            this.passengersToRemove = (this.passengersToRemove == null) ? other.passengersToRemove : this.passengersToRemove.merge(other.passengersToRemove);
+
+
+            this.availablePlanesToRemove = (this.availablePlanesToRemove == null) ? other.availablePlanesToRemove :
+                this.availablePlanesToRemove.merge(other.availablePlanesToRemove, v -> v, DataChanges::sumIntOrNull);
+
+            this.availablePlanesToAdd = (this.availablePlanesToAdd == null) ? other.availablePlanesToAdd :
+                this.availablePlanesToAdd.merge(other.availablePlanesToAdd, v -> v, DataChanges::sumIntOrNull);
+
+            this.playerMoneyChange = (this.playerMoneyChange == null) ? other.playerMoneyChange :
+                this.playerMoneyChange.merge(other.playerMoneyChange, v -> v, DataChanges::sumDoubleOrNull);
+
+            this.playerIncomeChange = (this.playerIncomeChange == null) ? other.playerIncomeChange :
+                this.playerIncomeChange.merge(other.playerIncomeChange, v -> v, DataChanges::sumDoubleOrNull);
+
+            this.playerActionPointsChange = (this.playerActionPointsChange == null) ? other.playerActionPointsChange :
+                this.playerActionPointsChange.merge(other.playerActionPointsChange, v -> v, DataChanges::sumIntOrNull);
+
+            this.ownersAirlinesToAdd = (this.ownersAirlinesToAdd == null) ? other.ownersAirlinesToAdd :
+                this.ownersAirlinesToAdd.merge(other.ownersAirlinesToAdd, v -> v, (oldS, newS) -> oldS.merge(newS));
+
+            this.ownersAirlinesToRemove = (this.ownersAirlinesToRemove == null) ? other.ownersAirlinesToRemove :
+                this.ownersAirlinesToRemove.merge(other.ownersAirlinesToRemove, v -> v, (oldS, newS) -> oldS.merge(newS));
+
+            this.ownersPlanesToAdd = (this.ownersPlanesToAdd == null) ? other.ownersPlanesToAdd :
+                this.ownersPlanesToAdd.merge(other.ownersPlanesToAdd, v -> v, (oldM, newM) -> oldM.merge(newM, v -> v, DataChanges::sumIntOrNull));
+
+            this.ownersPlanesToRemove = (this.ownersPlanesToRemove == null) ? other.ownersPlanesToRemove :
+                this.ownersPlanesToRemove.merge(other.ownersPlanesToRemove, v -> v, (oldM, newM) -> oldM.merge(newM, v -> v, DataChanges::sumIntOrNull));
+            return this;
+        }
+
+        private static Integer sumIntOrNull(Integer a, Integer b) {
+            int res = a + b;
+            return res == 0 ? null : res;
+        }
+
+        private static Double sumDoubleOrNull(Double a, Double b) {
+            double res = a + b;
+            return Math.abs(res) < 1e-9 ? null : res;
         }
     }
 
     public void applyChangesUnsafe(DataChanges changes){
+        if (changes.currentState != null) this.currentState = changes.currentState;
+        if (changes.currentPlayer != null) this.currentPlayer = changes.currentPlayer;
+        if (changes.newWorldEvents != null) {
+            worldEvents.clear();
+            worldEvents.addAll(changes.newWorldEvents);
+        }
+        availableAirlines.changeSet(changes.availableAirlinesToAdd, changes.availableAirlinesToRemove);
         players.changeSet(changes.playersToAdd, changes.playersToRemove);
         airports.changeSet(changes.airportsToAdd, changes.airportsToRemove);
         airlines.changeSet(changes.airlinesToAdd, changes.airlinesToRemove);
@@ -87,6 +155,7 @@ public class GameData {
             if(tmp==0) return null;
             return tmp;
         });
+        actionPoints.changeElements(changes.playerActionPointsChange, Integer::sum);
         players.changeAsStructWithSetter(Player::setIncome, Player::getIncome,
             Arrays.asList(changes.playerIncomeChange), (f, s)->f+s.get(0));
         players.changeAsStructWithSetter(Player::setMoney, Player::getMoney,
@@ -98,19 +167,22 @@ public class GameData {
             Arrays.asList(changes.ownersPlanesToAdd, changes.ownersPlanesToRemove),
             (f, s)-> f.changeElements(s,
                 (current, params)->{
-                    Integer tmp = current + params.get(0) - params.get(1);
+                    int tmp = current + params.get(0) - params.get(1);
                     if(tmp==0) return null;
                     return tmp;
                 }) );
     }
 
     public boolean checkChanges(DataChanges changes){
-        if( !players.checkChangeSet(changes.playersToAdd, changes.playersToRemove) ||
+        if( !availableAirlines.checkChangeSet(changes.availableAirlinesToAdd, changes.availableAirlinesToRemove) ||
+            !players.checkChangeSet(changes.playersToAdd, changes.playersToRemove) ||
             !airports.checkChangeSet(changes.airportsToAdd, changes.airportsToRemove) ||
             !airlines.checkChangeSet(changes.airlinesToAdd, changes.airlinesToRemove) ||
             !passengers.checkChangeSet(changes.passengersToAdd, changes.passengersToRemove) ||
             !availablePlanes.checkChangeElements(Arrays.asList(changes.availablePlanesToAdd, changes.availablePlanesToRemove),
-            (current, params)-> current + params.get(0) - params.get(1)>=0)
+                (current, params)-> current + params.get(0) - params.get(1)>=0) ||
+            !actionPoints.checkChangeElements(changes.playerActionPointsChange,
+                (current, param) -> current + param >= 0)
         ) return false;
         SetHolder<Player> tmpPlayers = new SetHolder<>(players);
         tmpPlayers.changeSet(changes.playersToAdd, changes.playersToRemove);

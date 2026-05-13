@@ -11,6 +11,13 @@ import java.util.function.Function;
 public class MapHolder<K extends Identifiable, V> implements Map<K, V> {
     private final Map<K, V> storage = new HashMap<>();
 
+
+    public MapHolder(){};
+
+    public MapHolder(Map<K,V> other){
+        if(other == null) return;
+        this.putAll(other);
+    }
     // --- Change elemets functions ---
 
     /**
@@ -163,6 +170,22 @@ public class MapHolder<K extends Identifiable, V> implements Map<K, V> {
     }
 
     // --- Check function ---
+
+    /**
+     * Validates the proposed changes.
+     * Returns false if any key is missing in storage, or if the checkFunction fails.
+     */
+    public boolean checkChangeElements(Map<K,V> other, BiPredicate<V, V> checkFunction){
+        for (Map.Entry<K,V> e : other.entrySet()) {
+            V storageValue = storage.get(e.getKey());
+            if(storageValue == null) return false;
+            if (!checkFunction.test(storageValue, e.getValue())) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 
     /**
      * Validates the proposed changes.
