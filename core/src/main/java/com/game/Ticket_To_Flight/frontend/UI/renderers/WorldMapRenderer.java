@@ -1,27 +1,59 @@
-package com.game.Ticket_To_Flight.frontend;
+package com.game.Ticket_To_Flight.frontend.UI.renderers;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.ScreenAdapter;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airport;
+import com.game.Ticket_To_Flight.packages.PackageCreateWorldMap;
 
-public class GameScreen extends ScreenAdapter {
-    private final GameClient client;
+import java.util.ArrayList;
+import java.util.List;
+
+public class WorldMapRenderer extends ScreenAdapter {
     private final SpriteBatch batch;
     private final Texture mapTexture;
 
+    private final Texture airportTexture;
+    private List<Airport> airportsToDraw = new ArrayList<>();
+    private final float AIRPORT_RADIUS = 15f; // Радиус точки города в координатах карты
+
     private final OrthographicCamera camera;
     private final Viewport viewport;
-    private final float WORLD_WIDTH = 1920f;
-    private final float WORLD_HEIGHT = 1080f;
+    private final float WORLD_WIDTH;
+    private final float WORLD_HEIGHT;
     private final Vector3 lastMousePos = new Vector3();
+
+    public WorldMapRenderer(PackageCreateWorldMap packet) {
+        this.batch = new SpriteBatch();
+        this.WORLD_WIDTH = packet.worldWidth;
+        this.WORLD_HEIGHT = packet.worldHeight;
+        this.mapTexture = new Texture(Gdx.files.internal(packet.mapTextureName));
+        this.camera = new OrthographicCamera();
+        this.viewport = new ExtendViewport(WORLD_WIDTH, WORLD_HEIGHT, camera);
+
+        int pixmapRadius = (int) AIRPORT_RADIUS;
+        Pixmap pixmap = new Pixmap(pixmapRadius * 2, pixmapRadius * 2, Pixmap.Format.RGBA8888);
+        pixmap.setColor(Color.WHITE);
+        pixmap.fillCircle(pixmapRadius, pixmapRadius, pixmapRadius);
+        this.airportTexture = new Texture(pixmap);
+        pixmap.dispose();
+
+        setupInput();
+    }
+
+    public void updateAirportsData(List<Airport> airports) {
+        this.airportsToDraw = airports;
+    }
 
     private void clampCamera() {
         float maxZoomX = WORLD_WIDTH / viewport.getWorldWidth();
@@ -38,16 +70,6 @@ public class GameScreen extends ScreenAdapter {
 
         camera.position.x = MathUtils.clamp(camera.position.x, halfViewWidth, WORLD_WIDTH - halfViewWidth);
         camera.position.y = MathUtils.clamp(camera.position.y, halfViewHeight, WORLD_HEIGHT - halfViewHeight);
-    }
-
-    public GameScreen(GameClient client) {
-        this.client = client;
-        this.batch = new SpriteBatch();
-        this.mapTexture = new Texture(Gdx.files.internal("EuropeMap.png"));
-        this.camera = new OrthographicCamera();
-        this.viewport = new ExtendViewport(WORLD_WIDTH, WORLD_HEIGHT, camera);
-
-        setupInput();
     }
 
     private void setupInput() {
@@ -86,7 +108,20 @@ public class GameScreen extends ScreenAdapter {
         batch.setProjectionMatrix(camera.combined);
 
         batch.begin();
+
         batch.draw(mapTexture, 0, 0, WORLD_WIDTH, WORLD_HEIGHT);
+
+        for (Airport airport : airportsToDraw) {
+            batch.setColor(airport.getColor());
+
+            float drawX = airport.getX() - AIRPORT_RADIUS;
+            float drawY = airport.getY() - AIRPORT_RADIUS;
+
+            batch.draw(airportTexture, drawX, drawY, AIRPORT_RADIUS * 2, AIRPORT_RADIUS * 2);
+        }
+
+        batch.setColor(Color.WHITE);
+
         batch.end();
     }
 
@@ -99,5 +134,6 @@ public class GameScreen extends ScreenAdapter {
     public void dispose() {
         batch.dispose();
         mapTexture.dispose();
+        if (airportTexture != null) airportTexture.dispose();
     }
 }
