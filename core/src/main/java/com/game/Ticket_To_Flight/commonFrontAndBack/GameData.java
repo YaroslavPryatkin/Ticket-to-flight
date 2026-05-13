@@ -34,7 +34,7 @@ public class GameData {
         TAXES
     }
     public State currentState;
-    public Integer currentPlayer;
+    public Player currentPlayer;
 
     public SetHolder<WorldEventType> worldEvents = new SetHolder<>();
     public SetHolder<Airport> airports = new SetHolder<>();
@@ -49,7 +49,7 @@ public class GameData {
         private static final AtomicInteger idGenerator = new AtomicInteger(0);
 
         public State currentState = null;
-        public Integer currentPlayer=null;
+        public Player currentPlayer=null;
         public SetHolder<WorldEventType> newWorldEvents = null;
         public SetHolder<Player> playersToAdd = null;
         public SetHolder<Player> playersToRemove = null;

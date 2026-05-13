@@ -30,9 +30,14 @@ public class SetHolder<T extends Identifiable> implements Set<T> {
     public T get(Integer id) {
         return storage.get(id);
     }
+    public T remove(Integer id) {return storage.remove(id);}
 
     public T get(T item) {
         return (item == null) ? null : storage.get(item.getId());
+    }
+
+    public boolean contains(Integer id){
+        return storage.containsKey(id);
     }
 
     /**
@@ -469,6 +474,8 @@ public class SetHolder<T extends Identifiable> implements Set<T> {
     public boolean contains(Object o) {
         return (o instanceof Identifiable) && storage.containsKey(((Identifiable) o).getId());
     }
+
+
 
     @Override
     public Iterator<T> iterator() { return storage.values().iterator(); }

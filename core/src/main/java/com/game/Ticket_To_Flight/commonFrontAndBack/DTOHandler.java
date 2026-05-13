@@ -9,6 +9,7 @@ import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airport;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Passenger;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Player;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.*;
+import com.sun.source.tree.IdentifierTree;
 
 import java.util.*;
 import java.util.function.Function;
@@ -73,22 +74,44 @@ public class DTOHandler {
     }
     public static class DataChangesDTO extends Identifiable{
         public final Set<PlayerDTO> playersToAdd;
-        public final Set<PlayerDTO> playersToRemove;
+        public final Set<Integer> playersToRemove;
         public final Set<AirportDTO> airportsToAdd;
-        public final Set<AirportDTO> airportsToRemove;
+        public final Set<Integer> airportsToRemove;
         public final Set<AirlineDTO> airlinesToAdd;
-        public final Set<AirlineDTO> airlinesToRemove;
+        public final Set<Integer> airlinesToRemove;
+        public final Set<PassengerDTO> passengersToAdd;
+        public final Set<Integer> passengersToRemove;
+
+        public final GameData.State currentState;
+        public final Integer currentPlayer;
+        public final Set<Integer> newWorldEvents;
+
+        public final Set<Integer> availableAirlinesToAdd;
+        public final Set<Integer> availableAirlinesToRemove;
         public final Map<Integer, Integer> availablePlanesToRemove;
         public final Map<Integer, Integer> availablePlanesToAdd;
-        public final Set<PassengerDTO> passengersToRemove;
-        public final Set<PassengerDTO> passengersToAdd;
-        public final Map<Integer, Double> playerIncomeChange;
-        public final Map<Integer, Set<Integer>> ownersAirlinesToAdd;
-        public final Map<Integer, Set<Integer>> ownersAirlinesToRemove;
-        public final Map<Integer, Map<Integer, Integer>> ownersPlanesToAdd;
-        public final Map<Integer, Map<Integer, Integer>> ownersPlanesToRemove;
 
-        public DataChangesDTO(int id, Set<PlayerDTO> playersToAdd, Set<PlayerDTO> playersToRemove, Set<AirportDTO> airportsToAdd, Set<AirportDTO> airportsToRemove, Set<AirlineDTO> airlinesToAdd, Set<AirlineDTO> airlinesToRemove, Map<Integer, Integer> availablePlanesToRemove, Map<Integer, Integer> availablePlanesToAdd, Set<PassengerDTO> passengersToRemove, Set<PassengerDTO> passengersToAdd, Map<Integer, Double> playerIncomeChange, Map<Integer, Set<Integer>> ownersAirlinesToAdd, Map<Integer, Set<Integer>> ownersAirlinesToRemove, Map<Integer, Map<Integer, Integer>> ownersPlanesToAdd, Map<Integer, Map<Integer, Integer>> ownersPlanesToRemove) {
+        public final Map<Integer, Double> playerMoneyChange;
+        public final Map<Integer, Double> playerIncomeChange;
+        public final Map<Integer, Integer> playerActionPointsChange;
+
+        public final Map<Integer, Set<Integer>> playerAirlinesToAdd;
+        public final Map<Integer, Set<Integer>> playerAirlinesToRemove;
+        public final Map<Integer, Map<Integer, Integer>> playerPlanesToAdd;
+        public final Map<Integer, Map<Integer, Integer>> playerPlanesToRemove;
+
+        public DataChangesDTO(int id, Set<PlayerDTO> playersToAdd, Set<Integer> playersToRemove,
+                              Set<AirportDTO> airportsToAdd, Set<Integer> airportsToRemove,
+                              Set<AirlineDTO> airlinesToAdd, Set<Integer> airlinesToRemove,
+                              Set<PassengerDTO> passengersToAdd, Set<Integer> passengersToRemove,
+                              GameData.State currentState, Integer currentPlayer, Set<Integer> newWorldEvents,
+                              Set<Integer> availableAirlinesToAdd, Set<Integer> availableAirlinesToRemove,
+                              Map<Integer, Integer> availablePlanesToRemove, Map<Integer, Integer> availablePlanesToAdd,
+                              Map<Integer, Double> playerMoneyChange, Map<Integer, Double> playerIncomeChange,
+                              Map<Integer, Integer> playerActionPointsChange, Map<Integer, Set<Integer>> playerAirlinesToAdd,
+                              Map<Integer, Set<Integer>> playerAirlinesToRemove,
+                              Map<Integer, Map<Integer, Integer>> playerPlanesToAdd,
+                              Map<Integer, Map<Integer, Integer>> playerPlanesToRemove) {
             super(id);
             this.playersToAdd = playersToAdd;
             this.playersToRemove = playersToRemove;
@@ -96,15 +119,22 @@ public class DTOHandler {
             this.airportsToRemove = airportsToRemove;
             this.airlinesToAdd = airlinesToAdd;
             this.airlinesToRemove = airlinesToRemove;
+            this.passengersToAdd = passengersToAdd;
+            this.passengersToRemove = passengersToRemove;
+            this.currentState = currentState;
+            this.currentPlayer = currentPlayer;
+            this.newWorldEvents = newWorldEvents;
+            this.availableAirlinesToAdd = availableAirlinesToAdd;
+            this.availableAirlinesToRemove = availableAirlinesToRemove;
             this.availablePlanesToRemove = availablePlanesToRemove;
             this.availablePlanesToAdd = availablePlanesToAdd;
-            this.passengersToRemove = passengersToRemove;
-            this.passengersToAdd = passengersToAdd;
+            this.playerMoneyChange = playerMoneyChange;
             this.playerIncomeChange = playerIncomeChange;
-            this.ownersAirlinesToAdd = ownersAirlinesToAdd;
-            this.ownersAirlinesToRemove = ownersAirlinesToRemove;
-            this.ownersPlanesToAdd = ownersPlanesToAdd;
-            this.ownersPlanesToRemove = ownersPlanesToRemove;
+            this.playerActionPointsChange = playerActionPointsChange;
+            this.playerAirlinesToAdd = playerAirlinesToAdd;
+            this.playerAirlinesToRemove = playerAirlinesToRemove;
+            this.playerPlanesToAdd = playerPlanesToAdd;
+            this.playerPlanesToRemove = playerPlanesToRemove;
         }
     }
 
@@ -148,11 +178,18 @@ public class DTOHandler {
         }
         else if(o instanceof GameData.DataChanges){
             GameData.DataChanges dc = (GameData.DataChanges) o;
-            // Helper for Set transformation: Domain -> DTO
-            Function<Set<?>, Set<?>> transformSet = (sourceSet) -> {
+
+            Function<Set<? extends Identifiable>, Set<?>> SetToDTO = (sourceSet) -> {
                 if (sourceSet == null) return null;
                 return sourceSet.stream()
-                    .map(item -> toDTO(item)) // Using toDTO(Object) as specified
+                    .map(item -> toDTO(item))
+                    .collect(Collectors.toSet());
+            };
+
+            Function<Set<? extends Identifiable>, Set<Integer>> SetToInteger = (sourceSet) -> {
+                if (sourceSet == null) return null;
+                return sourceSet.stream()
+                    .map(item -> item.getId())
                     .collect(Collectors.toSet());
             };
 
@@ -167,36 +204,41 @@ public class DTOHandler {
             };
 
             // 1. Transforming simple sets
-            Set<PlayerDTO> pAdd = (Set<PlayerDTO>) transformSet.apply(dc.playersToAdd);
-            Set<PlayerDTO> pRem = (Set<PlayerDTO>) transformSet.apply(dc.playersToRemove);
-            Set<AirportDTO> airpAdd = (Set<AirportDTO>) transformSet.apply(dc.airportsToAdd);
-            Set<AirportDTO> airpRem = (Set<AirportDTO>) transformSet.apply(dc.airportsToRemove);
-            Set<AirlineDTO> airlAdd = (Set<AirlineDTO>) transformSet.apply(dc.airlinesToAdd);
-            Set<AirlineDTO> airlRem = (Set<AirlineDTO>) transformSet.apply(dc.airlinesToRemove);
-            Set<PassengerDTO> passAdd = (Set<PassengerDTO>) transformSet.apply(dc.passengersToAdd);
-            Set<PassengerDTO> passRem = (Set<PassengerDTO>) transformSet.apply(dc.passengersToRemove);
+            Set<PlayerDTO> pAdd = (Set<PlayerDTO>) SetToDTO.apply(dc.playersToAdd);
+            Set<Integer> pRem = SetToInteger.apply(dc.playersToRemove);
+            Set<AirportDTO> airpAdd = (Set<AirportDTO>) SetToDTO.apply(dc.airportsToAdd);
+            Set<Integer> airpRem = SetToInteger.apply(dc.airportsToRemove);
+            Set<AirlineDTO> airlAdd = (Set<AirlineDTO>) SetToDTO.apply(dc.airlinesToAdd);
+            Set<Integer> airlRem = SetToInteger.apply(dc.airlinesToRemove);
+            Set<PassengerDTO> passAdd = (Set<PassengerDTO>) SetToDTO.apply(dc.passengersToAdd);
+            Set<Integer> passRem =  SetToInteger.apply(dc.passengersToRemove);
+            Set<Integer> avLineAdd = SetToInteger.apply(dc.availableAirlinesToAdd);
+            Set<Integer> avLineRem = SetToInteger.apply(dc.availableAirlinesToRemove);
+            Set<Integer> newEvents = SetToInteger.apply(dc.newWorldEvents);
 
             // 2. Transforming maps with simple values (Key -> ID)
-            Map<Integer, Integer> planesRem = (Map<Integer, Integer>) transformMapKeys.apply(dc.availablePlanesToRemove);
             Map<Integer, Integer> planesAdd = (Map<Integer, Integer>) transformMapKeys.apply(dc.availablePlanesToAdd);
+            Map<Integer, Integer> planesRem = (Map<Integer, Integer>) transformMapKeys.apply(dc.availablePlanesToRemove);
             Map<Integer, Double> incomeChg = (Map<Integer, Double>) transformMapKeys.apply(dc.playerIncomeChange);
+            Map<Integer, Double> moneyChg = (Map<Integer, Double>) transformMapKeys.apply(dc.playerMoneyChange);
+            Map<Integer, Integer> actChg = (Map<Integer, Integer>) transformMapKeys.apply(dc.playerActionPointsChange);
 
             // 3. Transforming complex maps (Owners' airlines and planes)
-            Map<Integer, Set<Integer>> ownAirlinesAdd = dc.ownersAirlinesToAdd == null ? null :
+            Map<Integer, Set<Integer>> plAirlinesAdd = dc.ownersAirlinesToAdd == null ? null :
                 dc.ownersAirlinesToAdd.entrySet().stream()
                 .collect(Collectors.toMap(
                     e -> e.getKey().getId(),
                     e -> e.getValue().stream().map(Airline::getId).collect(Collectors.toSet())
                 ));
 
-            Map<Integer, Set<Integer>> ownAirlinesRem = dc.ownersAirlinesToRemove == null ? null :
+            Map<Integer, Set<Integer>> plAirlinesRem = dc.ownersAirlinesToRemove == null ? null :
                 dc.ownersAirlinesToRemove.entrySet().stream()
                .collect(Collectors.toMap(
                    e -> e.getKey().getId(),
                    e -> e.getValue().stream().map(Airline::getId).collect(Collectors.toSet())
                ));
 
-            Map<Integer, Map<Integer, Integer>> ownPlanesAdd = dc.ownersPlanesToAdd == null ? null :
+            Map<Integer, Map<Integer, Integer>> plPlanesAdd = dc.ownersPlanesToAdd == null ? null :
                 dc.ownersPlanesToAdd.entrySet().stream()
                  .collect(Collectors.toMap(
                      e -> e.getKey().getId(),
@@ -204,7 +246,7 @@ public class DTOHandler {
                           .collect(Collectors.toMap(ie -> ie.getKey().getId(), Map.Entry::getValue))
                  ));
 
-            Map<Integer, Map<Integer, Integer>> ownPlanesRem = dc.ownersPlanesToRemove == null ? null :
+            Map<Integer, Map<Integer, Integer>> plPlanesRem = dc.ownersPlanesToRemove == null ? null :
                 dc.ownersPlanesToRemove.entrySet().stream()
                 .collect(Collectors.toMap(
                     e -> e.getKey().getId(),
@@ -214,41 +256,194 @@ public class DTOHandler {
 
             // 4. Create the final DTO instance via constructor
             DataChangesDTO dto = new DataChangesDTO(
-                dc.getId(),
-                pAdd, pRem,
-                airpAdd, airpRem,
-                airlAdd, airlRem,
-                planesRem, planesAdd,
-                passRem, passAdd,
-                incomeChg,
-                ownAirlinesAdd, ownAirlinesRem,
-                ownPlanesAdd, ownPlanesRem
-            );
+                dc.getId(), pAdd, pRem, airpAdd, airpRem, airlAdd, airlRem, passAdd, passRem, dc.currentState, dc.currentPlayer.getId(),
+                newEvents, avLineAdd, avLineRem, planesAdd, planesRem, moneyChg, incomeChg, actChg, plAirlinesAdd, plAirlinesRem,
+                plPlanesAdd, plPlanesRem);
         }
         throw new IllegalArgumentException("Could not create data transfer object: unknown class");
     }
 
     /**
-     * Restores an object, using entities from local GameData
+     * Restores an object, using entities from local GameData. Does no preserve object to transform
      * @param o - object to transform
      * @param data - local GameData. Is required for all types of o except Airport. Airport uses only static tables
      * @return non-DTO version of object o
      */
     public static Object fromDTO(Object o, GameData data){
+        return fromDTO(o,data,null);
+    }
+
+    private static <T extends Identifiable, D extends Identifiable> boolean parseAddRemoveDTO(
+        Set<D> toAdd, Set<Integer> toRemove, SetHolder<T> dcAdd,
+        SetHolder<T> dcRemove, SetHolder<T> cur, GameData curGD, GameData.DataChanges curDC){
+
+        boolean hasAdd = toAdd != null;
+        boolean hasRemove = toRemove != null;
+
+        if (hasAdd && dcAdd == null) return false;
+        if (hasRemove && dcRemove == null) return false;
+
+        if(hasAdd && hasRemove){
+            for (D d : toAdd) {
+                Integer id = d.getId();
+                T fromCur = cur.get(id);
+                boolean removeContains = toRemove.contains(id);
+
+                //delete old version, add new
+                if(fromCur != null && removeContains){
+                    dcRemove.add(fromCur);
+                    toRemove.remove(id);
+                    T newObj = (T) fromDTO(d, curGD, curDC);
+                    if (newObj == null) return false;
+                    dcAdd.add(newObj);
+                }
+                //add new object with same id, error
+                else if(fromCur != null){
+                    return false;
+                }
+                //add and immediately delete
+                else if(removeContains){
+                    toRemove.remove(id);
+                }
+                //add new
+                else{
+                    T newObj = (T) fromDTO(d, curGD, curDC);
+                    if (newObj == null) return false;
+                    dcAdd.add(newObj);
+                }
+            }
+            //delete old objects
+            for(Integer id : toRemove){
+                T fromCur = cur.get(id);
+                if(fromCur == null) return false;
+                dcRemove.add(fromCur);
+            }
+        }
+        //only adding
+        else if(hasAdd){
+            for (D d : toAdd) {
+                T newObj = (T) fromDTO(d, curGD, curDC);
+                if (newObj == null) return false;
+                dcAdd.add(newObj);
+            }
+        }
+        //only deleting
+        else if(hasRemove){
+            for(Integer id : toRemove){
+                T fromCur = cur.get(id);
+                if(fromCur == null) return false;
+                dcRemove.add(fromCur);
+            }
+        }
+        return true;
+    }
+
+    private static boolean parseAvailableAirlines(
+        Set<Integer> toAdd, Set<Integer> toRemove, GameData curGD, GameData.DataChanges curDC){
+        boolean hasAdd = toAdd != null;
+        boolean hasRemove = toRemove != null;
+
+        if (hasAdd && curDC.availableAirlinesToAdd == null) return false;
+        if (hasRemove && curDC.availableAirlinesToRemove == null) return false;
+
+        if(hasAdd && hasRemove){
+            for(Integer id : toRemove){
+                Airline line = curGD.availableAirlines.get(id);
+                if(line == null){
+                    if(toAdd.contains(id)){
+                        toAdd.remove(id);
+                    }
+                    else {
+                        return false;
+                    }
+                }
+                else{
+                    curDC.availableAirlinesToRemove.add(line);
+                }
+            }
+            for(Integer id : toAdd){
+                Airline line = curGD.airlines.get(id);
+                if(line == null) return false;
+                else curDC.availableAirlinesToAdd.add(line);
+            }
+        }
+        else if(hasAdd){
+            for(Integer id : toAdd){
+                Airline line = curGD.airlines.get(id);
+                if(line == null) return false;
+                else curDC.availableAirlinesToAdd.add(line);
+            }
+        }
+        else if(hasRemove){
+            for(Integer id : toRemove){
+                Airline line = curGD.availableAirlines.get(id);
+                if(line == null) {
+                    return false;
+                }
+                else{
+                    curDC.availableAirlinesToRemove.add(line);
+                }
+            }
+        }
+        return true;
+    }
+
+    private static <T extends Identifiable> T findInThree(int id, SetHolder<T> toAdd, SetHolder<T> toRem, SetHolder<T> cur){
+        T ad = toAdd.get(id);
+        T rm = toRem.get(id);
+        T cu = cur.get(id);
+        if(ad!=null){
+            if(rm!=null){
+                if(cu != null){
+                    return ad;
+                }
+                return null;
+            }
+            if(cu != null){
+                return null;
+            }
+            return ad;
+        }
+        else{
+            if(rm!=null){
+                return null;
+            }
+            if(cu != null){
+                return null;
+            }
+            return cu;
+        }
+    }
+
+    private static Object fromDTO(Object o, GameData data, GameData.DataChanges currentDT){
         if(o==null) return null;
         if(o instanceof AirlineDTO){
             if(data == null) return null;
 
             AirlineDTO dto = (AirlineDTO) o;
+
             AirlineType type = GameData.airlineTypes.get(dto.type);
+            if(type == null) return null;
+
             Airport portA = data.airports.get(dto.portA);
+            if(portA == null){
+                portA = currentDT.airportsToAdd.get(dto.portA);
+                if(portA == null) return null;
+            }
             Airport portB = data.airports.get(dto.portB);
-            if(type == null || portA == null || portB == null) return null;
+            if(portB == null){
+                portB = currentDT.airportsToAdd.get(dto.portB);
+                if(portB == null) return null;
+            }
+
             if(dto.player==null)
                 return new Airline(dto.id, type, portA, portB, null);
             else{
                 Player player = data.players.get(dto.player);
-                if(player==null) return null;
+                if(player==null){
+                    player = currentDT.playersToAdd.get(dto.player);
+                    if(player==null)return null;
+                }
                 return new Airline(dto.id, type, portA, portB, player);
             }
         }
@@ -262,12 +457,28 @@ public class DTOHandler {
             if(data == null) return null;
 
             PassengerDTO dto = (PassengerDTO) o;
+            if((dto.typeTo == null && dto.portTo == null) || (dto.typeTo != null && dto.portTo != null)) return null;
+
             PassengerType type = GameData.passengerTypes.get(dto.type);
+            if(type == null)  return null;
             Airport portFrom = data.airports.get(dto.portFrom);
-            Airport portTo = data.airports.get(dto.portTo);
-            CityType typeTo = GameData.cityTypes.get(dto.typeTo);
-            if(type==null || portFrom==null) return null;
-            if((typeTo == null && portTo == null) || (typeTo != null && portTo != null)) return null;
+            if(portFrom==null){
+                portFrom = currentDT.airportsToAdd.get(dto.portFrom);
+                if(portFrom==null) return null;
+            }
+            Airport portTo = null;
+            if(dto.portTo!=null) {
+                portTo = data.airports.get(dto.portTo);
+                if(portTo == null){
+                    portTo = currentDT.airportsToAdd.get(dto.portTo);
+                    if(portTo==null) return null;
+                }
+            }
+            CityType typeTo = null;
+            if(dto.typeTo!=null){
+                typeTo = GameData.cityTypes.get(dto.typeTo);
+            }
+
             return new Passenger(dto.id, type, portFrom, portTo, typeTo);
         }
         else if(o instanceof PlayerDTO){
@@ -278,7 +489,10 @@ public class DTOHandler {
             SetHolder<Airline> lines = new SetHolder<>();
             for(Integer lineid : dto.airlines){
                 Airline  line = data.airlines.get(lineid);
-                if(line == null) return null;
+                if(line == null){
+                    line = currentDT.airlinesToAdd.get(lineid);
+                    if(line == null) return null;
+                }
                 lines.add(line);
             }
             MapHolder<PlaneType, Integer> planes = new MapHolder<>();
@@ -292,6 +506,44 @@ public class DTOHandler {
         else if(o instanceof DataChangesDTO){
             if(data == null) return null;
             DataChangesDTO dto = (DataChangesDTO) o;
+            GameData.DataChanges dc = new GameData.DataChanges();
+
+            if(dto.playersToAdd != null) dc.playersToAdd = new SetHolder<>();
+            if(dto.playersToRemove != null) dc.playersToRemove = new SetHolder<>();
+            if(!parseAddRemoveDTO(dto.playersToAdd, dto.playersToRemove, dc.playersToAdd, dc.playersToRemove,
+                data.players, data, dc)) return null;
+            if(dto.airportsToAdd != null) dc.airportsToAdd = new SetHolder<>();
+            if(dto.airportsToRemove != null) dc.airportsToRemove = new SetHolder<>();
+            if(!parseAddRemoveDTO(dto.airportsToAdd, dto.airportsToRemove, dc.airportsToAdd, dc.airportsToRemove,
+                data.airports, data, dc)) return null;
+            if(dto.airlinesToAdd != null) dc.airlinesToAdd = new SetHolder<>();
+            if(dto.airlinesToRemove != null) dc.airlinesToRemove = new SetHolder<>();
+            if(!parseAddRemoveDTO(dto.airlinesToAdd, dto.airlinesToRemove, dc.airlinesToAdd, dc.airlinesToRemove,
+                data.airlines, data, dc)) return null;
+            if(dto.passengersToAdd != null) dc.passengersToAdd = new SetHolder<>();
+            if(dto.passengersToRemove != null) dc.passengersToRemove = new SetHolder<>();
+            if(!parseAddRemoveDTO(dto.passengersToAdd, dto.passengersToRemove, dc.passengersToAdd, dc.passengersToRemove,
+                data.passengers, data, dc)) return null;
+            if(dto.availableAirlinesToAdd != null) dc.availableAirlinesToAdd = new SetHolder<>();
+            if(dto.availableAirlinesToRemove != null) dc.availableAirlinesToRemove = new SetHolder<>();
+            if(!parseAvailableAirlines(dto.availableAirlinesToAdd, dto.availableAirlinesToRemove,
+                data,dc)) return null;
+
+            dc.currentState = dto.currentState;
+
+            Player pl = findInThree(dto.currentPlayer, dc.playersToAdd, dc.playersToRemove, data.players);
+            if(pl==null) return null;
+            dc.currentPlayer=pl;
+
+            if(dto.newWorldEvents!=null) dc.newWorldEvents=new SetHolder<>();
+            for(Integer id : dto.newWorldEvents){
+                WorldEventType tp = GameData.worldEventTypes.get(id);
+                if(tp == null) return null;
+                dc.newWorldEvents.add(tp);
+            }
+
+
+
             return null;
         }
         throw new IllegalArgumentException("Could not recreate an object from data transfer object: unknown class.");
