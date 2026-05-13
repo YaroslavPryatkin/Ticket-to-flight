@@ -2,7 +2,6 @@ package com.game.Ticket_To_Flight.network;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.EndPoint;
-import com.game.Ticket_To_Flight.backend.gameLogicEntities.Player;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;

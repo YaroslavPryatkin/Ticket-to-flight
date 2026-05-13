@@ -15,5 +15,7 @@ public class MainClient {
             PackageCreateWorldMap mapPacket = (PackageCreateWorldMap) packet;
             mainDrawer.drawWorldMap(mapPacket);
         }
+
+
     }
 }
