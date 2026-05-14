@@ -13,7 +13,7 @@ public class TicketToFlight extends Game {
         MainDrawer mainDrawer = new MainDrawer(this, gameClient.getMainClient());
         Server server = new Server();
 
-        gameClient.connect("127.0.0.1");
+        gameClient.connect("test");//server will be found automatically
         gameClient.sendWorldMapPacket();
     }
 }
