@@ -45,7 +45,7 @@ public class LowLevelHandler {
                     changesQueue.add(changes);
                 }
             } catch (Exception e) {
-                System.err.println("DTO paring error: " + e.getMessage());
+                System.err.println("DTO parsing error: " + e.getMessage());
                 e.printStackTrace();
             } finally {
                 gameData.releaseReadLock();
