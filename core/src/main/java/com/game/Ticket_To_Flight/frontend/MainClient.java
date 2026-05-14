@@ -1,7 +1,9 @@
 package com.game.Ticket_To_Flight.frontend;
 
+import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airport;
 import com.game.Ticket_To_Flight.packages.PackageCreateWorldMap;
 import com.game.Ticket_To_Flight.frontend.UI.MainDrawer;
+import com.game.Ticket_To_Flight.packages.PackageInitAirports;
 
 public class MainClient {
     private MainDrawer mainDrawer;
@@ -16,6 +18,9 @@ public class MainClient {
             mainDrawer.drawWorldMap(mapPacket);
         }
 
-
+        if (packet instanceof PackageInitAirports) {
+            PackageInitAirports newPacket = (PackageInitAirports) packet;
+            mainDrawer.drawAirports(newPacket);
+        }
     }
 }
