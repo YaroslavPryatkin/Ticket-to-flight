@@ -41,4 +41,16 @@ public class Passenger extends Identifiable {
         if(portTo != null ) return port == portTo;
         else return port.type.cityType == typeTo;
     }
+
+    public String getCityFrom() {
+        return portFrom.getCityName();
+    }
+
+    public String getCityTo() {
+        return portTo.getCityName();
+    }
+
+    public int getSize() {
+        return type.getSize();
+    }
 }

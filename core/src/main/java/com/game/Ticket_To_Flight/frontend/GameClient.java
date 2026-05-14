@@ -4,9 +4,12 @@ import com.badlogic.gdx.math.Vector2;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
+import com.game.Ticket_To_Flight.Utilities.ClosedInterval;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airport;
+import com.game.Ticket_To_Flight.backend.gameLogicEntities.Passenger;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.AirportType;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.CityType;
+import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.PassengerType;
 import com.game.Ticket_To_Flight.network.Network;
 import com.game.Ticket_To_Flight.packages.PackageCreateWorldMap;
 import com.game.Ticket_To_Flight.packages.PackageInitAirports;
@@ -79,26 +82,52 @@ public class GameClient {
         PackageCreateWorldMap mapPacket = new PackageCreateWorldMap("EuropeMap.png", 1920f, 1080f);
         mainClient.getPackage(mapPacket);
 
-        // ... где-то в методе инициализации для теста ...
+        CityType testCityType = null;
+        AirportType regionalType = new AirportType(1, 500.0, 2, testCityType, "Региональный");
+        AirportType internationalType = new AirportType(2, 1500.0, 5, testCityType, "Хаб");
 
-        CityType testCityType = null; // Если это класс, сделай new CityType(...), если enum — CityType.ТВОЕ_ЗНАЧЕНИЕ
+        PassengerType tourists = new PassengerType(
+            1,                               // <-- ВОТ ОН, пропущенный ID!
+            1.5,                             // solvency
+            3,                               // size (3 человека)
+            new ClosedInterval<>(1.0, 2.0),     // luxuryRange
+            new ClosedInterval<>(10.0, 50.0),   // yieldRange
+            new ClosedInterval<>(1, 10),        // capacityRange
+            new ClosedInterval<>(1, 5),         // stationsRange
+            "Туристы"                        // description
+        );
 
-        // 2. Создаем "Типы" аэропортов с ценами и гейтами
-        AirportType regionalType = new AirportType(1, 500.0, 2, testCityType, "Региональный аэропорт");
-        AirportType internationalType = new AirportType(2, 1500.0, 5, testCityType, "Международный хаб");
+        PassengerType business = new PassengerType(
+            2,
+            3.0, 1,
+            new ClosedInterval<>(2.0, 3.0), new ClosedInterval<>(50.0, 150.0),
+            new ClosedInterval<>(1, 5), new ClosedInterval<>(1, 3),
+            "Бизнесмены"
+        );
 
+        Airport krakow = new Airport(1, regionalType, new Vector2(1050f, 480f), "Krakow");
+        Airport naples = new Airport(2, regionalType, new Vector2(980f, 200f), "Naples");
+        Airport budapest = new Airport(3, internationalType, new Vector2(1120f, 420f), "Budapest");
+        Airport tbilisi = new Airport(4, internationalType, new Vector2(1800f, 250f), "Tbilisi");
+
+        Passenger group1 = new Passenger(tourists, krakow, naples, testCityType);
+        krakow.addPassengers(group1);
+
+        Passenger group2 = new Passenger(tourists, krakow, tbilisi, testCityType);
+        krakow.addPassengers(group2);
+
+        Passenger group3 = new Passenger(business, budapest, naples, testCityType);
+        budapest.addPassengers(group3);
+
+// 4. СОБИРАЕМ ВСЕ АЭРОПОРТЫ В СПИСОК ДЛЯ ПАКЕТА
         List<Airport> testAirports = new ArrayList<>();
+        testAirports.add(krakow);
+        testAirports.add(naples);
+        testAirports.add(budapest);
+        testAirports.add(tbilisi);
 
-        testAirports.add(new Airport(1, regionalType, new Vector2(1050f, 480f)));
-
-        testAirports.add(new Airport(2, regionalType, new Vector2(980f, 200f)));
-
-        testAirports.add(new Airport(3, internationalType, new Vector2(1120f, 420f)));
-
-        testAirports.add(new Airport(4, internationalType, new Vector2(1800f, 250f)));
-
+// 5. УПАКОВЫВАЕМ И ОТПРАВЛЯЕМ В РЕНДЕР
         PackageInitAirports airportPacket = new PackageInitAirports(testAirports);
-
         mainClient.getPackage(airportPacket);
     }
 

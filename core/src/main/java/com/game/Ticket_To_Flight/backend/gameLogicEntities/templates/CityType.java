@@ -9,4 +9,8 @@ public class CityType extends Identifiable {
         super(id);
         this.description = description;
     }
+
+    public String getCity() {
+        return description;
+    }
 }

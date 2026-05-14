@@ -15,4 +15,8 @@ public class AirportType extends Identifiable {
         this.cityType = cityTypeId;
         this.description = description;
     }
+
+    public String getCityType() {
+        return cityType.getCity();
+    }
 }

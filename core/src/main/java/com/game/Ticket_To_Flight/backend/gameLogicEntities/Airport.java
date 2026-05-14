@@ -5,15 +5,30 @@ import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.AirportType
 import com.game.Ticket_To_Flight.Utilities.Identifiable;
 import com.badlogic.gdx.graphics.Color;
 
+import java.util.ArrayList;
+
 public class Airport extends Identifiable {
     public final AirportType type;
     public final Vector2 position;
+    public final ArrayList<Passenger> passengers;
+    public final String airportName;
 
     public Airport(int id, AirportType type, Vector2 position) {
         super(id);
         if(type == null || position == null) throw new IllegalArgumentException("Null arguments in constructor.");
         this.type = type;
         this.position = position;
+        this.passengers = new ArrayList<>();
+        airportName = "";
+    }
+
+    public Airport(int id, AirportType type, Vector2 position, String AirportName) {
+        super(id);
+        if(type == null || position == null) throw new IllegalArgumentException("Null arguments in constructor.");
+        this.type = type;
+        this.position = position;
+        this.passengers = new ArrayList<>();
+        this.airportName = AirportName;
     }
 
     public Color getColor() {
@@ -38,6 +53,34 @@ public class Airport extends Identifiable {
 
     public Float getY() {
         return position.y;
+    }
+
+    public Float getRadius() {
+        if (this.type.id == 1) {
+            return 6f;
+        }
+        if (this.type.id == 2) {
+            return 9f;
+        }
+        if (this.type.id == 3) {
+            return 12f;
+        }
+        if (this.type.id == 4) {
+            return 15f;
+        }
+        return 6f;
+    }
+
+    public String getCityName() {
+        return airportName;
+    }
+
+    public ArrayList<Passenger> getGuests() {
+        return passengers;
+    }
+
+    public void addPassengers(Passenger group) {
+        passengers.add(group);
     }
 
 }

@@ -14,7 +14,16 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airport;
+import com.game.Ticket_To_Flight.backend.gameLogicEntities.Passenger;
 import com.game.Ticket_To_Flight.packages.PackageCreateWorldMap;
+import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.Window;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,13 +34,70 @@ public class WorldMapRenderer extends ScreenAdapter {
 
     private final Texture airportTexture;
     private List<Airport> airportsToDraw = new ArrayList<>();
-    private final float AIRPORT_RADIUS = 15f; // Радиус точки города в координатах карты
 
     private final OrthographicCamera camera;
     private final Viewport viewport;
     private final float WORLD_WIDTH;
     private final float WORLD_HEIGHT;
     private final Vector3 lastMousePos = new Vector3();
+    private Stage uiStage;
+    private Skin skin;
+    private Window currentTooltip;
+    private Airport selectedAirport;
+
+    private void createBasicSkin() {
+        skin = new Skin();
+        skin.add("default-font", new BitmapFont()); // Стандартный шрифт LibGDX
+
+        // Создаем темно-серый полупрозрачный фон для окна
+        Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
+        pixmap.setColor(new Color(0.2f, 0.2f, 0.2f, 0.8f));
+        pixmap.fill();
+        skin.add("background", new Texture(pixmap));
+        pixmap.dispose();
+
+        Window.WindowStyle windowStyle = new Window.WindowStyle();
+        windowStyle.titleFont = skin.getFont("default-font");
+        windowStyle.background = skin.getDrawable("background");
+        skin.add("default", windowStyle);
+
+        Label.LabelStyle labelStyle = new Label.LabelStyle();
+        labelStyle.font = skin.getFont("default-font");
+        labelStyle.fontColor = Color.WHITE;
+        skin.add("default", labelStyle);
+    }
+
+    private void showAirportTooltip(Airport airport) {
+        // Если уже было открыто окно - удаляем старое
+        if (currentTooltip != null) currentTooltip.remove();
+
+        selectedAirport = airport;
+
+        currentTooltip = new Window(airport.getCityName(), skin);
+        currentTooltip.pad(20); // Отступы от краев
+
+        Table table = new Table();
+        table.add(new Label("Route", skin)).padRight(10);
+        table.add(new Label("Group", skin));
+        table.row();
+
+        if (airport.getGuests() != null && !airport.getGuests().isEmpty()) {
+            for (Passenger group : airport.getGuests()) {
+                String routeText = group.getCityFrom() + " -> " + group.getCityTo();
+                String countText = group.getSize() + " people";
+
+                table.add(new Label(routeText, skin)).padRight(10);
+                table.add(new Label(countText, skin));
+                table.row();
+            }
+        } else {
+            table.add(new Label("No guests", skin)).colspan(2);
+        }
+
+        currentTooltip.add(table);
+        currentTooltip.pack();
+        uiStage.addActor(currentTooltip);
+    }
 
     public WorldMapRenderer(PackageCreateWorldMap packet) {
         this.batch = new SpriteBatch();
@@ -41,12 +107,17 @@ public class WorldMapRenderer extends ScreenAdapter {
         this.camera = new OrthographicCamera();
         this.viewport = new ExtendViewport(WORLD_WIDTH, WORLD_HEIGHT, camera);
 
-        int pixmapRadius = (int) AIRPORT_RADIUS;
-        Pixmap pixmap = new Pixmap(pixmapRadius * 2, pixmapRadius * 2, Pixmap.Format.RGBA8888);
+        int baseRadius = 32;
+        Pixmap pixmap = new Pixmap(baseRadius * 2, baseRadius * 2, Pixmap.Format.RGBA8888);
         pixmap.setColor(Color.WHITE);
-        pixmap.fillCircle(pixmapRadius, pixmapRadius, pixmapRadius);
+        pixmap.fillCircle(baseRadius, baseRadius, baseRadius);
         this.airportTexture = new Texture(pixmap);
+
+        this.airportTexture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         pixmap.dispose();
+
+        this.uiStage = new Stage(new ExtendViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
+        createBasicSkin();
 
         setupInput();
     }
@@ -73,9 +144,32 @@ public class WorldMapRenderer extends ScreenAdapter {
     }
 
     private void setupInput() {
+        InputMultiplexer multiplexer = new InputMultiplexer();
+        multiplexer.addProcessor(uiStage);
+
         Gdx.input.setInputProcessor(new InputAdapter() {
             @Override
             public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+                Vector3 worldClick = new Vector3(screenX, screenY, 0);
+                camera.unproject(worldClick);
+
+                boolean hitAirport = false;
+                for (Airport airport : airportsToDraw) {
+                    float distance = Vector2.dst(airport.getX(), airport.getY(), worldClick.x, worldClick.y);
+
+                    if (distance <= airport.getRadius()) {
+                        showAirportTooltip(airport);
+                        hitAirport = true;
+                        break;
+                    }
+                }
+
+                if (!hitAirport && currentTooltip != null) {
+                    currentTooltip.remove();
+                    currentTooltip = null;
+                    selectedAirport = null;
+                }
+
                 lastMousePos.set(screenX, screenY, 0);
                 return true;
             }
@@ -113,21 +207,32 @@ public class WorldMapRenderer extends ScreenAdapter {
 
         for (Airport airport : airportsToDraw) {
             batch.setColor(airport.getColor());
+            float currentRadius = airport.getRadius();
+            float diameter = currentRadius * 2f;
+            float drawX = airport.getX() - currentRadius;
+            float drawY = airport.getY() - currentRadius;
 
-            float drawX = airport.getX() - AIRPORT_RADIUS;
-            float drawY = airport.getY() - AIRPORT_RADIUS;
-
-            batch.draw(airportTexture, drawX, drawY, AIRPORT_RADIUS * 2, AIRPORT_RADIUS * 2);
+            batch.draw(airportTexture, drawX, drawY, diameter, diameter);
         }
 
         batch.setColor(Color.WHITE);
 
         batch.end();
+
+        if (currentTooltip != null && selectedAirport != null) {
+            Vector3 screenPos = new Vector3(selectedAirport.getX(), selectedAirport.getY(), 0);
+            camera.project(screenPos);
+            currentTooltip.setPosition(screenPos.x + 20, screenPos.y + 20);
+        }
+
+        uiStage.act(delta);
+        uiStage.draw();
     }
 
     @Override
     public void resize(int width, int height) {
         viewport.update(width, height, true);
+        uiStage.getViewport().update(width, height, true);
     }
 
     @Override
