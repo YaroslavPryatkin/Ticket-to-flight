@@ -40,4 +40,24 @@ public class Airline extends Identifiable {
         else if (end == portB) return portA;
         return null;
     }
+
+    public Player getPlayer() {
+        return player;
+    }
+
+    public double getPrice() {
+        return type.getPrice();
+    }
+
+    public String getName() {
+        return player.getName();
+    }
+
+    public Airport getPortA() {
+        return this.portA;
+    }
+
+    public Airport getPortB() {
+        return this.portB;
+    }
 }

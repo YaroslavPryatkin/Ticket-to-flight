@@ -5,13 +5,17 @@ import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.game.Ticket_To_Flight.Utilities.ClosedInterval;
+import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airline;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airport;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Passenger;
+import com.game.Ticket_To_Flight.backend.gameLogicEntities.Player;
+import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.AirlineType;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.AirportType;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.CityType;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.PassengerType;
 import com.game.Ticket_To_Flight.network.Network;
 import com.game.Ticket_To_Flight.packages.PackageCreateWorldMap;
+import com.game.Ticket_To_Flight.packages.PackageInitAirlines;
 import com.game.Ticket_To_Flight.packages.PackageInitAirports;
 
 import java.io.IOException;
@@ -82,29 +86,25 @@ public class GameClient {
         PackageCreateWorldMap mapPacket = new PackageCreateWorldMap("EuropeMap.png", 1920f, 1080f);
         mainClient.getPackage(mapPacket);
 
+        // --- 1. ТИПЫ АЭРОПОРТОВ И ГОРОДОВ ---
         CityType testCityType = null;
         AirportType regionalType = new AirportType(1, 500.0, 2, testCityType, "Региональный");
         AirportType internationalType = new AirportType(2, 1500.0, 5, testCityType, "Хаб");
 
+        // --- 2. ПАССАЖИРЫ ---
         PassengerType tourists = new PassengerType(
-            1,                               // <-- ВОТ ОН, пропущенный ID!
-            1.5,                             // solvency
-            3,                               // size (3 человека)
-            new ClosedInterval<>(1.0, 2.0),     // luxuryRange
-            new ClosedInterval<>(10.0, 50.0),   // yieldRange
-            new ClosedInterval<>(1, 10),        // capacityRange
-            new ClosedInterval<>(1, 5),         // stationsRange
-            "Туристы"                        // description
+            1, 1.5, 3,
+            new ClosedInterval<>(1.0, 2.0), new ClosedInterval<>(10.0, 50.0),
+            new ClosedInterval<>(1, 10), new ClosedInterval<>(1, 5), "Туристы"
         );
 
         PassengerType business = new PassengerType(
-            2,
-            3.0, 1,
+            2, 3.0, 1,
             new ClosedInterval<>(2.0, 3.0), new ClosedInterval<>(50.0, 150.0),
-            new ClosedInterval<>(1, 5), new ClosedInterval<>(1, 3),
-            "Бизнесмены"
+            new ClosedInterval<>(1, 5), new ClosedInterval<>(1, 3), "Бизнесмены"
         );
 
+        // --- 3. АЭРОПОРТЫ ---
         Airport krakow = new Airport(1, regionalType, new Vector2(1050f, 480f), "Krakow");
         Airport naples = new Airport(2, regionalType, new Vector2(980f, 200f), "Naples");
         Airport budapest = new Airport(3, internationalType, new Vector2(1120f, 420f), "Budapest");
@@ -112,23 +112,72 @@ public class GameClient {
 
         Passenger group1 = new Passenger(tourists, krakow, naples, testCityType);
         krakow.addPassengers(group1);
-
         Passenger group2 = new Passenger(tourists, krakow, tbilisi, testCityType);
         krakow.addPassengers(group2);
-
         Passenger group3 = new Passenger(business, budapest, naples, testCityType);
         budapest.addPassengers(group3);
 
-// 4. СОБИРАЕМ ВСЕ АЭРОПОРТЫ В СПИСОК ДЛЯ ПАКЕТА
+        // Отправляем аэропорты
         List<Airport> testAirports = new ArrayList<>();
         testAirports.add(krakow);
         testAirports.add(naples);
         testAirports.add(budapest);
         testAirports.add(tbilisi);
 
-// 5. УПАКОВЫВАЕМ И ОТПРАВЛЯЕМ В РЕНДЕР
         PackageInitAirports airportPacket = new PackageInitAirports(testAirports);
         mainClient.getPackage(airportPacket);
+
+        // ==========================================
+        // --- 4. НОВОЕ: ИГРОКИ И АВИАЛИНИИ ---
+        // ==========================================
+
+        // Создаем тестовых игроков (Я предполагаю, что у игрока есть пустой конструктор)
+        Player playerYaroslav = new Player();
+        playerYaroslav.name = "Yaroslav";
+        playerYaroslav.money = 2000.0; // Богатый игрок
+
+        Player player2 = new Player();
+        player2.name = "Player 2";
+        player2.money = 500.0;
+
+        // Создаем типы авиалиний
+        AirlineType cheapRoute = new AirlineType(
+            1, 15.0, 1, 1,
+            new ClosedInterval<>(1.0, 2.0), new ClosedInterval<>(50, 100),
+            300.0, "Бюджетный маршрут"
+        );
+
+        AirlineType expensiveRoute = new AirlineType(
+            2, 50.0, 2, 2,
+            new ClosedInterval<>(3.0, 5.0), new ClosedInterval<>(150, 300),
+            1200.0, "Элитный хаб-маршрут"
+        );
+
+        // Создаем сами линии (используем клиентский конструктор с ID)
+
+        // 1. Свободная авиалиния (Krakow -> Naples), никто не купил
+        Airline krakowNaples = new Airline(1, cheapRoute, krakow, naples, null);
+
+        // 2. Купленная авиалиния (Budapest -> Tbilisi), принадлежит Ярославу
+        Airline budapestTbilisi = new Airline(2, expensiveRoute, budapest, tbilisi, playerYaroslav);
+
+        // 3. Свободная дорогая авиалиния (Krakow -> Budapest), для теста нехватки денег
+        Airline krakowBudapest = new Airline(3, expensiveRoute, krakow, budapest, null);
+
+        // Добавляем линии в список
+        List<Airline> testAirlines = new ArrayList<>();
+        testAirlines.add(krakowNaples);
+        testAirlines.add(budapestTbilisi);
+        testAirlines.add(krakowBudapest);
+
+        // --- 5. ОТПРАВЛЯЕМ АВИАЛИНИИ В РЕНДЕР ---
+        // Если у тебя еще нет отдельного пакета для авиалиний (PackageInitAirlines),
+        // можешь временно передать их напрямую в рендерер через твой mainClient/mainDrawer:
+        // mainDrawer.updateAirlines(testAirlines);
+
+        // Но по-хорошему, нужно создать DTO-пакет:
+        PackageInitAirlines airlinePacket = new PackageInitAirlines(testAirlines);
+        mainClient.getPackage(airlinePacket);
     }
 
 

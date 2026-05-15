@@ -22,4 +22,8 @@ public class AirlineType extends Identifiable {
         this.price = price;
         this.description = description;
     }
+
+    public double getPrice() {
+        return price;
+    }
 }
