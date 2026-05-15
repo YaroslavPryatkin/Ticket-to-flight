@@ -18,8 +18,9 @@ public class Player extends Identifiable {
     /**
      * Should not be called anywhere except game data
      */
-    public Player(int id, double money, double income, MapHolder<PlaneType, Integer> planes, SetHolder<Airline> airlines){
+    public Player(int id, String name, double money, double income, MapHolder<PlaneType, Integer> planes, SetHolder<Airline> airlines){
         super(id);
+        this.name = name;
         this.money = money;
         this.income=income;
         this.planes = planes;

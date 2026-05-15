@@ -182,12 +182,14 @@ public class GameData {
     public static class PlayerDTO extends Identifiable{
         private static final AtomicInteger idGenerator = new AtomicInteger(0);
 
+        private final String name;
         private final double money;
         private final double income;
         private final Map<Integer, Integer> planes;
         private final Set<Integer> airlines;
         public PlayerDTO(Player player) {
             super(player.getId());
+            this.name = player.name;
             this.money = player.money;
             this.income = player.income;
             this.airlines = new HashSet<>();
@@ -198,8 +200,9 @@ public class GameData {
             this.planes.putAll(player.planes);
         }
 
-        public PlayerDTO(int id, double money, double income, MapHolder<PlaneType, Integer> planes, SetHolder<Airline> airlines){
+        public PlayerDTO(int id, String name, double money, double income, MapHolder<PlaneType, Integer> planes, SetHolder<Airline> airlines){
             super(id);
+            this.name = name;
             this.money = money;
             this.income=income;
             this.airlines = new HashSet<>();
@@ -214,8 +217,9 @@ public class GameData {
          * Should not be called anywhere except Low Level Handler
          * Creates player in default state
          */
-        public PlayerDTO(){
+        public PlayerDTO(String name){
             super( idGenerator.incrementAndGet());
+            this.name = name;
             money = 0;
             income = 0;
             planes = new HashMap<>();
@@ -236,7 +240,7 @@ public class GameData {
             catch(Exception e){
                 return null;
             }
-            return new Player(this.getId(), this.money, this.income, planes, lines);
+            return new Player(this.getId(), this.name, this.money, this.income, planes, lines);
         }
     }
 

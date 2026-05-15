@@ -114,52 +114,61 @@ public class Network {
         }
     }
 
-    public static class PlayerAirlineChoiceResponse{
+    public static class GameMessage{
+
+    }
+
+    public static class PlayerAirlineChoiceResponse extends GameMessage{
         public Set<Integer> airlines;
     }
 
-    public static class PlayerPlaneChoiceResponse{
+    public static class PlayerPlaneChoiceResponse extends GameMessage{
         public Set<Integer> planes;
     }
 
-    public static class PlayerInvestmentChoiceResponse{
+    public static class PlayerInvestmentChoiceResponse extends GameMessage{
         public Integer amountOfShares;
     }
 
-    public static class PlayerAbilityChoiceResponse{
+    public static class PlayerAbilityChoiceResponse extends GameMessage{
         public Integer ability;
     }
 
-    public static class PlayerWorldEventChoiceResponse{
+    public static class PlayerWorldEventChoiceResponse extends GameMessage{
         public Integer worldEvent;
     }
 
-    public static class PlayerRouteChoiceResponse{
+    public static class PlayerRouteChoiceResponse extends GameMessage{
         //no route class yet
     }
 
-    public static class DataChangesMessage{
+    public static class DataChangesMessage extends GameMessage{
         public GameData.DataChanges dc;
+        public DataChangesMessage(GameData.DataChanges dc) { this.dc = dc;}
     }
 
-    public static class ReloadGameDataRequest{
+    public static class ReloadGameDataRequest extends GameMessage{
 
     }
 
-    public static class ReloadGameDataResponse{
+    public static class ReloadGameDataResponse extends GameMessage{
         public GameData.DataChanges dc;
+        public ReloadGameDataResponse(GameData.DataChanges dc) { this.dc = dc;}
     }
 
-    public static class JoinGameRequest {
+    public static class JoinGameRequest extends GameMessage{
         public String playerName;
+        public JoinGameRequest(String name) { this.playerName = name;}
     }
 
-    public static class JoinGameResponse {
+    public static class JoinGameResponse extends GameMessage{
         public enum Response {
             SUCCESS,
             NAME_ALREADY_EXISTS,
             BADNAME
         }
         public Response response;
+        public Integer id;
+        public JoinGameResponse(Response response, Integer id){this.response = response; this.id = id;}
     }
 }

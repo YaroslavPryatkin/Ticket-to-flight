@@ -3,14 +3,17 @@ package com.game.Ticket_To_Flight.backend.server;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
+import com.game.Ticket_To_Flight.commonFrontAndBack.LowLevelHandler;
 import com.game.Ticket_To_Flight.network.Network;
 
 import java.io.IOException;
 
 public class GameServer {
     private final Server server;
+    private final LowLevelHandler llh;
 
-    public GameServer() {
+    public GameServer(LowLevelHandler llh) {
+        this.llh = llh;
         server = new Server();
 
         Network.register(server);
@@ -18,12 +21,12 @@ public class GameServer {
         server.addListener(new Listener() {
             @Override
             public void connected(Connection connection) {
-                System.out.println("The new client connected: " + connection.getRemoteAddressTCP());
+                llh.handleNewConnection(connection);
             }
 
             @Override
             public void received(Connection connection, Object object) {
-
+                llh.receiveMessage(connection, object);
             }
         });
     }

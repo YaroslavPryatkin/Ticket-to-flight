@@ -1,12 +1,15 @@
 package com.game.Ticket_To_Flight.frontend;
 
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airport;
+import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
 import com.game.Ticket_To_Flight.packages.PackageCreateWorldMap;
 import com.game.Ticket_To_Flight.frontend.UI.MainDrawer;
 import com.game.Ticket_To_Flight.packages.PackageInitAirports;
 
 public class MainClient {
     private MainDrawer mainDrawer;
+    private final GameData gameData = new GameData();
+    private final LowLevelHandlerFront llh = new LowLevelHandlerFront(gameData);
 
     public void setMainDrawer(MainDrawer mainDrawer) {
         this.mainDrawer = mainDrawer;

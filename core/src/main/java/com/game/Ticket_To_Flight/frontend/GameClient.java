@@ -9,6 +9,7 @@ import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airport;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.AirportType;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.CityType;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.PassengerType;
+import com.game.Ticket_To_Flight.commonFrontAndBack.LowLevelHandler;
 import com.game.Ticket_To_Flight.network.Network;
 import com.game.Ticket_To_Flight.packages.PackageCreateWorldMap;
 import com.game.Ticket_To_Flight.packages.PackageInitAirports;
@@ -22,17 +23,21 @@ import java.util.List;
 
 public class GameClient {
     private final Client client;
-    private final MainClient mainClient;
+    private final LowLevelHandler llh;
 
-    public GameClient() {
+    public GameClient(LowLevelHandler llh) {
+        this.llh = llh;
         client = new Client();
-        mainClient = new MainClient();
         Network.register(client);
 
         client.addListener(new Listener() {
             @Override
+            public void connected(Connection connection){
+                llh.handleNewConnection(connection);
+            }
+            @Override
             public void received(Connection connection, Object object) {
-
+                llh.receiveMessage(connection, object);
             }
         });
         client.start();
@@ -72,9 +77,6 @@ public class GameClient {
         }
     }
 
-    public MainClient getMainClient() {
-        return mainClient;
-    }
 
     // temporary function
     /*public void sendWorldMapPacket() {
