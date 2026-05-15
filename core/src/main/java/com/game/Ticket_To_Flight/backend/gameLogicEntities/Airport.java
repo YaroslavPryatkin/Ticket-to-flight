@@ -8,6 +8,9 @@ import com.badlogic.gdx.graphics.Color;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.PassengerType;
 import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
 
+import java.util.Map;
+import java.util.Set;
+
 public class Airport extends Identifiable {
     public final AirportType type;
     public final Vector2 position;
@@ -68,6 +71,10 @@ public class Airport extends Identifiable {
 
     public String getCityName() {
         return airportName;
+    }
+
+    public MapHolder<PassengerType, Integer> getGuests() {
+        return this.passengers;
     }
 
 }

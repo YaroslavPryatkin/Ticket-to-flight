@@ -1,5 +1,6 @@
 package com.game.Ticket_To_Flight.commonFrontAndBack;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.game.Ticket_To_Flight.Utilities.SetHolder;
 import com.game.Ticket_To_Flight.Utilities.Identifiable;
@@ -187,6 +188,8 @@ public class GameData {
         private final double income;
         private final Map<Integer, Integer> planes;
         private final Set<Integer> airlines;
+        private Color color;
+
         public PlayerDTO(Player player) {
             super(player.getId());
             this.name = player.name;
@@ -240,7 +243,7 @@ public class GameData {
             catch(Exception e){
                 return null;
             }
-            return new Player(this.getId(), this.name, this.money, this.income, planes, lines);
+            return new Player(this.getId(), this.money, this.income, planes, lines, this.name, this.color);
         }
     }
 

@@ -11,7 +11,7 @@ public class TicketToFlight extends Game {
         MainClient cl = new MainClient();
         MainDrawer mainDrawer = new MainDrawer(this, cl);
         cl.setMainDrawer(mainDrawer);
-
+        cl.sendWorldMapPacket();
 
     }
 }
