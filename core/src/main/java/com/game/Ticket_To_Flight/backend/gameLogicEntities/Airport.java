@@ -6,28 +6,19 @@ import com.game.Ticket_To_Flight.Utilities.Identifiable;
 import com.badlogic.gdx.graphics.Color;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Airport extends Identifiable {
     public final AirportType type;
     public final Vector2 position;
-    public final ArrayList<Passenger> passengers;
+    public final List<Passenger> passengers = new ArrayList<>();
     public final String airportName;
-
-    public Airport(int id, AirportType type, Vector2 position) {
-        super(id);
-        if(type == null || position == null) throw new IllegalArgumentException("Null arguments in constructor.");
-        this.type = type;
-        this.position = position;
-        this.passengers = new ArrayList<>();
-        airportName = "";
-    }
 
     public Airport(int id, AirportType type, Vector2 position, String AirportName) {
         super(id);
         if(type == null || position == null) throw new IllegalArgumentException("Null arguments in constructor.");
         this.type = type;
         this.position = position;
-        this.passengers = new ArrayList<>();
         this.airportName = AirportName;
     }
 
@@ -75,7 +66,7 @@ public class Airport extends Identifiable {
         return airportName;
     }
 
-    public ArrayList<Passenger> getGuests() {
+    public List<Passenger> getGuests() {
         return passengers;
     }
 

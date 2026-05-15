@@ -4,15 +4,17 @@ import com.game.Ticket_To_Flight.Utilities.SetHolder;
 import com.game.Ticket_To_Flight.Utilities.MapHolder;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.PlaneType;
 import com.game.Ticket_To_Flight.Utilities.Identifiable;
+import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Player extends Identifiable {
     private static final AtomicInteger idGenerator = new AtomicInteger(0);
 
+    public String name;
     public double money=0;
     public double income=0;
-    public MapHolder<PlaneType, Integer> planes = new MapHolder<>();
+    public MapHolder<PlaneType, Integer> planes = new MapHolder<>(GameData.planeTypes);
     public SetHolder<Airline> airlines = new SetHolder<>();
 
     //for server

@@ -16,6 +16,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class DTOHandler {
+    /*
     public static class AirlineDTO extends Identifiable {
         public final int type;
         public final int portA;
@@ -66,10 +67,6 @@ public class DTOHandler {
             this.income = income;
             this.planes = planes;
             this.airlines = airlines;
-        }
-        @Override
-        public int hashCode(){
-            return id;
         }
     }
     public static class DataChangesDTO extends Identifiable{
@@ -138,11 +135,7 @@ public class DTOHandler {
         }
     }
 
-    /**
-     *Transforms an object to data transfer object
-     * @param o - object to transform
-     * @return DTO version of object o
-     */
+
     public static Object toDTO(Object o){
         if(o==null) return null;
         if(o instanceof Airline){
@@ -263,12 +256,6 @@ public class DTOHandler {
         throw new IllegalArgumentException("Could not create data transfer object: unknown class");
     }
 
-    /**
-     * Restores an object, using entities from local GameData. Does no preserve object to transform
-     * @param o - object to transform
-     * @param data - local GameData. Is required for all types of o except Airport. Airport uses only static tables
-     * @return non-DTO version of object o
-     */
     public static Object fromDTO(Object o, GameData data){
         return fromDTO(o,data,null);
     }
@@ -495,7 +482,7 @@ public class DTOHandler {
                 }
                 lines.add(line);
             }
-            MapHolder<PlaneType, Integer> planes = new MapHolder<>();
+            MapHolder<PlaneType, Integer> planes = new MapHolder<>(GameData.planeTypes);
             for(Map.Entry<Integer, Integer> entry : dto.planes.entrySet()){
                 PlaneType plane = GameData.planeTypes.get(entry.getKey());
                 if(plane == null) return null;
@@ -548,4 +535,6 @@ public class DTOHandler {
         }
         throw new IllegalArgumentException("Could not recreate an object from data transfer object: unknown class.");
     }
+    */
 }
+

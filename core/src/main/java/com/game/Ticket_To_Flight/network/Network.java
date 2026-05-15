@@ -2,6 +2,7 @@ package com.game.Ticket_To_Flight.network;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.EndPoint;
+import com.game.Ticket_To_Flight.commonFrontAndBack.DTOHandler;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -38,10 +39,7 @@ public class Network {
 
     //root classes to register. Also, should be classes in <> because of type erase
     private static final Class[] ROOT_CLASSES = {
-        GameStateRequest.class,
-        GameStateResponse.class,
-        PlayerStateRequest.class,
-        PlayerStateResponse.class,
+
         JoinGameRequest.class,
         JoinGameResponse.class,
         Arrays.asList().getClass(),
@@ -115,22 +113,40 @@ public class Network {
         }
     }
 
-
-
-    public static class GameStateRequest {
-        public String playerName;
+    public static class PlayerAirlineChoiceResponse{
+        public Set<Integer> airlines;
     }
 
-    public static class GameStateResponse {
+    public static class PlayerPlaneChoiceResponse{
+        public Set<Integer> planes;
+    }
+
+    public static class PlayerInvestmentChoiceResponse{
+        public Integer shares;
+    }
+
+    public static class PlayerAbilityChoiceResponse{
+        public Integer ability;
+    }
+
+    public static class PlayerWorldEventChoiceResponse{
+        public Integer worldEvent;
+    }
+
+    public static class PlayerRouteChoiceResponse{
+        public Integer worldEvent;
+    }
+
+    public static class DataChangesMessage{
+        //public DTOHandler.DataChangesDTO dcDTO;
+    }
+
+    public static class ReloadGameDataRequest{
 
     }
 
-    public static class PlayerStateRequest {
-        public String playerName;
-    }
-
-    public static class PlayerStateResponse {
-
+    public static class ReloadGameDataResponse{
+        //public DTOHandler.DataChangesDTO dcDTO;
     }
 
     public static class JoinGameRequest {
