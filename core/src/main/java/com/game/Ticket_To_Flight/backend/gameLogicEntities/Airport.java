@@ -1,25 +1,29 @@
 package com.game.Ticket_To_Flight.backend.gameLogicEntities;
 
 import com.badlogic.gdx.math.Vector2;
+import com.game.Ticket_To_Flight.Utilities.MapHolder;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.AirportType;
 import com.game.Ticket_To_Flight.Utilities.Identifiable;
 import com.badlogic.gdx.graphics.Color;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.PassengerType;
+import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
 
 public class Airport extends Identifiable {
     public final AirportType type;
     public final Vector2 position;
-    public final List<Passenger> passengers = new ArrayList<>();
+    public final MapHolder<PassengerType, Integer> passengers;
     public final String airportName;
 
+    /**
+     * Should not be called anywhere except game data
+     */
     public Airport(int id, AirportType type, Vector2 position, String AirportName) {
         super(id);
         if(type == null || position == null) throw new IllegalArgumentException("Null arguments in constructor.");
         this.type = type;
         this.position = position;
         this.airportName = AirportName;
+        this.passengers = new MapHolder<>(GameData.passengerTypes);
     }
 
     public Color getColor() {
@@ -64,14 +68,6 @@ public class Airport extends Identifiable {
 
     public String getCityName() {
         return airportName;
-    }
-
-    public List<Passenger> getGuests() {
-        return passengers;
-    }
-
-    public void addPassengers(Passenger group) {
-        passengers.add(group);
     }
 
 }

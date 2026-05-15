@@ -6,7 +6,6 @@ import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.game.Ticket_To_Flight.Utilities.ClosedInterval;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airport;
-import com.game.Ticket_To_Flight.backend.gameLogicEntities.Passenger;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.AirportType;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.CityType;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.PassengerType;
@@ -78,7 +77,7 @@ public class GameClient {
     }
 
     // temporary function
-    public void sendWorldMapPacket() {
+    /*public void sendWorldMapPacket() {
         PackageCreateWorldMap mapPacket = new PackageCreateWorldMap("EuropeMap.png", 1920f, 1080f);
         mainClient.getPackage(mapPacket);
 
@@ -130,6 +129,6 @@ public class GameClient {
         PackageInitAirports airportPacket = new PackageInitAirports(testAirports);
         mainClient.getPackage(airportPacket);
     }
-
+*/
 
 }

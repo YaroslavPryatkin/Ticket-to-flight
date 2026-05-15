@@ -12,21 +12,153 @@ public class MapHolder<K extends Identifiable, V> implements Map<Integer, V> {
     private final Int2ObjectOpenHashMap<V> storage = new Int2ObjectOpenHashMap<>();
     private final SetHolder<K> keyHolder;
 
-    public MapHolder(SetHolder<K> keyHolder){
-        if(keyHolder == null) throw new NullPointerException();
+    public MapHolder(SetHolder<K> keyHolder) {
+        if (keyHolder == null) throw new NullPointerException();
         this.keyHolder = keyHolder;
-    };
+    }
 
-    public MapHolder(SetHolder<K> keyHolder, Map<? extends K,? extends V> other){
-        if(keyHolder == null) throw new NullPointerException();
+
+
+    public MapHolder(SetHolder<K> keyHolder, Map<? extends K, ? extends V> other) {
+        if (keyHolder == null) throw new NullPointerException();
         this.keyHolder = keyHolder;
-        if(other != null) {
+        if (other != null) {
             this.putAllIdentifiable(other);
         }
     }
 
-    // --- Change elemets functions ---
+    // --- specific methods for multi sets
 
+    /**
+     * Returns a lazy, immutable {@link List} view of the elements contained in the holder.
+     * @param <K>    the type of identifiable elements
+     * @param holder the MapHolder containing the storage and key references
+     * @return a read-only list view that performs index-based lookups in O(log M) time
+     * @throws NullPointerException if the provided holder is null
+     */
+    public static <K extends Identifiable> List<K> viewAsList(MapHolder<K, Integer> holder) {
+        NavigableMap<Integer, Integer> indexMap = new TreeMap<>();
+        int totalSize = 0;
+
+        for (var entry : holder.storage.entrySet()) {
+            if (entry.getValue() > 0) {
+                indexMap.put(totalSize, entry.getKey());
+                totalSize += entry.getValue();
+            }
+        }
+
+        final int finalSize = totalSize;
+
+        return new AbstractList<K>() {
+            @Override
+            public K get(int index) {
+                if (index < 0 || index >= finalSize) {
+                    throw new IndexOutOfBoundsException();
+                }
+                Integer startOffset = indexMap.floorKey(index);
+                Integer storageKey = indexMap.get(startOffset);
+                return holder.keyHolder.get(storageKey);
+            }
+
+            @Override
+            public int size() {
+                return finalSize;
+            }
+        };
+    }
+
+    /**
+     * Returns a memory-efficient iterator over the elements in the holder.
+     * <p>
+     * This iterator is lazy and does not materialise the full list in memory.
+     * <b>Note:</b> This implementation departs from the standard Iterator contract:
+     * next() returns {@code null} instead of throwing {@link NoSuchElementException}
+     * when the iteration is complete, allowing for a single-call check in hot loops.
+     * </p>
+     *
+     * @param <K>    the type of identifiable elements
+     * @param holder the MapHolder containing data
+     * @return an iterator that returns elements or {@code null} when exhausted
+     */
+    public static <K extends Identifiable> Iterator<K> viewAsListIterator(MapHolder<K, Integer> holder) {
+        return new Iterator<K>() {
+            private final Iterator<Map.Entry<Integer, Integer>> entryIterator =
+                holder.storage.entrySet().iterator();
+
+            private K currentItem = null;
+            private int remaining = 0;
+
+            @Override
+            public boolean hasNext() {
+                // Ищем следующий доступный элемент, если текущий исчерпан
+                while (remaining <= 0 && entryIterator.hasNext()) {
+                    Map.Entry<Integer, Integer> entry = entryIterator.next();
+                    Integer count = entry.getValue();
+
+                    if (count != null && count > 0) {
+                        K item = holder.keyHolder.get(entry.getKey());
+                        if (item != null) {
+                            currentItem = item;
+                            remaining = count;
+                        }
+                    }
+                }
+                return remaining > 0;
+            }
+
+            @Override
+            public K next() {
+                if (!hasNext()) {
+                    return null;
+                }
+                remaining--;
+                return currentItem;
+            }
+        };
+    }
+
+    /**
+     * Returns a lazy iterator over entries (Item -> Count).
+     * <b>Note:</b> next() returns null when exhausted to allow single-check iteration.
+     */
+    public static <K extends Identifiable> Iterator<Entry<K, Integer>> viewAsEntrySet(MapHolder<K, Integer> holder) {
+        final Iterator<Map.Entry<Integer, Integer>> storageIterator = holder.storage.entrySet().iterator();
+
+        return new Iterator<Entry<K, Integer>>() {
+            private Entry<K, Integer> cachedNext = null;
+
+            @Override
+            public boolean hasNext() {
+                if (cachedNext != null) return true;
+
+                while (storageIterator.hasNext()) {
+                    Map.Entry<Integer, Integer> storageEntry = storageIterator.next();
+                    Integer count = storageEntry.getValue();
+
+                    if (count != null && count > 0) {
+                        K item = holder.keyHolder.get(storageEntry.getKey());
+                        if (item != null) {
+                            cachedNext = new AbstractMap.SimpleImmutableEntry<>(item, count);
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }
+
+            @Override
+            public Entry<K, Integer> next() {
+                if (!hasNext()) {
+                    return null;
+                }
+                Entry<K, Integer> result = cachedNext;
+                cachedNext = null;
+                return result;
+            }
+        };
+    }
+    // --- Change elemets functions ---
+    {
     /**
      * Applies the replaceFunction to elements that exist in both storage and the provided params map.
      * If replaceFunction returns null, the element is removed from storage.
@@ -50,12 +182,12 @@ public class MapHolder<K extends Identifiable, V> implements Map<Integer, V> {
 //        }
 //        return this;
 //    }
-
+}
     /**
      * Applies the replaceFunction to elements that exist in both storage and the provided params map.
      * If replaceFunction returns null, the element is removed from storage.
      */
-    public MapHolder<K,V> changeElements(Map<Integer, V> params, BiFunction<V, V, V> replaceFunction) {
+    public MapHolder<K, V> changeElements(Map<Integer, V> params, BiFunction<V, V, V> replaceFunction) {
         if (params == null) return this;
 
         for (Map.Entry<Integer, V> entry : params.entrySet()) {
@@ -74,7 +206,7 @@ public class MapHolder<K extends Identifiable, V> implements Map<Integer, V> {
         }
         return this;
     }
-
+    {
     /**
      * Applies the replaceFunction to all keys found in the parameters, if they exist in storage.
      * Updates the storage with the newly returned value.
@@ -100,6 +232,7 @@ public class MapHolder<K extends Identifiable, V> implements Map<Integer, V> {
 //        return this;
 //    }
 
+}
     /**
      * Applies the replaceFunction to all keys found in the parameters, if they exist in storage.
      * Updates the storage with the newly returned value.
@@ -471,7 +604,7 @@ public class MapHolder<K extends Identifiable, V> implements Map<Integer, V> {
 
 
 
-
+    {
 
 //    public MapHolder<K, V> merge(Map<K, V> extra) {
 //        if (extra == null) return this;
@@ -572,6 +705,7 @@ public class MapHolder<K extends Identifiable, V> implements Map<Integer, V> {
 //        }
 //        return paramValues;
 //    }
+}
 
     private Set<Integer> collectAllKeysInteger(List<? extends Map<Integer, V>> params) {
         Set<Integer> allKeys = new HashSet<>();

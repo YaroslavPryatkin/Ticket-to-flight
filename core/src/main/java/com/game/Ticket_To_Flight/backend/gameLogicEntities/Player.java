@@ -9,22 +9,15 @@ import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Player extends Identifiable {
-    private static final AtomicInteger idGenerator = new AtomicInteger(0);
-
     public String name;
-    public double money=0;
-    public double income=0;
-    public MapHolder<PlaneType, Integer> planes = new MapHolder<>(GameData.planeTypes);
-    public SetHolder<Airline> airlines = new SetHolder<>();
+    public double money;
+    public double income;
+    public MapHolder<PlaneType, Integer> planes;
+    public SetHolder<Airline> airlines;
 
-    //for server
-    public Player() {
-        super( idGenerator.incrementAndGet());
-    }
-    //for server
-    public Player(int id) {super(id);}
-
-    //for client
+    /**
+     * Should not be called anywhere except game data
+     */
     public Player(int id, double money, double income, MapHolder<PlaneType, Integer> planes, SetHolder<Airline> airlines){
         super(id);
         this.money = money;

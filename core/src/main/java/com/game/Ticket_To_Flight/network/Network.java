@@ -3,6 +3,7 @@ package com.game.Ticket_To_Flight.network;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.EndPoint;
 import com.game.Ticket_To_Flight.commonFrontAndBack.DTOHandler;
+import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -122,7 +123,7 @@ public class Network {
     }
 
     public static class PlayerInvestmentChoiceResponse{
-        public Integer shares;
+        public Integer amountOfShares;
     }
 
     public static class PlayerAbilityChoiceResponse{
@@ -134,11 +135,11 @@ public class Network {
     }
 
     public static class PlayerRouteChoiceResponse{
-        public Integer worldEvent;
+        //no route class yet
     }
 
     public static class DataChangesMessage{
-        //public DTOHandler.DataChangesDTO dcDTO;
+        public GameData.DataChanges dc;
     }
 
     public static class ReloadGameDataRequest{
@@ -146,7 +147,7 @@ public class Network {
     }
 
     public static class ReloadGameDataResponse{
-        //public DTOHandler.DataChangesDTO dcDTO;
+        public GameData.DataChanges dc;
     }
 
     public static class JoinGameRequest {

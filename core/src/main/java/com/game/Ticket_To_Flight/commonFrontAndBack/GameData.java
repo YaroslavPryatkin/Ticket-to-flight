@@ -1,12 +1,12 @@
 package com.game.Ticket_To_Flight.commonFrontAndBack;
 
+import com.badlogic.gdx.math.Vector2;
 import com.game.Ticket_To_Flight.Utilities.SetHolder;
 import com.game.Ticket_To_Flight.Utilities.Identifiable;
 import com.game.Ticket_To_Flight.Utilities.MapHolder;
 import com.game.Ticket_To_Flight.Utilities.TemporarySetHolder;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airline;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airport;
-import com.game.Ticket_To_Flight.backend.gameLogicEntities.Passenger;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Player;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.*;
 
@@ -61,26 +61,194 @@ public class GameData {
     public SetHolder<WorldEventType> worldEvents = new SetHolder<>();
     public SetHolder<Airport> airports = new SetHolder<>();
     public SetHolder<Airline> airlines = new SetHolder<>();
-    public SetHolder<Passenger> passengers = new SetHolder<>();
     public SetHolder<Player> players = new SetHolder<>();
     public SetHolder<Airline> availableAirlines = new SetHolder<>();
     public MapHolder<PlaneType, Integer> availablePlanes = new MapHolder<>(GameData.planeTypes);
     public MapHolder<Player, Integer> actionPoints = new MapHolder<>(players);
 
-    public static class DataChanges extends Identifiable {
 
+    public static class AirlineDTO extends Identifiable {
+        private static final AtomicInteger idGenerator = new AtomicInteger(0);
+        private final int type;
+        private final int portA;
+        private final int portB;
+        private final Integer player;
 
+        public AirlineDTO(Airline line){
+            super(line.getId());
+            this.type = line.type.getId();
+            this.portA = line.portA.getId();
+            this.portB = line.portB.getId();
+            if(line.player!=null){
+                this.player=line.player.getId();
+            }
+            else {
+                this.player=null;
+            }
+        }
 
+        /**
+         * Should not be called anywhere except Low Level Handler
+         */
+        public AirlineDTO(AirlineType type, Airport portA, Airport portB) {
+            super(idGenerator.incrementAndGet());
+            this.type = type.getId();
+            this.portA = portA.getId();
+            this.portB = portB.getId();
+            this.player = null;
+        }
+
+        /**
+         * Should not be called anywhere except Low Level Handler
+         * UNSAFE
+         */
+        public AirlineDTO(Integer type, Integer portA, Integer portB) {
+            super(idGenerator.incrementAndGet());
+            this.type = type;
+            this.portA = portA;
+            this.portB = portB;
+            this.player = null;
+        }
+
+        public Airline restore(SetHolder<Airport> lookUpAirports, SetHolder<Player> lookUpPlayers){
+            AirlineType type = GameData.airlineTypes.get(this.type);
+            Airport portA = lookUpAirports.get(this.portA);
+            Airport portB = lookUpAirports.get(this.portB);
+            if(type == null || portA == null || portB == null) return null;
+
+            if(this.player==null)
+                return new Airline(this.getId(), type, portA, portB, null);
+
+            Player player = lookUpPlayers.get(this.player);
+            if(player == null) return null;
+
+            return new Airline(this.getId(), type, portA, portB, player);
+        }
+    }
+    public static class AirportDTO extends Identifiable{
+        private final Integer type;
+        private final Vector2 position;
+        private final Map<Integer, Integer> passengers;
+        private final String name;
+        public AirportDTO(Airport port) {
+            super(port.getId());
+            this.type = port.type.getId();
+            this.position = port.position;
+            this.passengers=new HashMap<>();
+            for(Map.Entry<Integer,Integer> psg : port.passengers.entrySet()){
+                this.passengers.put(psg.getKey(), psg.getValue());
+            }
+            this.name = port.airportName;
+        }
+
+        /**
+         * Should not be called anywhere except Low Level Handler
+         */
+        public AirportDTO(int id, AirportType type, Vector2 position, String AirportName) {
+            super(id);
+            if(type == null || position == null) throw new IllegalArgumentException("Null arguments in constructor.");
+            this.type = type.getId();
+            this.position = position;
+            this.name = AirportName;
+            this.passengers = new MapHolder<>(GameData.passengerTypes);
+        }
+
+        /**
+         * Should not be called anywhere except Low Level Handler
+         * UNSAFE
+         */
+        public AirportDTO(int id, Integer type, Vector2 position, String AirportName) {
+            super(id);
+            if(type == null || position == null) throw new IllegalArgumentException("Null arguments in constructor.");
+            this.type = type;
+            this.position = position;
+            this.name = AirportName;
+            this.passengers = new MapHolder<>(GameData.passengerTypes);
+        }
+
+        public Airport restore(){
+            AirportType type = GameData.airportTypes.get(this.type);
+            if(type == null) return null;
+            MapHolder<PassengerType, Integer> passengers = new MapHolder<>(GameData.passengerTypes);
+            try {
+                passengers.putAll(this.passengers);
+            }
+            catch(Exception e){
+                return null;
+            }
+            return new Airport(this.getId(), type, this.position, this.name);
+        }
+    }
+    public static class PlayerDTO extends Identifiable{
         private static final AtomicInteger idGenerator = new AtomicInteger(0);
 
-        public  Set<Player> playersToAdd = null;
+        private final double money;
+        private final double income;
+        private final Map<Integer, Integer> planes;
+        private final Set<Integer> airlines;
+        public PlayerDTO(Player player) {
+            super(player.getId());
+            this.money = player.money;
+            this.income = player.income;
+            this.airlines = new HashSet<>();
+            for(Airline line : player.airlines){
+                this.airlines.add(line.getId());
+            }
+            this.planes = new HashMap<>();
+            this.planes.putAll(player.planes);
+        }
+
+        public PlayerDTO(int id, double money, double income, MapHolder<PlaneType, Integer> planes, SetHolder<Airline> airlines){
+            super(id);
+            this.money = money;
+            this.income=income;
+            this.airlines = new HashSet<>();
+            for(Airline line : airlines){
+                this.airlines.add(line.getId());
+            }
+            this.planes = new HashMap<>();
+            this.planes.putAll(planes);
+        }
+
+        /**
+         * Should not be called anywhere except Low Level Handler
+         * Creates player in default state
+         */
+        public PlayerDTO(){
+            super( idGenerator.incrementAndGet());
+            money = 0;
+            income = 0;
+            planes = new HashMap<>();
+            airlines = new HashSet<>();
+        }
+
+        public Player restore(SetHolder<Airline> lookUpAirlines){
+            SetHolder<Airline> lines = new SetHolder<>();
+            for(Integer id : this.airlines ){
+                Airline line = lookUpAirlines.get(id);
+                if(line == null) return null;
+                lines.add(line);
+            }
+            MapHolder<PlaneType, Integer> planes = new MapHolder<>(GameData.planeTypes);
+            try {
+                planes.putAll(this.planes);
+            }
+            catch(Exception e){
+                return null;
+            }
+            return new Player(this.getId(), this.money, this.income, planes, lines);
+        }
+    }
+
+    public static class DataChanges extends Identifiable {
+        private static final AtomicInteger idGenerator = new AtomicInteger(0);
+
+        public  Set<PlayerDTO> playersToAdd = null;
         public  Set<Integer> playersToRemove= null;
-        public  Set<Airport> airportsToAdd= null;
+        public  Set<AirportDTO> airportsToAdd= null;
         public  Set<Integer> airportsToRemove= null;
-        public  Set<Airline> airlinesToAdd= null;
+        public  Set<AirlineDTO> airlinesToAdd= null;
         public  Set<Integer> airlinesToRemove= null;
-        public  Set<Passenger> passengersToAdd= null;
-        public  Set<Integer> passengersToRemove= null;
         public  Set<Integer> availableAirlinesToAdd= null;
         public  Set<Integer> availableAirlinesToRemove= null;
 
@@ -92,6 +260,9 @@ public class GameData {
 
         public  Map<Integer, Integer> availablePlanesToRemove= null;
         public  Map<Integer, Integer> availablePlanesToAdd= null;
+        public  Map<Integer, Map<Integer, Integer>> airportPassengersToAdd= null;
+        public  Map<Integer, Map<Integer, Integer>> airportPassengersToRemove= null;
+
 
         public  Map<Integer, Double> playerMoneyChange= null;
         public  Map<Integer, Double> playerIncomeChange= null;
@@ -124,9 +295,16 @@ public class GameData {
             this.airportsToRemove = SetHolder.merge(this.airportsToRemove, other.airportsToRemove);
             this.airlinesToAdd = SetHolder.merge(this.airlinesToAdd, other.airlinesToAdd);
             this.airlinesToRemove = SetHolder.merge(this.airlinesToRemove, other.airlinesToRemove);
-            this.passengersToAdd = SetHolder.merge(this.passengersToAdd, other.passengersToAdd);
-            this.passengersToRemove = SetHolder.merge(this.passengersToRemove, other.passengersToRemove);
 
+            this.airportPassengersToAdd = MapHolder.merge(
+                this.airportPassengersToAdd, other.airportPassengersToAdd, v->v,
+                (f,s)->MapHolder.merge(f,s,v->v,(o,n)->o+n)
+            );
+
+            this.airportPassengersToRemove = MapHolder.merge(
+                this.airportPassengersToRemove, other.airportPassengersToRemove, v->v,
+                (f,s)->MapHolder.merge(f,s,v->v,(o,n)->o+n)
+            );
 
             this.availablePlanesToRemove = MapHolder.merge(
                 this.availablePlanesToRemove, other.availablePlanesToRemove, v -> v, DataChanges::sumIntOrNull);
@@ -145,12 +323,12 @@ public class GameData {
 
             this.playerAirlinesToAdd = MapHolder.merge(
                 this.playerAirlinesToAdd, other.playerAirlinesToAdd, v->v,
-                (f,s)-> SetHolder.merge(f,s)
+                SetHolder::merge
             );
 
             this.playerAirlinesToRemove = MapHolder.merge(
                 this.playerAirlinesToRemove, other.playerAirlinesToRemove, v->v,
-                (f,s)-> SetHolder.merge(f,s)
+                SetHolder::merge
             );
 
             this.playerPlanesToAdd = MapHolder.merge(
@@ -184,10 +362,12 @@ public class GameData {
         if (changes.currentState != null) this.currentState = changes.currentState;
         if (changes.currentPlayer != null) this.currentPlayer = players.get(changes.currentPlayer);
         worldEvents.clearAndAddAllFromLookUp(changes.newWorldEvents, GameData.worldEventTypes);
-        players.changeSetTI(changes.playersToAdd, changes.playersToRemove);
-        airports.changeSetTI(changes.airportsToAdd, changes.airportsToRemove);
-        airlines.changeSetTI(changes.airlinesToAdd, changes.airlinesToRemove);
-        passengers.changeSetTI(changes.passengersToAdd, changes.passengersToRemove);
+        airports.changeSetDTOI(changes.airportsToAdd, changes.airportsToRemove,
+            (dto)->dto.restore());
+        airlines.changeSetDTOI(changes.airlinesToAdd, changes.airlinesToRemove,
+            (dto)->dto.restore(this.airports, this.players));
+        players.changeSetDTOI(changes.playersToAdd, changes.playersToRemove,
+            (dto)->dto.restore(this.airlines));
         availableAirlines.changeSetII(changes.availableAirlinesToAdd, changes.availableAirlinesToRemove, this.airlines);
         availableAirlines.retainAll(airlines);
 
@@ -203,13 +383,25 @@ public class GameData {
             changes.playerIncomeChange, (f, s)->f+s);
         players.changeAsStructWithSetterInteger(Player::setMoney, Player::getMoney,
             changes.playerMoneyChange, (f, s)->f+s);
-        players.changeAsStructInteger((pl) -> pl.airlines,
+        players.changeAsStructInteger((pl) -> pl,
             Arrays.asList(changes.playerAirlinesToAdd, changes.playerAirlinesToRemove),
             (cur, params)-> {
-            cur.changeSetII(params.get(0), params.get(1), airlines); cur.retainAll(airlines);
+            cur.airlines.changeSetII(params.get(0), params.get(1), airlines,
+                (line)->line.player=null,
+                (line)->{line.player = cur; return line;});
+            cur.airlines.retainAll(airlines);
         });
         players.changeAsStructInteger((pl) -> pl.planes,
             Arrays.asList(changes.playerPlanesToAdd, changes.playerPlanesToRemove),
+            (f, s)-> f.merge(s,
+                (params)-> {Integer res = params.get(0) - params.get(1); return res == 0 ? null : res;},
+                (old, params)->{Integer res = old+params.get(0) - params.get(1); return res == 0 ? null : res;},
+                (i)->0
+            )
+        );
+
+        airports.changeAsStructInteger((pl) -> pl.passengers,
+            Arrays.asList(changes.airportPassengersToAdd, changes.airportPassengersToRemove),
             (f, s)-> f.merge(s,
                 (params)-> {Integer res = params.get(0) - params.get(1); return res == 0 ? null : res;},
                 (old, params)->{Integer res = old+params.get(0) - params.get(1); return res == 0 ? null : res;},
@@ -223,16 +415,21 @@ public class GameData {
         if( !GameData.worldEventTypes.containsAll(changes.newWorldEvents) ||
             !players.checkChangeSetTI(changes.playersToAdd, changes.playersToRemove) ||
             !airports.checkChangeSetTI(changes.airportsToAdd, changes.airportsToRemove) ||
-            !airlines.checkChangeSetTI(changes.airlinesToAdd, changes.airlinesToRemove) ||
-            !passengers.checkChangeSetTI(changes.passengersToAdd, changes.passengersToRemove)
+            !airlines.checkChangeSetTI(changes.airlinesToAdd, changes.airlinesToRemove)
         ) return false;
 
+        SetHolder<Airport> airportsTmp = TemporarySetHolder.generateTemporarySetHolder(
+          airports, changes.airportsToAdd, changes.airportsToRemove,
+            (dto)->dto.restore());
         SetHolder<Airline> airlinesTmp = TemporarySetHolder.generateTemporarySetHolder(
-            airlines, changes.airlinesToAdd, changes.airlinesToRemove);
+            airlines, changes.airlinesToAdd, changes.airlinesToRemove,
+            (dto)->dto.restore(airportsTmp, this.players));
         SetHolder<Player> playersTmp = TemporarySetHolder.generateTemporarySetHolder(
-            players, changes.playersToAdd, changes.playersToRemove);
+            players, changes.playersToAdd, changes.playersToRemove,
+            (dto)->dto.restore(airlinesTmp));
 
         if (changes.currentPlayer != null && !playersTmp.contains(changes.currentPlayer)) return false;
+
         if( !availableAirlines.checkChangeSetIILookUp(
             changes.availableAirlinesToAdd, changes.availableAirlinesToRemove, airlinesTmp) ||
             !GameData.planeTypes.containsAll(changes.availablePlanesToAdd.keySet()) ||
@@ -258,6 +455,14 @@ public class GameData {
                     (old, params)->old+params.get(0)-params.get(1)>=0,
                     (i)->0
                 ) && GameData.planeTypes.containsAll(s.get(0).keySet())
+            ) ||
+            !airportsTmp.checkChangeAsStructInteger((port)->port.passengers,
+                Arrays.asList(changes.airportPassengersToAdd, changes.airportPassengersToRemove),
+                (f,s)->f.checkMergeElements(s,
+                    (params)->params.get(0)-params.get(1)>=0,
+                    (old, params)->old+params.get(0)-params.get(1)>=0,
+                    (i)->0
+                ) && GameData.passengerTypes.containsAll(s.get(0).keySet())
             )
         ) return false;
 
@@ -276,7 +481,7 @@ public class GameData {
     }
 
     //returns null if requirements not met, otherwise returns total income
-    public static Double checkLine(Airline line, List<Passenger> psg, PlaneType plane){
+    public static Double checkLine(Airline line, MapHolder<PassengerType, Integer> passengers, PlaneType plane){
         if(!line.type.luxuryRange.contains(plane.luxury) ||
             !line.type.capacityRange.contains(plane.capacity) ||
             !plane.distRange.contains(line.getDistance()) ||
@@ -287,13 +492,17 @@ public class GameData {
         int amountOfPeople = 0;
         double solvencySum = 0;
 
-        for(Passenger pt : psg) {
-            if(!pt.type.luxuryRange.contains(plane.luxury) ||
-                !pt.type.capacityRange.contains(plane.capacity) ||
-                !pt.type.yieldRange.contains(line.type.yield))
+        Iterator<Map.Entry<PassengerType, Integer>> id = MapHolder.viewAsEntrySet(passengers);
+        Map.Entry<PassengerType, Integer> e;
+        while((e=id.next()) != null) {
+            PassengerType type = e.getKey();
+            int count = e.getValue();
+            if(!type.luxuryRange.contains(plane.luxury) ||
+                !type.capacityRange.contains(plane.capacity) ||
+                !type.yieldRange.contains(line.type.yield))
                 return null;
-            amountOfPeople += pt.type.size;
-            solvencySum += pt.type.solvency;
+            amountOfPeople += type.size * count;
+            solvencySum += type.solvency * count;
         }
 
         if(plane.capacity< amountOfPeople) return null;
@@ -302,7 +511,8 @@ public class GameData {
     }
 
     //does not check if a player has a plane and does not add removing the plane from the player
-    public static DataChanges checkRoute(Airport start, List<Airline> route, List<Passenger> passengers, PlaneType plane){
+    /*
+    public static DataChanges checkRoute(Airport start, List<Airline> route, MapHolder<Airport, MapHolder<PassengerType, Integer>> passengers, PlaneType plane){
         if(start == null || route == null || passengers == null ||
             route.isEmpty() || passengers.isEmpty() || plane==null) return null;
 
@@ -315,10 +525,9 @@ public class GameData {
 
         DataChanges resultChanges = new DataChanges();
         resultChanges.playerIncomeChange = new HashMap<>();
-        resultChanges.passengersToRemove = new HashSet<>();
+        resultChanges.airportPassengersToRemove = new HashMap<>();
 
         Iterator<Airline> airlineIterator = route.listIterator();
-        Iterator<Passenger> passengersIterator = passengers.listIterator();
 
         class BoardedPassengers{
             private final List<Passenger> psgs = new LinkedList<>();
@@ -391,4 +600,6 @@ public class GameData {
             !boardedPassengers.isEmpty()) return null;
         return resultChanges;
     }
+    */
+
 }

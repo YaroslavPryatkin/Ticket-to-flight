@@ -685,6 +685,67 @@ public class SetHolder<T extends Identifiable> implements Set<T> {
         return this;
     }
 
+    /**
+     * toAdd will not be changed, toRemove might be <br>
+     * If element is contained in, then after changing in the set will remain the element from: <br>
+     * this, toAdd, toRemove -> toAdd ----- delete old one, add new one <br>
+     * this, toRemove -> null ------------- delete old one <br>
+     * toAdd, toRemove -> null ------------ add new one and immediately delete <br>
+     * this, toAdd -> this ---------------- trying to add a copy, dismiss <br>
+     * this -> this ----------------------- nothing changed <br>
+     * toAdd -> toAdd --------------------- add new one <br>
+     * toRemove -> null ------------------- removing non-existing, dismiss
+     * @param toAdd a set to add
+     * @param toRemove a set to remove
+     * @return this
+     */
+    public <C extends Identifiable> SetHolder<T> changeSetDTOI(Set<C> toAdd, Set<Integer> toRemove, Function<C, T> restoreDTO){
+        if(toAdd != null && toRemove != null){
+            for(C t : toAdd){
+                boolean inThis = this.contains(t);
+                boolean inRem = toRemove.contains(t.getId());
+                if(inRem){
+                    if(inThis) { // this, toAdd, toRem
+                        this.remove(t.getId());
+                        T newItem = restoreDTO.apply(t);
+                        if(newItem!=null)
+                            this.add(newItem);
+                    }
+                    toRemove.remove(t.getId()); // toAdd, toRem AND this, toAdd, toRem
+                }
+                else if(!inThis) { // toAdd
+                    T newItem = restoreDTO.apply(t);
+                    if(newItem!=null)
+                        this.add(newItem);
+                }
+            }
+            for(Integer id : toRemove){
+                boolean inThis = this.contains(id);
+                if(inThis){ //this, toRem
+                    this.remove(id);
+                }
+            }
+        }
+        else if(toAdd !=null){
+            for(C t : toAdd){
+                boolean inThis = this.contains(t);
+                if(!inThis){
+                    T newItem = restoreDTO.apply(t);
+                    if(newItem!=null)
+                        this.add(newItem);
+                }
+            }
+        }
+        else if(toRemove!=null){
+            for(Integer id : toRemove){
+                boolean inThis = this.contains(id);
+                if(inThis){
+                    this.remove(id);
+                }
+            }
+        }
+        return this;
+    }
 
     /**
      * toAdd will not be changed, toRemove might be. <br>
@@ -703,10 +764,117 @@ public class SetHolder<T extends Identifiable> implements Set<T> {
      * @return this
      */
     public SetHolder<T> changeSetII(Set<Integer> toAdd, Set<Integer> toRemove, SetHolder<T> lookUp) {
-        SetHolder.changeSetII(this, toAdd, toRemove, lookUp);
+        if (toAdd != null && toRemove != null) {
+            for (Integer id : toAdd) {
+                boolean inRem = toRemove.contains(id);
+                boolean inThis = this.contains(id);
+
+                if (inRem) {
+                    if (inThis) {
+                        this.remove(id);
+                        T newItem = lookUp.get(id);
+                        if (newItem != null) {
+                            this.add(newItem);
+                        }
+                    }
+                    toRemove.remove(id);
+                } else if (!inThis) {
+                    T newItem = lookUp.get(id);
+                    if (newItem != null) {
+                        this.add(newItem);
+                    }
+                }
+            }
+            for (Integer id : toRemove) {
+                if (this.contains(id)) {
+                    this.remove(id);
+                }
+            }
+        } else if (toAdd != null) {
+            for (Integer id : toAdd) {
+                if (!this.contains(id)) {
+                    T newItem = lookUp.get(id);
+                    if (newItem != null) {
+                        this.add(newItem);
+                    }
+                }
+            }
+        } else if (toRemove != null) {
+            for (Integer id : toRemove) {
+                if (this.contains(id)) {
+                    this.remove(id);
+                }
+            }
+        }
         return this;
     }
 
+    /**
+     * toAdd will not be changed, toRemove might be. <br>
+     * If element is contained in, then after changing in the set will remain the element from: <br>
+     * this, toAdd, toRemove -> toAdd ----- delete old one, add new one <br>
+     * this, toRemove -> null ------------- delete old one <br>
+     * toAdd, toRemove -> null ------------ add new one and immediately delete <br>
+     * this, toAdd -> this ---------------- trying to add a copy, dismiss <br>
+     * this -> this ----------------------- nothing changed <br>
+     * toAdd -> toAdd --------------------- add new one <br>
+     * toRemove -> null ------------------- removing non-existing, dismiss <br>
+     * If an element is not found in lookUp, then it is not added to this.<br>
+     * Also applies functions to removed and added elements
+     * @param toAdd a set to add
+     * @param toRemove a set to remove
+     * @param lookUp a holder of actual objects from toAdd
+     * @param modifyOldFunction modifies an element after removing
+     * @param modifyNewFunction modifies an element before adding
+     */
+    public void changeSetII(Set<Integer> toAdd, Set<Integer> toRemove, SetHolder<T> lookUp,
+                            Consumer<T> modifyOldFunction, Function<T,T> modifyNewFunction) {
+        if(modifyOldFunction == null)  modifyOldFunction = (t)->{};
+        if(modifyNewFunction == null) modifyNewFunction = (t)->t;
+
+        if (toAdd != null && toRemove != null) {
+            for (Integer id : toAdd) {
+                boolean inRem = toRemove.contains(id);
+                boolean inThis = this.contains(id);
+
+                if (inRem) {
+                    if (inThis) {
+                        modifyOldFunction.accept(this.remove(id));
+                        T newItem = lookUp.get(id);
+                        if (newItem != null) {
+                            this.add(modifyNewFunction.apply(newItem));
+                        }
+                    }
+                    toRemove.remove(id);
+                } else if (!inThis) {
+                    T newItem = lookUp.get(id);
+                    if (newItem != null) {
+                        this.add(modifyNewFunction.apply(newItem));
+                    }
+                }
+            }
+            for (Integer id : toRemove) {
+                if (this.contains(id)) {
+                    modifyOldFunction.accept(this.remove(id));
+                }
+            }
+        } else if (toAdd != null) {
+            for (Integer id : toAdd) {
+                if (!this.contains(id)) {
+                    T newItem = lookUp.get(id);
+                    if (newItem != null) {
+                        this.add(modifyNewFunction.apply(newItem));
+                    }
+                }
+            }
+        } else if (toRemove != null) {
+            for (Integer id : toRemove) {
+                if (this.contains(id)) {
+                    modifyOldFunction.accept(this.remove(id));
+                }
+            }
+        }
+    }
 
     /**
      * All allowed combinations of an element containing in this, toAdd, toRemove are: <br>
@@ -756,10 +924,10 @@ public class SetHolder<T extends Identifiable> implements Set<T> {
      * @param toRemove a set to remove
      * @return result of the check. If false, then not all changes will be applied
      */
-    public boolean checkChangeSetTI(Set<T> toAdd, Set<Integer> toRemove) {
+    public <C extends Identifiable>boolean checkChangeSetTI(Set<C> toAdd, Set<Integer> toRemove) {
         if (toAdd != null && toRemove != null) {
             Set<Integer> addIds = new HashSet<>();
-            for (T item : toAdd) {
+            for (C item : toAdd) {
                 Integer id = item.getId();
                 addIds.add(id);
                 if (this.contains(id) && !toRemove.contains(id)) return false;
@@ -768,7 +936,7 @@ public class SetHolder<T extends Identifiable> implements Set<T> {
                 if (!this.contains(id) && !addIds.contains(id)) return false;
             }
         } else if (toAdd != null) {
-            for (T item : toAdd) {
+            for (C item : toAdd) {
                 if (this.contains(item.getId())) return false;
             }
         } else if (toRemove != null) {
@@ -778,6 +946,8 @@ public class SetHolder<T extends Identifiable> implements Set<T> {
         }
         return true;
     }
+
+
 
     /**
      * All allowed combinations of an element containing in this, toAdd, toRemove are: <br>
@@ -836,67 +1006,6 @@ public class SetHolder<T extends Identifiable> implements Set<T> {
 
     // --- Static change set methods ---
 
-    /**
-     * toAdd will not be changed, toRemove might be. <br>
-     * If element is contained in, then after changing in the set will remain the element from: <br>
-     * this, toAdd, toRemove -> toAdd ----- delete old one, add new one <br>
-     * this, toRemove -> null ------------- delete old one <br>
-     * toAdd, toRemove -> null ------------ add new one and immediately delete <br>
-     * this, toAdd -> this ---------------- trying to add a copy, dismiss <br>
-     * this -> this ----------------------- nothing changed <br>
-     * toAdd -> toAdd --------------------- add new one <br>
-     * toRemove -> null ------------------- removing non-existing, dismiss <br>
-     * If an element is not found in lookUp, then it is not added to this.
-     * @param current "this" set
-     * @param toAdd a set to add
-     * @param toRemove a set to remove
-     * @param lookUp a holder of actual objects from toAdd
-     */
-    public static <T extends Identifiable> void changeSetII(Set<T> current, Set<Integer> toAdd, Set<Integer> toRemove, SetHolder<T> lookUp) {
-        if(current == null) return;
-        if (toAdd != null && toRemove != null) {
-            for (Integer id : toAdd) {
-                boolean inRem = toRemove.contains(id);
-                boolean inThis = current.contains(id);
-
-                if (inRem) {
-                    if (inThis) {
-                        current.remove(id);
-                        T newItem = lookUp.get(id);
-                        if (newItem != null) {
-                            current.add(newItem);
-                        }
-                    }
-                    toRemove.remove(id);
-                } else if (!inThis) {
-                    T newItem = lookUp.get(id);
-                    if (newItem != null) {
-                        current.add(newItem);
-                    }
-                }
-            }
-            for (Integer id : toRemove) {
-                if (current.contains(id)) {
-                    current.remove(id);
-                }
-            }
-        } else if (toAdd != null) {
-            for (Integer id : toAdd) {
-                if (!current.contains(id)) {
-                    T newItem = lookUp.get(id);
-                    if (newItem != null) {
-                        current.add(newItem);
-                    }
-                }
-            }
-        } else if (toRemove != null) {
-            for (Integer id : toRemove) {
-                if (current.contains(id)) {
-                    current.remove(id);
-                }
-            }
-        }
-    }
 
     /**
      * All allowed combinations of an element containing in this, toAdd, toRemove are: <br>

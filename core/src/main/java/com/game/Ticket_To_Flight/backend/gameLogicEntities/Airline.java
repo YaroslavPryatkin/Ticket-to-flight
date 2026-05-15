@@ -6,22 +6,14 @@ import com.game.Ticket_To_Flight.Utilities.Identifiable;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Airline extends Identifiable {
-    private static final AtomicInteger idGenerator = new AtomicInteger(0);
-
     public final AirlineType type;
     public final Airport portA;
     public final Airport portB;
     public Player player = null;
 
-    //for server
-    public Airline(AirlineType type, Airport portA, Airport portB) {
-        super(idGenerator.incrementAndGet());
-        this.type = type;
-        this.portA = portA;
-        this.portB = portB;
-    }
-
-    //for client
+    /**
+     * Should not be called anywhere except game data
+     */
     public Airline(int id, AirlineType type, Airport portA, Airport portB, Player player) {
         super(id);
         this.type = type;

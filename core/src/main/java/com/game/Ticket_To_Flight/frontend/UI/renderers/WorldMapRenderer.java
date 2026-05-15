@@ -14,7 +14,6 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airport;
-import com.game.Ticket_To_Flight.backend.gameLogicEntities.Passenger;
 import com.game.Ticket_To_Flight.packages.PackageCreateWorldMap;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -80,7 +79,7 @@ public class WorldMapRenderer extends ScreenAdapter {
         table.add(new Label("Route", skin)).padRight(10);
         table.add(new Label("Group", skin));
         table.row();
-
+        /*
         if (airport.getGuests() != null && !airport.getGuests().isEmpty()) {
             for (Passenger group : airport.getGuests()) {
                 String routeText = group.getCityFrom() + " -> " + group.getCityTo();
@@ -93,6 +92,8 @@ public class WorldMapRenderer extends ScreenAdapter {
         } else {
             table.add(new Label("No guests", skin)).colspan(2);
         }
+
+         */
 
         currentTooltip.add(table);
         currentTooltip.pack();
