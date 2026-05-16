@@ -221,10 +221,12 @@ public class WorldMapRenderer extends ScreenAdapter {
                     }
                 }
 
-                currentTooltip.remove();
-                currentTooltip = null;
-                selectedAirport = null;
-                selectedAirline = null;
+                if (currentTooltip != null) {
+                    currentTooltip.remove();
+                    currentTooltip = null;
+                    selectedAirport = null;
+                    selectedAirline = null;
+                }
 
                 lastMousePos.set(screenX, screenY, 0);
                 return true;
