@@ -1,0 +1,17 @@
+[
+  {
+    "id": 201,
+    "solvency": 1.5,
+    "size": 2,
+    "minLuxury": 0.5,
+    "maxLuxury": 1.0,
+    "minYield": 10.0,
+    "maxYield": 25.5,
+    "minCapacity": 50,
+    "maxCapacity": 150,
+    "minStations": 1,
+    "maxStations": 3,
+    "typeTo": 1,
+    "description": "Бизнес-класс"
+  }
+]

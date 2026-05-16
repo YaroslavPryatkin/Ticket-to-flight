@@ -1,0 +1,338 @@
+[
+  {
+    "id": 101,
+    "cost": 70.0,
+    "gateAmount": 8,
+    "cityType": 1,
+    "description": "A small charter airfield for seasonal tourists."
+  },
+  {
+    "id": 102,
+    "cost": 100.0,
+    "gateAmount": 20,
+    "cityType": 1,
+    "description": "A standard tourist airport with moderate passenger traffic."
+  },
+  {
+    "id": 103,
+    "cost": 130.0,
+    "gateAmount": 40,
+    "cityType": 1,
+    "description": "A major international hub welcoming crowds of tourists all year round."
+  },
+  {
+    "id": 104,
+    "cost": 220.0,
+    "gateAmount": 12,
+    "cityType": 1,
+    "description": "VIP terminal for private jets and wealthy travelers."
+  },
+  {
+    "id": 201,
+    "cost": 250.0,
+    "gateAmount": 16,
+    "cityType": 2,
+    "description": "An old urban airport hemmed in by residential areas."
+  },
+  {
+    "id": 202,
+    "cost": 120.0,
+    "gateAmount": 48,
+    "cityType": 2,
+    "description": "The metropolis's main international airport with massive growth potential."
+  },
+  {
+    "id": 203,
+    "cost": 90.0,
+    "gateAmount": 24,
+    "cityType": 2,
+    "description": "A low-cost carrier terminal on the outskirts of the city."
+  },
+  {
+    "id": 204,
+    "cost": 150.0,
+    "gateAmount": 60,
+    "cityType": 2,
+    "description": "A massive multi-terminal hub designed for transit layovers."
+  },
+  {
+    "id": 301,
+    "cost": 80.0,
+    "gateAmount": 12,
+    "cityType": 3,
+    "description": "An airport heavily focused on cargo operations."
+  },
+  {
+    "id": 302,
+    "cost": 100.0,
+    "gateAmount": 20,
+    "cityType": 3,
+    "description": "A standard industrial center airport serving workers and engineers."
+  },
+  {
+    "id": 303,
+    "cost": 110.0,
+    "gateAmount": 36,
+    "cityType": 3,
+    "description": "A large-scale logistics hub operating 24/7."
+  },
+  {
+    "id": 304,
+    "cost": 160.0,
+    "gateAmount": 8,
+    "cityType": 3,
+    "description": "A corporate airstrip for factory management and business aviation."
+  },
+  {
+    "id": 401,
+    "cost": 40.0,
+    "gateAmount": 4,
+    "cityType": 4,
+    "description": "A tiny regional airfield. Expansion is cheap; city hall welcomes any investment."
+  },
+  {
+    "id": 402,
+    "cost": 80.0,
+    "gateAmount": 12,
+    "cityType": 4,
+    "description": "The main airport of regional significance, linking the area to major cities."
+  },
+  {
+    "id": 403,
+    "cost": 100.0,
+    "gateAmount": 20,
+    "cityType": 4,
+    "description": "A regional hub airport connecting several neighboring districts at once."
+  },
+  {
+    "id": 404,
+    "cost": 60.0,
+    "gateAmount": 8,
+    "cityType": 4,
+    "description": "An airfield for suburban shuttles and local light aviation."
+  },
+  {
+    "id": 501,
+    "cost": 350.0,
+    "gateAmount": 16,
+    "cityType": 5,
+    "description": "A business airport right in the center of the financial capital."
+  },
+  {
+    "id": 502,
+    "cost": 180.0,
+    "gateAmount": 44,
+    "cityType": 5,
+    "description": "An international financial hub for business people from around the globe."
+  },
+  {
+    "id": 503,
+    "cost": 400.0,
+    "gateAmount": 8,
+    "cityType": 5,
+    "description": "An exclusive terminal for billionaires."
+  },
+  {
+    "id": 504,
+    "cost": 120.0,
+    "gateAmount": 28,
+    "cityType": 5,
+    "description": "An auxiliary airport for regular corporate staff and business trips."
+  },
+  {
+    "id": 601,
+    "cost": 200.0,
+    "gateAmount": 8,
+    "cityType": 6,
+    "description": "An island airfield."
+  },
+  {
+    "id": 602,
+    "cost": 110.0,
+    "gateAmount": 24,
+    "cityType": 6,
+    "description": "A popular gateway airport for incoming resort tourists."
+  },
+  {
+    "id": 603,
+    "cost": 250.0,
+    "gateAmount": 16,
+    "cityType": 6,
+    "description": "An elite hub for luxury resorts featuring private lounge zones."
+  },
+  {
+    "id": 604,
+    "cost": 150.0,
+    "gateAmount": 4,
+    "cityType": 6,
+    "description": "A seaplane base delivering guests directly to the doors of five-star hotels."
+  },
+  {
+    "id": 701,
+    "cost": 140.0,
+    "gateAmount": 20,
+    "cityType": 7,
+    "description": "A high-tech airport featuring full automation and biometrics."
+  },
+  {
+    "id": 702,
+    "cost": 160.0,
+    "gateAmount": 32,
+    "cityType": 7,
+    "description": "An international Silicon Valley hub, attracting global tech investors."
+  },
+  {
+    "id": 703,
+    "cost": 220.0,
+    "gateAmount": 12,
+    "cityType": 7,
+    "description": "An experimental port for drones and air taxis."
+  },
+  {
+    "id": 704,
+    "cost": 130.0,
+    "gateAmount": 24,
+    "cityType": 7,
+    "description": "An airport catering to startup founders, digital nomads, and IT specialists."
+  },
+  {
+    "id": 801,
+    "cost": 50.0,
+    "gateAmount": 12,
+    "cityType": 8,
+    "description": "A joint-use airfield."
+  },
+  {
+    "id": 802,
+    "cost": 90.0,
+    "gateAmount": 24,
+    "cityType": 8,
+    "description": "A strategic military-civilian transportation node."
+  },
+  {
+    "id": 803,
+    "cost": 600.0,
+    "gateAmount": 4,
+    "cityType": 8,
+    "description": "A classified airbase."
+  },
+  {
+    "id": 804,
+    "cost": 80.0,
+    "gateAmount": 16,
+    "cityType": 8,
+    "description": "An airport serving military families and base support personnel."
+  },
+  {
+    "id": 901,
+    "cost": 120.0,
+    "gateAmount": 12,
+    "cityType": 9,
+    "description": "An airfield attached to a major research institute."
+  },
+  {
+    "id": 902,
+    "cost": 110.0,
+    "gateAmount": 20,
+    "cityType": 9,
+    "description": "The main scientific hub for hosting international conferences and exhibitions."
+  },
+  {
+    "id": 903,
+    "cost": 300.0,
+    "gateAmount": 16,
+    "cityType": 9,
+    "description": "A hub situated near a spaceport."
+  },
+  {
+    "id": 904,
+    "cost": 140.0,
+    "gateAmount": 8,
+    "cityType": 9,
+    "description": "An isolated airstrip designated for classified government experiments."
+  },
+  {
+    "id": 1001,
+    "cost": 400.0,
+    "gateAmount": 12,
+    "cityType": 10,
+    "description": "An airport in the old city center."
+  },
+  {
+    "id": 1002,
+    "cost": 160.0,
+    "gateAmount": 28,
+    "cityType": 10,
+    "description": "The main tourist gateway to the ancient city, located well outside the historic borders."
+  },
+  {
+    "id": 1003,
+    "cost": 250.0,
+    "gateAmount": 8,
+    "cityType": 10,
+    "description": "A boutique airport designed in a classic architectural style for art enthusiasts."
+  },
+  {
+    "id": 1004,
+    "cost": 140.0,
+    "gateAmount": 20,
+    "cityType": 10,
+    "description": "A museum-airport featuring art exhibitions directly inside the terminals."
+  },
+  {
+    "id": 1101,
+    "cost": 30.0,
+    "gateAmount": 4,
+    "cityType": 11,
+    "description": "An airstrip for agricultural aviation."
+  },
+  {
+    "id": 1102,
+    "cost": 70.0,
+    "gateAmount": 16,
+    "cityType": 11,
+    "description": "A regional agricultural airport used for distributing farm produce."
+  },
+  {
+    "id": 1103,
+    "cost": 90.0,
+    "gateAmount": 28,
+    "cityType": 11,
+    "description": "A major hub dedicated to the international export of food and livestock."
+  },
+  {
+    "id": 1104,
+    "cost": 50.0,
+    "gateAmount": 8,
+    "cityType": 11,
+    "description": "An airfield catering to seasonal workers and cargo charters."
+  },
+  {
+    "id": 1201,
+    "cost": 20.0,
+    "gateAmount": 4,
+    "cityType": 12,
+    "description": "A dirt runway at the edge of the world."
+  },
+  {
+    "id": 1202,
+    "cost": 40.0,
+    "gateAmount": 8,
+    "cityType": 12,
+    "description": "A vital supply airport."
+  },
+  {
+    "id": 1203,
+    "cost": 80.0,
+    "gateAmount": 16,
+    "cityType": 12,
+    "description": "A transit hub for shift workers and the extraction of mined resources."
+  },
+  {
+    "id": 1204,
+    "cost": 10.0,
+    "gateAmount": 2,
+    "cityType": 12,
+    "description": "An emergency services and occasional mail airfield operating in harsh climate conditions."
+  }
+]

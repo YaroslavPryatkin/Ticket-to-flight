@@ -1,0 +1,15 @@
+[
+  {
+    "id": 1,
+    "fuel": 4.2,
+    "stations": 0,
+    "luxury": 1,
+    "capacity": 180,
+    "minGate": 4,
+    "maxGate": 4,
+    "minDist": 500.0,
+    "maxDist": 3500.0,
+    "price": 300.0,
+    "description": ""
+  }
+]

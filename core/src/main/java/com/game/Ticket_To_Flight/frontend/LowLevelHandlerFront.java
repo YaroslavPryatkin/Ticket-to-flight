@@ -53,6 +53,7 @@ public class LowLevelHandlerFront extends LowLevelHandler {
         if (checkedChanges != null) {
             gameData.acquireWriteLock();
             try {
+                System.out.println("Applying changes");
                 gameData.applyChangesUnsafe(checkedChanges);
 
                 checkedChanges = null;
@@ -65,31 +66,32 @@ public class LowLevelHandlerFront extends LowLevelHandler {
             }
         }
         if (!isValidationRunning.get() && !changesQueue.isEmpty()) {
-            GameData.DataChanges nextToValidate = changesQueue.poll();
-            if (nextToValidate != null) {
-                startAsyncValidation(nextToValidate);
-            }
+            startAsyncValidation();
         }
     }
 
-    private void startAsyncValidation(final GameData.DataChanges change) {
+    private void startAsyncValidation() {
         isValidationRunning.set(true);
 
         validationExecutor.execute(() -> {
             boolean isValid = false;
+            GameData.DataChanges change = null;
             try {
                 gameData.acquireReadLock();
-                try {
-                    isValid = gameData.checkChanges(change);
-                } finally {
-                    gameData.releaseReadLock();
+                change = changesQueue.poll();
+                while(!changesQueue.isEmpty()) {
+                    change.merge(changesQueue.poll());
                 }
+                isValid = gameData.checkChanges(change);
 
             } catch (Exception e) {
-                dataInconsistent();
+                System.out.println("checking exception " + e.toString());
+                e.printStackTrace();
             } finally {
+                gameData.releaseReadLock();
                 isValidationRunning.set(false);
             }
+
             if (isValid) {
                 checkedChanges = change;
             }

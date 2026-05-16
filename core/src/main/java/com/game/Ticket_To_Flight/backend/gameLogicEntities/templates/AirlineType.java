@@ -1,5 +1,7 @@
 package com.game.Ticket_To_Flight.backend.gameLogicEntities.templates;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.game.Ticket_To_Flight.Utilities.ClosedInterval;
 import com.game.Ticket_To_Flight.Utilities.Identifiable;
 
@@ -19,6 +21,28 @@ public class AirlineType extends Identifiable {
         this.gateB = gateB;
         this.luxuryRange = new ClosedInterval<>(luxuryRange);
         this.capacityRange = new ClosedInterval<>(capacityRange);
+        this.price = price;
+        this.description = description;
+    }
+
+    @JsonCreator
+    public AirlineType(
+        @JsonProperty("id") int id,
+        @JsonProperty("yield") double yield,
+        @JsonProperty("gateA") int gateA,
+        @JsonProperty("gateB") int gateB,
+        @JsonProperty("minLuxury") double minLuxury,
+        @JsonProperty("maxLuxury") double maxLuxury,
+        @JsonProperty("minCapacity") int minCapacity,
+        @JsonProperty("maxCapacity") int maxCapacity,
+        @JsonProperty("price") double price,
+        @JsonProperty("description") String description
+    ){   super(id);
+        this.yield = yield;
+        this.gateA = gateA;
+        this.gateB = gateB;
+        this.luxuryRange = new ClosedInterval<>(minLuxury, maxLuxury);
+        this.capacityRange = new ClosedInterval<>(minCapacity, maxCapacity);
         this.price = price;
         this.description = description;
     }

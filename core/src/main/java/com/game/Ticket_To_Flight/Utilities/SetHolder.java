@@ -1102,6 +1102,11 @@ public class SetHolder<T extends Identifiable> implements Set<T> {
         return true;
     }
 
+    public boolean containsAllKeys(Map<?, ?> c) {
+        if(c==null) return true;
+        return containsAll(c.keySet());
+    }
+
     @Override
     public boolean addAll(Collection<? extends T> c) {
         boolean modified = false;

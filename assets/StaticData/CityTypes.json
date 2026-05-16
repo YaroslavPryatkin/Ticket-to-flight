@@ -1,0 +1,14 @@
+[
+  { "id": 1, "description": "Tourist attraction" },
+  { "id": 2, "description": "Metropolis" },
+  { "id": 3, "description": "Industrial Hub" },
+  { "id": 4, "description": "Regional Town" },
+  { "id": 5, "description": "Financial Capital" },
+  { "id": 6, "description": "Resort Oasis" },
+  { "id": 7, "description": "Tech Valley" },
+  { "id": 8, "description": "Military outpost" },
+  { "id": 9, "description": "Science center" },
+  { "id": 10, "description": "Historical Center" },
+  { "id": 11, "description": "Agricultural Hub" },
+  { "id": 12, "description": "Remote Settlement" }
+]

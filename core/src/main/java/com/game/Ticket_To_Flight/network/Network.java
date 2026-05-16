@@ -37,12 +37,6 @@ public class Network {
     }
     */
 
-    private static void registerAdditional(Kryo kryo){
-        kryo.register(JoinGameResponse.Response.class);
-    }
-
-
-    //root classes to register. Also, should be classes in <> because of type erase
     private static final Class[] ROOT_CLASSES = {
         GameMessage.class,
         StartGameMessage.class,
@@ -55,11 +49,10 @@ public class Network {
         DataChangesMessage.class,
         ReloadGameDataRequest.class,
         ReloadGameDataResponse.class,
-        JoinGameRequest.class,
-        JoinGameResponse.class,
         JoinGameResponse.Response.class,
         JoinGameRequest.class,
         JoinGameResponse.class,
+        GameData.State.class,
         Arrays.asList().getClass(),
         Collections.emptyList().getClass(),
         Collections.emptyMap().getClass(),
@@ -95,9 +88,6 @@ public class Network {
             kryo.register(clazz);
             System.out.println(clazz.toString() + " registered for " + endPoint.toString());
         }
-
-        registerAdditional(kryo);
-
     }
 
     private static void discoverRecursive(Class<?> clazz, Set<Class> found) {
@@ -105,7 +95,12 @@ public class Network {
             return;
         }
 
-        if (clazz.isEnum() || clazz.getName().startsWith("java.") || clazz.getName().startsWith("javax.")) {
+        String name = clazz.getName();
+        if (name.startsWith("java.util.concurrent") || name.startsWith("sun.misc")) {
+            return;
+        }
+        if (clazz.isEnum() || name.startsWith("java.") || name.startsWith("javax.")) {
+            found.add(clazz);
             return;
         }
 

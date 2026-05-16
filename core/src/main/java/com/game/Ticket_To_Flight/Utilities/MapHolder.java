@@ -448,6 +448,7 @@ public class MapHolder<K extends Identifiable, V> implements Map<Integer, V> {
      * @return false if at least one check returned false
      */
     public boolean checkMergeElements(Map<Integer,V> other, Predicate<V> checkFunctionIfNotExist, BiPredicate<V, V> checkFunctionIfExist){
+        if(other == null) other = Collections.emptyMap();
         if(checkFunctionIfNotExist != null && checkFunctionIfExist != null) {
             for (Map.Entry<Integer, V> e : other.entrySet()) {
                 V thisValue = this.get(e.getKey());

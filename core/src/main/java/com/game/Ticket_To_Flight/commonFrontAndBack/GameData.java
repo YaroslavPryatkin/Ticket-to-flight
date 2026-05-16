@@ -2,6 +2,8 @@ package com.game.Ticket_To_Flight.commonFrontAndBack;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.CollectionType;
 import com.game.Ticket_To_Flight.Utilities.SetHolder;
 import com.game.Ticket_To_Flight.Utilities.Identifiable;
 import com.game.Ticket_To_Flight.Utilities.MapHolder;
@@ -11,6 +13,8 @@ import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airport;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Player;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.*;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -45,6 +49,63 @@ public class GameData {
     public static Integer maxActionsPerTurn = 5;
     public static Integer maxAmountOfShares = 20;
 
+    private static boolean jsonDownloaded = false;
+    private static String jsonFolder = "assets/StaticData";
+    private static List<SetHolder<? extends Identifiable>> staticHolder = List.of(
+        cityTypes,
+        airlineTypes,
+        airportTypes,
+        passengerTypes,
+        planeTypes
+    );
+    private static List<String> jsonNames = List.of(
+        "CityTypes.json",
+        "AirlineTypes.json",
+        "AirportTypes.json",
+        "PassengerTypes.json",
+        "PlaneTypes.json"
+    );
+    private static List<Class<? extends Identifiable>> staticClasses = List.of(
+        CityType.class,
+        AirlineType.class,
+        AirportType.class,
+        PassengerType.class,
+        PlaneType.class
+    );
+
+    public static void loadAllJsons() {
+        if(jsonDownloaded) return;
+        jsonDownloaded = true;
+        ObjectMapper mapper = new ObjectMapper();
+
+        for (int i = 0; i < jsonNames.size(); i++) {
+            String path = jsonFolder + File.separator + jsonNames.get(i);
+            Class<? extends Identifiable> clazz = staticClasses.get(i);
+            SetHolder<? extends Identifiable> holder = staticHolder.get(i);
+
+            loadSingleJson(path, (SetHolder) holder, clazz, mapper);
+        }
+    }
+
+    private static <T extends Identifiable> void loadSingleJson(String path, SetHolder<T> holder, Class<T> clazz, ObjectMapper mapper) {
+        try {
+            File file = new File(path);
+            if (!file.exists()) {
+                System.err.println("File not found: " + path);
+                return;
+            }
+            CollectionType setType = mapper.getTypeFactory().constructCollectionType(Set.class, clazz);
+            Set<T> loadedData = mapper.readValue(file, setType);
+            holder.clear();
+            holder.addAll(loadedData);
+            System.out.println("Successfully downloaded json [" + clazz.getSimpleName() + "]: " + holder.size());
+
+        } catch (IOException e) {
+            System.err.println("Error during json parsing for " + path + ": " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
     public enum State {
         WORLD_UPDATE,
         INVESTMENTS,
@@ -71,6 +132,7 @@ public class GameData {
 
 
     public static class AirlineDTO extends Identifiable {
+        private AirlineDTO(){super(0); type = 0; portA = 0; portB = 0; player = null;};
         private static final AtomicInteger idGenerator = new AtomicInteger(0);
         private final int type;
         private final int portA;
@@ -129,6 +191,7 @@ public class GameData {
         }
     }
     public static class AirportDTO extends Identifiable{
+        private AirportDTO(){super(0); type = null; position = null; passengers = null; name = null;}
         private final Integer type;
         private final Vector2 position;
         private final Map<Integer, Integer> passengers;
@@ -183,6 +246,7 @@ public class GameData {
         }
     }
     public static class PlayerDTO extends Identifiable{
+        private PlayerDTO(){super(0); name = null; money = 0; income = 0; planes = null; airlines = null;}
         private static final AtomicInteger idGenerator = new AtomicInteger(0);
 
         private final String name;
@@ -448,7 +512,7 @@ public class GameData {
 
         if( !availableAirlines.checkChangeSetIILookUp(
             changes.availableAirlinesToAdd, changes.availableAirlinesToRemove, airlinesTmp) ||
-            !GameData.planeTypes.containsAll(changes.availablePlanesToAdd.keySet()) ||
+            !GameData.planeTypes.containsAllKeys(changes.availablePlanesToAdd) ||
             !availablePlanes.checkMergeElements(
                 Arrays.asList(changes.availablePlanesToAdd, changes.availablePlanesToRemove),
                 (params)->params.get(0)-params.get(1)>=0,
@@ -457,8 +521,8 @@ public class GameData {
             ) ||
             !playersTmp.checkChangeAsStructInteger(Player::getMoney, changes.playerMoneyChange,
                 (current, change) -> current + change >= 0) ||
-            !playersTmp.containsAll(changes.playerActionPointsChange.keySet()) ||
-            !playersTmp.containsAll(changes.playerAmountOfSharesChange.keySet()) ||
+            !playersTmp.containsAllKeys(changes.playerActionPointsChange) ||
+            !playersTmp.containsAllKeys(changes.playerAmountOfSharesChange) ||
             !actionPoints.checkMergeElements(changes.playerActionPointsChange, null,
                 (o, n)->o+n>=0 && o+n<=GameData.maxActionsPerTurn) ||
             !amountOfShares.checkMergeElements(changes.playerAmountOfSharesChange, null,
@@ -498,6 +562,16 @@ public class GameData {
 
         return true;
     }
+
+
+
+
+
+
+
+
+
+
 
     //returns null if requirements not met, otherwise returns total income
     public static Double checkLine(Airline line, MapHolder<PassengerType, Integer> passengers, PlaneType plane){
