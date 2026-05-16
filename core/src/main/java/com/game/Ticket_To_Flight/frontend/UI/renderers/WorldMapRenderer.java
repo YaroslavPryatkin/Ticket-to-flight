@@ -16,24 +16,18 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.ui.Window;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import com.game.Ticket_To_Flight.Utilities.MapHolder;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airport;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airline;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.PassengerType;
-import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
 import com.game.Ticket_To_Flight.packages.PackageCreateWorldMap;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class WorldMapRenderer extends ScreenAdapter {
    // private final GameData gameData;
@@ -55,7 +49,9 @@ public class WorldMapRenderer extends ScreenAdapter {
     private final Vector3 screenPos = new Vector3();
 
     private Stage uiStage;
-    private Skin skin;
+
+    private Skin skin_default_window;
+    private Skin skin_invest_window;
     private Window currentTooltip;
 
     private Airport selectedAirport;
@@ -65,13 +61,21 @@ public class WorldMapRenderer extends ScreenAdapter {
     private double currentPlayerMoney = 1000.0;
     private double currentPlayerIncome = 50.0;
 
+    private int currentRound = 1;
+    private int currentStage = 1;
+    private int timeRemaining = 120;
+
+    private Label roundLabel;
+    private Label stageLabel;
+    private Label timeLabel;
+
     private Label moneyLabel;
     private Label incomeLabel;
 
+    private boolean isOverlayActive = false;
 
 
     public WorldMapRenderer(PackageCreateWorldMap packet) {
-        //this.gameData = gameData;
         this.batch = new SpriteBatch();
         this.WORLD_WIDTH = packet.worldWidth;
         this.WORLD_HEIGHT = packet.worldHeight;
@@ -96,71 +100,117 @@ public class WorldMapRenderer extends ScreenAdapter {
 
         this.uiStage = new Stage(new ExtendViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
 
-        createBasicSkin();
-        createHUD();
+        createBasicWindow();
+        createInvestWindow();
         setupInput();
+        showInvestWindow();
+        createHUD();
+        //showPlaneWindow();
     }
 
-    private void createBasicSkin() {
-        skin = new Skin();
-        skin.add("default-font", new BitmapFont());
+    private void createBasicWindow() {
+        skin_default_window = new Skin();
+        skin_default_window.add("default-font", new BitmapFont());
 
         Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
         pixmap.setColor(new Color(0.2f, 0.2f, 0.2f, 0.8f));
         pixmap.fill();
-        skin.add("background", new Texture(pixmap));
+        skin_default_window.add("background", new Texture(pixmap));
 
         Pixmap btnPixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
         btnPixmap.setColor(new Color(0.4f, 0.4f, 0.4f, 1f));
         btnPixmap.fill();
-        skin.add("btn-up", new Texture(btnPixmap));
+        skin_default_window.add("btn-up", new Texture(btnPixmap));
 
         Pixmap btnDisabledPixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
         btnDisabledPixmap.setColor(new Color(0.1f, 0.1f, 0.1f, 0.9f));
         btnDisabledPixmap.fill();
-        skin.add("btn-disabled", new Texture(btnDisabledPixmap));
+        skin_default_window.add("btn-disabled", new Texture(btnDisabledPixmap));
 
         pixmap.dispose();
         btnPixmap.dispose();
         btnDisabledPixmap.dispose();
 
         Window.WindowStyle windowStyle = new Window.WindowStyle();
-        windowStyle.titleFont = skin.getFont("default-font");
-        windowStyle.background = skin.getDrawable("background");
-        skin.add("default", windowStyle);
+        windowStyle.titleFont = skin_default_window.getFont("default-font");
+        windowStyle.background = skin_default_window.getDrawable("background");
+        skin_default_window.add("default", windowStyle);
 
         Label.LabelStyle labelStyle = new Label.LabelStyle();
-        labelStyle.font = skin.getFont("default-font");
+        labelStyle.font = skin_default_window.getFont("default-font");
         labelStyle.fontColor = Color.WHITE;
-        skin.add("default", labelStyle);
+        skin_default_window.add("default", labelStyle);
 
         TextButton.TextButtonStyle btnStyle = new TextButton.TextButtonStyle();
-        btnStyle.font = skin.getFont("default-font");
+        btnStyle.font = skin_default_window.getFont("default-font");
         btnStyle.fontColor = Color.WHITE;
-        btnStyle.up = skin.getDrawable("btn-up");
-        btnStyle.disabled = skin.getDrawable("btn-disabled");
-        skin.add("default", btnStyle);
+        btnStyle.up = skin_default_window.getDrawable("btn-up");
+        btnStyle.disabled = skin_default_window.getDrawable("btn-disabled");
+        skin_default_window.add("default", btnStyle);
+    }
+
+    private void createInvestWindow() {
+        skin_invest_window = new Skin();
+        skin_invest_window.add("default-font", new BitmapFont());
+
+        Pixmap bluePix = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
+        bluePix.setColor(new Color(0.1f, 0.2f, 0.5f, 0.85f));
+        bluePix.fill();
+        skin_invest_window.add("blue-bg", new Texture(bluePix));
+        bluePix.dispose();
+
+        Pixmap sliderKnob = new Pixmap(20, 20, Pixmap.Format.RGBA8888);
+        sliderKnob.setColor(Color.CYAN);
+        sliderKnob.fillCircle(10, 10, 10);
+        skin_invest_window.add("slider-knob", new Texture(sliderKnob));
+        sliderKnob.dispose();
+
+        Pixmap darkPix = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
+        darkPix.setColor(new Color(0.1f, 0.1f, 0.1f, 0.9f));
+        darkPix.fill();
+        skin_invest_window.add("dark-bg", new Texture(darkPix));
+        darkPix.dispose();
+
+        Pixmap sliderTrackPix = new Pixmap(100, 10, Pixmap.Format.RGBA8888);
+        sliderTrackPix.setColor(new Color(0.2f, 0.2f, 0.2f, 1f));
+        sliderTrackPix.fill();
+        skin_invest_window.add("slider-track", new Texture(sliderTrackPix));
+        sliderTrackPix.dispose();
+
+        Slider.SliderStyle sliderStyle = new Slider.SliderStyle();
+        sliderStyle.background = skin_invest_window.getDrawable("slider-track");
+        sliderStyle.knob = skin_invest_window.getDrawable("slider-knob");
+        skin_invest_window.add("default-horizontal", sliderStyle);
+
+        Label.LabelStyle labelStyle = new Label.LabelStyle();
+        labelStyle.font = skin_invest_window.getFont("default-font");
+        labelStyle.fontColor = Color.WHITE;
+        skin_invest_window.add("default", labelStyle);
+
+        TextButton.TextButtonStyle btnStyle = new TextButton.TextButtonStyle();
+        btnStyle.font = skin_invest_window.getFont("default-font");
+        btnStyle.fontColor = Color.WHITE;
+        btnStyle.up = skin_invest_window.getDrawable("dark-bg"); // Будет темная кнопка
+        skin_invest_window.add("default", btnStyle);
     }
 
     private void createHUD() {
-        Table hudContainer = new Table();
-        hudContainer.setFillParent(true);
-        hudContainer.top().right();
-        hudContainer.pad(10);
+        Table topBar = new Table();
+        topBar.setFillParent(true);
+        topBar.top();
+        topBar.pad(15);
 
-        Table statsPanel = new Table();
-        statsPanel.pad(5);
+        Table leftStats = new Table();
+        leftStats.add(showRound()).padRight(30);
+        leftStats.add(showStage()).padRight(30);
+        leftStats.add(showTime());
 
-        moneyLabel = new Label("Money: $" + currentPlayerMoney, skin);
-        incomeLabel = new Label("Income: +$" + currentPlayerIncome, skin);
+        Table rightStats = showMoneyAndIncome();
 
-        incomeLabel.setColor(Color.GREEN);
+        topBar.add(leftStats).expandX().left();
+        topBar.add(rightStats).expandX().right();
 
-        statsPanel.add(moneyLabel).left().row();
-        statsPanel.add(incomeLabel).left().padTop(5).row();
-
-        hudContainer.add(statsPanel);
-        uiStage.addActor(hudContainer);
+        uiStage.addActor(topBar);
     }
 
     public void updateAirportData(List<Airport> airports) {
@@ -190,11 +240,14 @@ public class WorldMapRenderer extends ScreenAdapter {
 
     private void setupInput() {
         InputMultiplexer multiplexer = new InputMultiplexer();
+
         multiplexer.addProcessor(uiStage);
 
-        Gdx.input.setInputProcessor(new InputAdapter() {
+        InputAdapter mapInputProcessor = new InputAdapter() {
             @Override
             public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+                if (isOverlayActive) return true;
+
                 Vector3 worldClick = new Vector3(screenX, screenY, 0);
                 camera.unproject(worldClick);
 
@@ -234,6 +287,7 @@ public class WorldMapRenderer extends ScreenAdapter {
 
             @Override
             public boolean touchDragged(int screenX, int screenY, int pointer) {
+                if (isOverlayActive) return true;
                 float deltaX = lastMousePos.x - screenX;
                 float deltaY = screenY - lastMousePos.y;
 
@@ -244,10 +298,14 @@ public class WorldMapRenderer extends ScreenAdapter {
 
             @Override
             public boolean scrolled(float amountX, float amountY) {
+                if (isOverlayActive) return true;
                 camera.zoom += amountY * 0.1f;
                 return true;
             }
-        });
+        };
+
+        multiplexer.addProcessor(mapInputProcessor);
+        Gdx.input.setInputProcessor(multiplexer);
     }
 
     private float distanceToSegment(float px, float py, float x1, float y1, float x2, float y2) {
@@ -280,17 +338,44 @@ public class WorldMapRenderer extends ScreenAdapter {
         return (float) Math.sqrt(dx * dx + dy * dy);
     }
 
+    private Table showMoneyAndIncome() {
+        Table table = new Table();
+        moneyLabel = new Label("Money: $" + currentPlayerMoney, skin_default_window);
+        incomeLabel = new Label("Income: +$" + currentPlayerIncome, skin_default_window);
+        incomeLabel.setColor(Color.GREEN);
+
+        table.add(moneyLabel).left().row();
+        table.add(incomeLabel).left().padTop(5).row();
+        return table;
+    }
+
+    private Label showRound() {
+        roundLabel = new Label("Round: " + currentRound, skin_default_window);
+        return roundLabel;
+    }
+
+    private Label showStage() {
+        stageLabel = new Label("Stage: " + currentStage, skin_default_window);
+        return stageLabel;
+    }
+
+    private Label showTime() {
+        timeLabel = new Label("Time: " + timeRemaining + "s", skin_default_window);
+        timeLabel.setColor(Color.ORANGE); // Сделаем время оранжевым для красоты
+        return timeLabel;
+    }
+
     private void showAirportTooltip(Airport airport) {
         if (currentTooltip != null) currentTooltip.remove();
 
         selectedAirport = airport;
 
-        currentTooltip = new Window(airport.getCityName(), skin);
+        currentTooltip = new Window(airport.getCityName(), skin_default_window);
         currentTooltip.pad(20);
 
         Table table = new Table();
-        table.add(new Label("Route", skin)).padRight(10);
-        table.add(new Label("Group", skin));
+        table.add(new Label("Route", skin_default_window)).padRight(10);
+        table.add(new Label("Group", skin_default_window));
         table.row();
 
         var guestsMap = airport.getGuests();
@@ -303,13 +388,13 @@ public class WorldMapRenderer extends ScreenAdapter {
                 String passengerInfo = type.description;
                 String countText = groupCount + " гр. (по " + type.size + " чел.)";
 
-                table.add(new Label(passengerInfo, skin)).padRight(10).left();
-                table.add(new Label(countText, skin)).right();
+                table.add(new Label(passengerInfo, skin_default_window)).padRight(10).left();
+                table.add(new Label(countText, skin_default_window)).right();
                 table.row();
             }
         }
         else {
-            table.add(new Label("No guests", skin)).colspan(2);
+            table.add(new Label("No guests", skin_default_window)).colspan(2);
         }
 
         currentTooltip.add(table);
@@ -323,14 +408,14 @@ public class WorldMapRenderer extends ScreenAdapter {
         selectedAirport = null;
         selectedAirline = airline;
 
-        currentTooltip = new Window("Route Details", skin);
+        currentTooltip = new Window("Route Details", skin_default_window);
         currentTooltip.pad(20);
         Table table = new Table();
 
         if (airline.getPlayer() != null) {
-            table.add(new Label("Owned by: " + airline.getPlayer().getName(), skin));
+            table.add(new Label("Owned by: " + airline.getPlayer().getName(), skin_default_window));
         } else {
-            TextButton buyButton = new TextButton("Buy for $" + airline.getPrice(), skin);
+            TextButton buyButton = new TextButton("Buy for $" + airline.getPrice(), skin_default_window);
 
             if (!isBuyingPhase) {
                 buyButton.setDisabled(true);
@@ -360,6 +445,154 @@ public class WorldMapRenderer extends ScreenAdapter {
         screenPos.set(clickX, clickY, 0);
         camera.project(screenPos);
         currentTooltip.setPosition(screenPos.x + 10, screenPos.y + 10);
+    }
+
+    public void showInvestWindow() {
+        isOverlayActive = true;
+
+        final Table overlayWindow = new Table();
+        overlayWindow.setFillParent(true);
+        overlayWindow.setBackground(skin_invest_window.getDrawable("blue-bg"));
+        overlayWindow.setTouchable(com.badlogic.gdx.scenes.scene2d.Touchable.enabled);
+
+        Label titleLabel = new Label("Investing", skin_invest_window);
+        titleLabel.setFontScale(1.5f);
+
+        Label subtitleLabel = new Label("invest your incomes to money", skin_invest_window);
+
+        final Slider slider = new Slider(1, 20, 1, false, skin_invest_window);
+        final Label amountLabel = new Label("1", skin_invest_window);
+
+        slider.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, com.badlogic.gdx.scenes.scene2d.Actor actor) {
+                amountLabel.setText(String.valueOf((int) slider.getValue()));
+            }
+        });
+
+        TextButton submitBtn = new TextButton("Submit", skin_invest_window);
+        submitBtn.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                int investedAmount = (int) slider.getValue();
+                overlayWindow.remove();
+                showSuccessWindow("Income was invested successfully!");
+            }
+        });
+
+        overlayWindow.add(titleLabel).padBottom(15).row();
+        overlayWindow.add(subtitleLabel).padBottom(40).row();
+        overlayWindow.add(slider).width(300).padBottom(10).row();
+        overlayWindow.add(amountLabel).padBottom(40).row();
+        overlayWindow.add(submitBtn).width(150).height(50);
+
+        uiStage.addActor(overlayWindow);
+    }
+
+    public void showSuccessWindow(String message) {
+        isOverlayActive = true;
+
+        final Window successWindow = new Window(" Success", skin_default_window);
+        successWindow.pad(30);
+        successWindow.padTop(50);
+        successWindow.setModal(true);
+        successWindow.setMovable(false);
+
+        Label messageLabel = new Label(message, skin_default_window);
+
+        TextButton closeBtn = new TextButton("Close", skin_default_window);
+        closeBtn.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                successWindow.remove();
+                isOverlayActive = false;
+            }
+        });
+
+        successWindow.add(messageLabel).padBottom(30).row();
+        successWindow.add(closeBtn).width(120).height(40);
+
+        successWindow.pack();
+        float centerX = (uiStage.getWidth() - successWindow.getWidth()) / 2f;
+        float centerY = (uiStage.getHeight() - successWindow.getHeight()) / 2f;
+        successWindow.setPosition(centerX, centerY);
+
+        uiStage.addActor(successWindow);
+    }
+
+    public void showPlaneWindow() {
+        isOverlayActive = true;
+
+        final Table overlayWindow = new Table();
+        overlayWindow.setFillParent(true);
+        overlayWindow.setBackground(skin_invest_window.getDrawable("blue-bg"));
+        overlayWindow.setTouchable(com.badlogic.gdx.scenes.scene2d.Touchable.enabled);
+
+        Label titleLabel = new Label("Purchase planes", skin_invest_window);
+        titleLabel.setFontScale(1.5f);
+        Label subtitleLabel = new Label("Buy new planes", skin_invest_window);
+
+        Table planesTable = new Table();
+
+        planesTable.add(new Label("Regional Jet", skin_invest_window)).pad(20);
+        planesTable.add(new Label("Business Plane", skin_invest_window)).pad(20);
+        planesTable.add(new Label("Usual Jet", skin_invest_window)).pad(20);
+        planesTable.row();
+
+        planesTable.add(new Label("$500", skin_invest_window)).padBottom(20);
+        planesTable.add(new Label("$1200", skin_invest_window)).padBottom(20);
+        planesTable.add(new Label("$2500", skin_invest_window)).padBottom(20);
+        planesTable.row();
+
+        TextButton buyRegBtn = new TextButton("BUY", skin_invest_window);
+        TextButton buyBusBtn = new TextButton("BUY", skin_invest_window);
+        TextButton buyUsuBtn = new TextButton("BUY", skin_invest_window);
+
+        buyRegBtn.addListener(new ClickListener() {
+            @Override
+            public void clicked(com.badlogic.gdx.scenes.scene2d.InputEvent event, float x, float y) {
+                System.out.println("Куплен Regional Jet");
+                overlayWindow.remove();
+                showSuccessWindow("Regional Jet purchased successfully!");
+            }
+        });
+
+        buyBusBtn.addListener(new ClickListener() {
+            @Override
+            public void clicked(com.badlogic.gdx.scenes.scene2d.InputEvent event, float x, float y) {
+                System.out.println("Куплен Business Plane");
+                overlayWindow.remove();
+                showSuccessWindow("Business Plane purchased successfully!");
+            }
+        });
+
+        buyUsuBtn.addListener(new ClickListener() {
+            @Override
+            public void clicked(com.badlogic.gdx.scenes.scene2d.InputEvent event, float x, float y) {
+                System.out.println("Куплен Usual Jet");
+                overlayWindow.remove();
+                showSuccessWindow("Usual Jet purchased successfully!");
+            }
+        });
+
+        planesTable.add(buyRegBtn).width(140).height(45);
+        planesTable.add(buyBusBtn).width(140).height(45);
+        planesTable.add(buyUsuBtn).width(140).height(45);
+
+        TextButton closeBtn = new TextButton("Cancel", skin_invest_window);
+        closeBtn.addListener(new ClickListener() {
+            @Override
+            public void clicked(com.badlogic.gdx.scenes.scene2d.InputEvent event, float x, float y) {
+                overlayWindow.remove();
+            }
+        });
+
+        overlayWindow.add(titleLabel).padBottom(10).row();
+        overlayWindow.add(subtitleLabel).padBottom(50).row();
+        overlayWindow.add(planesTable).padBottom(50).row(); // Вставляем всю таблицу с самолетами целиком
+        overlayWindow.add(closeBtn).width(150).height(50);
+
+        uiStage.addActor(overlayWindow);
     }
 
     @Override
@@ -410,6 +643,8 @@ public class WorldMapRenderer extends ScreenAdapter {
             batch.draw(airportTexture, drawX, drawY, diameter, diameter);
         }
 
+
+
         batch.setColor(Color.WHITE);
 
         batch.end();
@@ -420,9 +655,20 @@ public class WorldMapRenderer extends ScreenAdapter {
             currentTooltip.setPosition(screenPos.x + 20, screenPos.y + 20);
         }
 
-        if (moneyLabel != null && incomeLabel != null) {
+        if (moneyLabel != null) {
             moneyLabel.setText("Money: $" + currentPlayerMoney);
+        }
+        if (incomeLabel != null) {
             incomeLabel.setText("Income: +$" + currentPlayerIncome);
+        }
+        if (roundLabel != null) {
+            roundLabel.setText("Round: " + currentRound);
+        }
+        if (stageLabel != null) {
+            stageLabel.setText("Stage: " + currentStage);
+        }
+        if (timeLabel != null) {
+            timeLabel.setText("Time: " + timeRemaining + "s");
         }
 
         uiStage.act(delta);
