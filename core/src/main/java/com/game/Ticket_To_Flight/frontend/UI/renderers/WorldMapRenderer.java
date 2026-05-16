@@ -28,6 +28,7 @@ import com.game.Ticket_To_Flight.Utilities.MapHolder;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airport;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airline;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.PassengerType;
+import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
 import com.game.Ticket_To_Flight.packages.PackageCreateWorldMap;
 
 import java.util.ArrayList;
@@ -35,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 
 public class WorldMapRenderer extends ScreenAdapter {
+   // private final GameData gameData;
     private final SpriteBatch batch;
 
     private final Texture mapTexture;
@@ -61,8 +63,15 @@ public class WorldMapRenderer extends ScreenAdapter {
 
     private boolean isBuyingPhase = true;
     private double currentPlayerMoney = 1000.0;
+    private double currentPlayerIncome = 50.0;
+
+    private Label moneyLabel;
+    private Label incomeLabel;
+
+
 
     public WorldMapRenderer(PackageCreateWorldMap packet) {
+        //this.gameData = gameData;
         this.batch = new SpriteBatch();
         this.WORLD_WIDTH = packet.worldWidth;
         this.WORLD_HEIGHT = packet.worldHeight;
@@ -86,7 +95,9 @@ public class WorldMapRenderer extends ScreenAdapter {
         linePixmap.dispose();
 
         this.uiStage = new Stage(new ExtendViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
+
         createBasicSkin();
+        createHUD();
         setupInput();
     }
 
@@ -100,12 +111,12 @@ public class WorldMapRenderer extends ScreenAdapter {
         skin.add("background", new Texture(pixmap));
 
         Pixmap btnPixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
-        btnPixmap.setColor(new Color(0.4f, 0.4f, 0.4f, 1f)); // Нормальная кнопка
+        btnPixmap.setColor(new Color(0.4f, 0.4f, 0.4f, 1f));
         btnPixmap.fill();
         skin.add("btn-up", new Texture(btnPixmap));
 
         Pixmap btnDisabledPixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
-        btnDisabledPixmap.setColor(new Color(0.1f, 0.1f, 0.1f, 0.9f)); // Темная неактивная
+        btnDisabledPixmap.setColor(new Color(0.1f, 0.1f, 0.1f, 0.9f));
         btnDisabledPixmap.fill();
         skin.add("btn-disabled", new Texture(btnDisabledPixmap));
 
@@ -129,6 +140,27 @@ public class WorldMapRenderer extends ScreenAdapter {
         btnStyle.up = skin.getDrawable("btn-up");
         btnStyle.disabled = skin.getDrawable("btn-disabled");
         skin.add("default", btnStyle);
+    }
+
+    private void createHUD() {
+        Table hudContainer = new Table();
+        hudContainer.setFillParent(true);
+        hudContainer.top().right();
+        hudContainer.pad(10);
+
+        Table statsPanel = new Table();
+        statsPanel.pad(5);
+
+        moneyLabel = new Label("Money: $" + currentPlayerMoney, skin);
+        incomeLabel = new Label("Income: +$" + currentPlayerIncome, skin);
+
+        incomeLabel.setColor(Color.GREEN);
+
+        statsPanel.add(moneyLabel).left().row();
+        statsPanel.add(incomeLabel).left().padTop(5).row();
+
+        hudContainer.add(statsPanel);
+        uiStage.addActor(hudContainer);
     }
 
     public void updateAirportData(List<Airport> airports) {
@@ -166,7 +198,6 @@ public class WorldMapRenderer extends ScreenAdapter {
                 Vector3 worldClick = new Vector3(screenX, screenY, 0);
                 camera.unproject(worldClick);
 
-                boolean hitAirport = false;
                 for (Airport airport : airportsToDraw) {
                     float distance = Vector2.dst(airport.getX(), airport.getY(), worldClick.x, worldClick.y);
 
@@ -176,7 +207,7 @@ public class WorldMapRenderer extends ScreenAdapter {
                     }
                 }
 
-                float clickTolerance = 10f; // Насколько близко нужно кликнуть к линии
+                float clickTolerance = 10f;
                 for (Airline airline : airlinesToDraw) {
                     float distanceToLine = distanceToSegment(
                         worldClick.x, worldClick.y,
@@ -190,12 +221,10 @@ public class WorldMapRenderer extends ScreenAdapter {
                     }
                 }
 
-                if (!hitAirport && currentTooltip != null) {
-                    currentTooltip.remove();
-                    currentTooltip = null;
-                    selectedAirport = null;
-                    selectedAirline = null;
-                }
+                currentTooltip.remove();
+                currentTooltip = null;
+                selectedAirport = null;
+                selectedAirline = null;
 
                 lastMousePos.set(screenX, screenY, 0);
                 return true;
@@ -228,18 +257,18 @@ public class WorldMapRenderer extends ScreenAdapter {
         float dot = A * C + B * D;
         float len_sq = C * C + D * D;
         float param = -1;
-        if (len_sq != 0) // избегаем деления на ноль
+        if (len_sq != 0)
             param = dot / len_sq;
 
         float xx, yy;
 
-        if (param < 0) { // Точка за первым концом
+        if (param < 0) {
             xx = x1;
             yy = y1;
-        } else if (param > 1) { // Точка за вторым концом
+        } else if (param > 1) {
             xx = x2;
             yy = y2;
-        } else { // Точка проецируется на сам отрезок
+        } else {
             xx = x1 + param * C;
             yy = y1 + param * D;
         }
@@ -255,7 +284,7 @@ public class WorldMapRenderer extends ScreenAdapter {
         selectedAirport = airport;
 
         currentTooltip = new Window(airport.getCityName(), skin);
-        currentTooltip.pad(20); // Отступы от краев
+        currentTooltip.pad(20);
 
         Table table = new Table();
         table.add(new Label("Route", skin)).padRight(10);
@@ -265,7 +294,6 @@ public class WorldMapRenderer extends ScreenAdapter {
         var guestsMap = airport.getGuests();
 
         if (guestsMap != null) {
-
             for (PassengerType type : guestsMap.getKeys()) {
                 Integer groupCount = guestsMap.get(type);
                 if (groupCount == null || groupCount == 0) continue;
@@ -277,7 +305,8 @@ public class WorldMapRenderer extends ScreenAdapter {
                 table.add(new Label(countText, skin)).right();
                 table.row();
             }
-        } else {
+        }
+        else {
             table.add(new Label("No guests", skin)).colspan(2);
         }
 
@@ -387,6 +416,11 @@ public class WorldMapRenderer extends ScreenAdapter {
             Vector3 screenPos = new Vector3(selectedAirport.getX(), selectedAirport.getY(), 0);
             camera.project(screenPos);
             currentTooltip.setPosition(screenPos.x + 20, screenPos.y + 20);
+        }
+
+        if (moneyLabel != null && incomeLabel != null) {
+            moneyLabel.setText("Money: $" + currentPlayerMoney);
+            incomeLabel.setText("Income: +$" + currentPlayerIncome);
         }
 
         uiStage.act(delta);
