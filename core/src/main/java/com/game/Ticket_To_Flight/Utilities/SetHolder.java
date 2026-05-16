@@ -1053,6 +1053,12 @@ public class SetHolder<T extends Identifiable> implements Set<T> {
         return true;
     }
 
+    public void printAllToConsole(){
+        for(Map.Entry<Integer, T> e : storage.entrySet()){
+            System.out.println(e.getKey() + " -> " + e.getValue());
+        }
+    }
+
     // --- Set Interface Implementation (Delegation to Map) ---
 
     @Override

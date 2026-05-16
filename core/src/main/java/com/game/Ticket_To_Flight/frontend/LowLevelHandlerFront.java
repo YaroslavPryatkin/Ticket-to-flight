@@ -53,9 +53,8 @@ public class LowLevelHandlerFront extends LowLevelHandler {
         if (checkedChanges != null) {
             gameData.acquireWriteLock();
             try {
-                System.out.println("Applying changes");
+                //System.out.println("Applying changes");
                 gameData.applyChangesUnsafe(checkedChanges);
-
                 checkedChanges = null;
             }
             catch (Exception e){

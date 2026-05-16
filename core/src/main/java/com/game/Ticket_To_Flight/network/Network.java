@@ -86,7 +86,7 @@ public class Network {
 
         for (Class clazz : discovered) {
             kryo.register(clazz);
-            System.out.println(clazz.toString() + " registered for " + endPoint.toString());
+            //System.out.println(clazz.toString() + " registered for " + endPoint.toString());
         }
     }
 

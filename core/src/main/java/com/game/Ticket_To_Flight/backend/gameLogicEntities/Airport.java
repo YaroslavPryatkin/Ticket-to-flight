@@ -77,4 +77,9 @@ public class Airport extends Identifiable {
         return this.passengers;
     }
 
+    @Override
+    public String toString(){
+        return "Airport " + airportName + " of type " + type.description;
+    }
+
 }

@@ -52,4 +52,9 @@ public class Airline extends Identifiable {
     public Airport getPortB() {
         return this.portB;
     }
+
+    @Override
+    public String toString(){
+        return "Airline of type [" + type.description + "] connecting airports A: " + portA.getId() + " and B: " + portB.getId();
+    }
 }

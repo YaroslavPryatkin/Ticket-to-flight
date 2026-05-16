@@ -56,4 +56,10 @@ public class Player extends Identifiable {
     public Color getColor() {
         return this.color;
     }
+
+    @Override
+    public String toString(){
+        return "Player " + name;
+    }
+
 }

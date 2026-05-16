@@ -216,7 +216,7 @@ public class GameData {
             this.type = type.getId();
             this.position = position;
             this.name = AirportName;
-            this.passengers = new MapHolder<>(GameData.passengerTypes);
+            this.passengers = new HashMap<>();
         }
 
         /**
@@ -229,7 +229,7 @@ public class GameData {
             this.type = type;
             this.position = position;
             this.name = AirportName;
-            this.passengers = new MapHolder<>(GameData.passengerTypes);
+            this.passengers = new HashMap<>();
         }
 
         public Airport restore(){

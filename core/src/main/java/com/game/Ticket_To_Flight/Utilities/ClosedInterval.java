@@ -7,7 +7,7 @@ public class ClosedInterval<T extends Comparable<T>> {
     private ClosedInterval() { this.from = null; this.to = null; }
 
     public ClosedInterval(T from, T to) {
-        if (from != null && to != null && from.compareTo(to) > 0) throw new IllegalArgumentException("from > to");
+        if (from != null && to != null && from.compareTo(to) > 0) throw new IllegalArgumentException(from + " > " + to);
         this.from = from;
         this.to = to;
     }

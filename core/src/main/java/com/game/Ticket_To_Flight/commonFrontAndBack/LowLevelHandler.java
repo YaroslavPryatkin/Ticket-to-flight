@@ -60,7 +60,7 @@ public abstract class LowLevelHandler {
         MessageAndConnection mc;
         while ((mc = sendMessageQueue.poll()) != null) {
             if(mc.con != null && mc.con.isConnected()) {
-                System.out.println("Sending message " + mc.message.getClass() + " to "+ mc.con);
+                //System.out.println("Sending message " + mc.message.getClass() + " to "+ mc.con);
                 mc.con.sendTCP(mc.message);
             }
             else{

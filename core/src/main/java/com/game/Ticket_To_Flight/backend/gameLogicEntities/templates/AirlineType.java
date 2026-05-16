@@ -31,10 +31,10 @@ public class AirlineType extends Identifiable {
         @JsonProperty("yield") double yield,
         @JsonProperty("gateA") int gateA,
         @JsonProperty("gateB") int gateB,
-        @JsonProperty("minLuxury") double minLuxury,
-        @JsonProperty("maxLuxury") double maxLuxury,
-        @JsonProperty("minCapacity") int minCapacity,
-        @JsonProperty("maxCapacity") int maxCapacity,
+        @JsonProperty("minLuxury") Double minLuxury,
+        @JsonProperty("maxLuxury") Double maxLuxury,
+        @JsonProperty("minCapacity") Integer minCapacity,
+        @JsonProperty("maxCapacity") Integer maxCapacity,
         @JsonProperty("price") double price,
         @JsonProperty("description") String description
     ){   super(id);
