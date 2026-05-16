@@ -1,32 +1,66 @@
 package com.game.Ticket_To_Flight.frontend;
 
-import com.badlogic.gdx.math.Vector2;
-import com.game.Ticket_To_Flight.Utilities.ClosedInterval;
-import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airline;
-import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airport;
-import com.game.Ticket_To_Flight.backend.gameLogicEntities.Player;
-import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.AirlineType;
-import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.AirportType;
-import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.CityType;
-import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.PassengerType;
+import com.badlogic.gdx.Game;
 import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
-import com.game.Ticket_To_Flight.packages.PackageCreateWorldMap;
+import com.game.Ticket_To_Flight.network.Network;
 import com.game.Ticket_To_Flight.frontend.UI.MainDrawer;
-import com.game.Ticket_To_Flight.packages.PackageInitAirlines;
-import com.game.Ticket_To_Flight.packages.PackageInitAirports;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.game.Ticket_To_Flight.frontend.LowLevelHandlerFront.Flags;
 
 public class MainClient {
-    private MainDrawer mainDrawer;
+    Game myGame;
+    MainDrawer mainDrawer;
     private final GameData gameData = new GameData();
     private final LowLevelHandlerFront llh = new LowLevelHandlerFront(gameData);
 
-    public void setMainDrawer(MainDrawer mainDrawer) {
-        this.mainDrawer = mainDrawer;
+    public MainClient(Game gm){
+        this.myGame = gm;
+        this.mainDrawer = new MainDrawer(myGame, this);
     }
 
+    public void mainCycleWithUpdate(){
+        llh.update();
+        gameData.acquireReadLock();
+        mainCycle();
+    }
+
+
+    private void mainCycle(){
+        if(llh.flags.gamePreparationsState != Flags.GamePreparationsState.RUNNING){
+            GamePraparationStage();
+        }
+    }
+
+
+    private void GamePraparationStage(){
+        if(llh.flags.gamePreparationsState == Flags.GamePreparationsState.WAITING_FOR_CONNECT_CALL){
+            llh.connectToServer();
+        }
+        else if(llh.flags.gamePreparationsState == Flags.GamePreparationsState.SEARCHING_FOR_SERVER){
+            //ui крутить колесико
+        }
+        else if(llh.flags.gamePreparationsState == Flags.GamePreparationsState.READY_TO_JOIN_THE_GAME){
+            if(llh.flags.joinGameResponse == null) {
+                //ui спросить имя
+                llh.sendJoinRequest("test");
+            }
+            else if(llh.flags.joinGameResponse == Network.JoinGameResponse.Response.NAME_ALREADY_EXISTS){
+                //ui спросить игрока еще раз
+                llh.sendJoinRequest("other name");
+            }
+
+        }
+        else if(llh.flags.gamePreparationsState == Flags.GamePreparationsState.WAITING_FOR_SERVER_RESPONSE){
+            //ui крутить колесико
+        }
+        else if(llh.flags.gamePreparationsState == Flags.GamePreparationsState.WAITING_FOR_OTHER_PLAYERS_TO_JOIN){
+            //ui ждем игроков
+        }
+    }
+
+
+    public GameData getGameData(){return gameData;}
+
+    /*
     public void sendWorldMapPacket() {
         PackageCreateWorldMap mapPacket = new PackageCreateWorldMap("EuropeMap.png", 1920f, 1080f);
         mainDrawer.drawWorldMap(mapPacket);
@@ -122,4 +156,6 @@ public class MainClient {
         PackageInitAirlines airlinePacket = new PackageInitAirlines(testAirlines);
         mainDrawer.drawAirlines(airlinePacket);
     }
+
+     */
 }

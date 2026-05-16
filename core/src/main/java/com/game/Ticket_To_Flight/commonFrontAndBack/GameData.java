@@ -43,6 +43,7 @@ public class GameData {
     public static SetHolder<WorldEventType> worldEventTypes = new SetHolder<>();
     public static SetHolder<AbilityType> abilityTypes = new SetHolder<>();
     public static Integer maxActionsPerTurn = 5;
+    public static Integer maxAmountOfShares = 20;
 
     public enum State {
         WORLD_UPDATE,
@@ -66,6 +67,7 @@ public class GameData {
     public SetHolder<Airline> availableAirlines = new SetHolder<>();
     public MapHolder<PlaneType, Integer> availablePlanes = new MapHolder<>(GameData.planeTypes);
     public MapHolder<Player, Integer> actionPoints = new MapHolder<>(players);
+    public MapHolder<Player,Integer> amountOfShares = new MapHolder<>(players);
 
 
     public static class AirlineDTO extends Identifiable {
@@ -274,6 +276,7 @@ public class GameData {
         public  Map<Integer, Double> playerMoneyChange= null;
         public  Map<Integer, Double> playerIncomeChange= null;
         public  Map<Integer, Integer> playerActionPointsChange= null;
+        public  Map<Integer, Integer> playerAmountOfSharesChange= null;
 
         public  Map<Integer, Set<Integer>> playerAirlinesToAdd= null;
         public  Map<Integer, Set<Integer>> playerAirlinesToRemove= null;
@@ -327,6 +330,9 @@ public class GameData {
 
             this.playerActionPointsChange = MapHolder.merge(
                 this.playerActionPointsChange, other.playerActionPointsChange, v -> v, DataChanges::sumIntOrNull);
+
+            this.playerAmountOfSharesChange = MapHolder.merge(
+                this.playerAmountOfSharesChange, other.playerAmountOfSharesChange, v -> v, DataChanges::sumIntOrNull);
 
             this.playerAirlinesToAdd = MapHolder.merge(
                 this.playerAirlinesToAdd, other.playerAirlinesToAdd, v->v,
@@ -385,6 +391,9 @@ public class GameData {
 
         actionPoints.merge(changes.playerActionPointsChange, (o)->o, (o, n)->n+o);
         actionPoints.removeAllRefsToNotExistingObjects();
+
+        amountOfShares.merge(changes.playerAmountOfSharesChange, (o)->o, (o, n)->n+o);
+        amountOfShares.removeAllRefsToNotExistingObjects();
 
         players.changeAsStructWithSetterInteger(Player::setIncome, Player::getIncome,
             changes.playerIncomeChange, (f, s)->f+s);
@@ -449,8 +458,11 @@ public class GameData {
             !playersTmp.checkChangeAsStructInteger(Player::getMoney, changes.playerMoneyChange,
                 (current, change) -> current + change >= 0) ||
             !playersTmp.containsAll(changes.playerActionPointsChange.keySet()) ||
+            !playersTmp.containsAll(changes.playerAmountOfSharesChange.keySet()) ||
             !actionPoints.checkMergeElements(changes.playerActionPointsChange, null,
                 (o, n)->o+n>=0 && o+n<=GameData.maxActionsPerTurn) ||
+            !amountOfShares.checkMergeElements(changes.playerAmountOfSharesChange, null,
+                (o, n)->o+n>=0 && o+n<=GameData.maxAmountOfShares) ||
             !playersTmp.checkChangeAsStructInteger((pl)->pl.airlines,
                 Arrays.asList(changes.playerAirlinesToAdd, changes.playerAirlinesToRemove),
                 (f,s)->f.checkChangeSetIILookUp(s.get(0), s.get(1), airlinesTmp)

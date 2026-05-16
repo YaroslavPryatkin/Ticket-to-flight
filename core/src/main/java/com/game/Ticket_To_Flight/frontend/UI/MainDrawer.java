@@ -14,11 +14,7 @@ public class MainDrawer {
 
     public MainDrawer(Game myGame, MainClient mainClient) {
         this.myGame = myGame;
-        mainClient.setMainDrawer(this);
-    }
-
-    public void drawWorldMap(PackageCreateWorldMap packet) {
-        this.currentMapScreen = new WorldMapRenderer(packet);
+        this.currentMapScreen = new WorldMapRenderer(mainClient);
         myGame.setScreen(currentMapScreen);
     }
 

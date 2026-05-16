@@ -2,7 +2,6 @@ package com.game.Ticket_To_Flight.network;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.EndPoint;
-import com.game.Ticket_To_Flight.commonFrontAndBack.DTOHandler;
 import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
 
 import java.lang.reflect.Field;
@@ -38,9 +37,27 @@ public class Network {
     }
     */
 
+    private static void registerAdditional(Kryo kryo){
+        kryo.register(JoinGameResponse.Response.class);
+    }
+
+
     //root classes to register. Also, should be classes in <> because of type erase
     private static final Class[] ROOT_CLASSES = {
-
+        GameMessage.class,
+        StartGameMessage.class,
+        PlayerAirlineChoiceResponse.class,
+        PlayerPlaneChoiceResponse.class,
+        PlayerInvestmentChoiceResponse.class,
+        PlayerAbilityChoiceResponse.class,
+        PlayerWorldEventChoiceResponse.class,
+        PlayerRouteChoiceResponse.class,
+        DataChangesMessage.class,
+        ReloadGameDataRequest.class,
+        ReloadGameDataResponse.class,
+        JoinGameRequest.class,
+        JoinGameResponse.class,
+        JoinGameResponse.Response.class,
         JoinGameRequest.class,
         JoinGameResponse.class,
         Arrays.asList().getClass(),
@@ -78,6 +95,9 @@ public class Network {
             kryo.register(clazz);
             System.out.println(clazz.toString() + " registered for " + endPoint.toString());
         }
+
+        registerAdditional(kryo);
+
     }
 
     private static void discoverRecursive(Class<?> clazz, Set<Class> found) {
@@ -115,60 +135,73 @@ public class Network {
     }
 
     public static class GameMessage{
-
+        public GameMessage(){}
     }
 
     public static class PlayerAirlineChoiceResponse extends GameMessage{
-        public Set<Integer> airlines;
+        public PlayerAirlineChoiceResponse(){}
+        public Set<Integer> airlines =null;
     }
 
     public static class PlayerPlaneChoiceResponse extends GameMessage{
+        public PlayerPlaneChoiceResponse(){}
         public Set<Integer> planes;
     }
 
     public static class PlayerInvestmentChoiceResponse extends GameMessage{
-        public Integer amountOfShares;
+        public PlayerInvestmentChoiceResponse(){}
+        public Integer amountOfShares =null;
     }
 
     public static class PlayerAbilityChoiceResponse extends GameMessage{
-        public Integer ability;
+        public PlayerAbilityChoiceResponse(){}
+        public Integer ability =null;
     }
 
     public static class PlayerWorldEventChoiceResponse extends GameMessage{
-        public Integer worldEvent;
+        public PlayerWorldEventChoiceResponse(){}
+        public Integer worldEvent =null;
     }
 
     public static class PlayerRouteChoiceResponse extends GameMessage{
+        public PlayerRouteChoiceResponse(){}
         //no route class yet
     }
 
     public static class DataChangesMessage extends GameMessage{
-        public GameData.DataChanges dc;
+        public DataChangesMessage(){}
+        public GameData.DataChanges dc =null;
         public DataChangesMessage(GameData.DataChanges dc) { this.dc = dc;}
     }
 
     public static class ReloadGameDataRequest extends GameMessage{
-
+        public ReloadGameDataRequest(){}
     }
 
     public static class ReloadGameDataResponse extends GameMessage{
-        public GameData.DataChanges dc;
+        public ReloadGameDataResponse(){}
+        public GameData.DataChanges dc=null;
         public ReloadGameDataResponse(GameData.DataChanges dc) { this.dc = dc;}
     }
 
     public static class JoinGameRequest extends GameMessage{
-        public String playerName;
+        public String playerName=null;
+        public JoinGameRequest(){}
         public JoinGameRequest(String name) { this.playerName = name;}
     }
 
     public static class JoinGameResponse extends GameMessage{
+        public JoinGameResponse(){}
         public enum Response {
             SUCCESS,
-            NAME_ALREADY_EXISTS,
-            BADNAME
+            NAME_ALREADY_EXISTS
         }
-        public Response response;
-        public Integer id;
+        public Response response=null;
+        public Integer id=null;
         public JoinGameResponse(Response response, Integer id){this.response = response; this.id = id;}
+    }
+
+    public static class StartGameMessage extends GameMessage {
+        public StartGameMessage(){}
     }
 }

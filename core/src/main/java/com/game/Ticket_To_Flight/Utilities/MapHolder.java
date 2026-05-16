@@ -601,13 +601,6 @@ public class MapHolder<K extends Identifiable, V> implements Map<Integer, V> {
         return true;
     }
 
-    public SetHolder<K> getKeys() {
-        return keyHolder;
-    }
-
-    public V get(K key) {
-        return storage.get(key.id);
-    }
 
 
 

@@ -21,16 +21,20 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.game.Ticket_To_Flight.PresetPaths;
+import com.game.Ticket_To_Flight.Utilities.MapHolder;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airport;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airline;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.PassengerType;
+import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
+import com.game.Ticket_To_Flight.frontend.MainClient;
 import com.game.Ticket_To_Flight.packages.PackageCreateWorldMap;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class WorldMapRenderer extends ScreenAdapter {
-   // private final GameData gameData;
     private final SpriteBatch batch;
 
     private final Texture mapTexture;
@@ -74,12 +78,17 @@ public class WorldMapRenderer extends ScreenAdapter {
 
     private boolean isOverlayActive = false;
 
+    private MainClient client;
+    private final GameData gameData;
 
-    public WorldMapRenderer(PackageCreateWorldMap packet) {
+    public WorldMapRenderer(MainClient client) {
+        this.client = client;
+        this.gameData = client.getGameData();
         this.batch = new SpriteBatch();
-        this.WORLD_WIDTH = packet.worldWidth;
-        this.WORLD_HEIGHT = packet.worldHeight;
-        this.mapTexture = new Texture(Gdx.files.internal(packet.mapTextureName));
+
+        this.WORLD_WIDTH = Gdx.graphics.getWidth();
+        this.WORLD_HEIGHT = Gdx.graphics.getHeight();
+        this.mapTexture = new Texture(Gdx.files.internal(PresetPaths.presetPaths.get(1)));
 
         this.camera = new OrthographicCamera();
         this.viewport = new ExtendViewport(WORLD_WIDTH, WORLD_HEIGHT, camera);
@@ -103,9 +112,9 @@ public class WorldMapRenderer extends ScreenAdapter {
         createBasicWindow();
         createInvestWindow();
         setupInput();
-        showInvestWindow();
+        //showInvestWindow();
+        showPlaneWindow();
         createHUD();
-        //showPlaneWindow();
     }
 
     private void createBasicWindow() {
@@ -381,7 +390,9 @@ public class WorldMapRenderer extends ScreenAdapter {
         var guestsMap = airport.getGuests();
 
         if (guestsMap != null) {
-            for (PassengerType type : guestsMap.getKeys()) {
+            Iterator<PassengerType> it = MapHolder.viewAsListIterator(guestsMap);
+            PassengerType type;
+            while ((type = it.next()) != null) {
                 Integer groupCount = guestsMap.get(type);
                 if (groupCount == null || groupCount == 0) continue;
 
@@ -597,6 +608,12 @@ public class WorldMapRenderer extends ScreenAdapter {
 
     @Override
     public void render(float delta) {
+        client.mainCycleWithUpdate();
+        renderNoLogic(delta);
+        gameData.releaseReadLock();
+    }
+
+    private void renderNoLogic(float delta){
         Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 

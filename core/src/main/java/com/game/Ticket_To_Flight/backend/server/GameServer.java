@@ -13,6 +13,7 @@ public class GameServer {
     private final LowLevelHandler llh;
 
     public GameServer(LowLevelHandler llh) {
+
         this.llh = llh;
         server = new Server();
 
@@ -29,6 +30,7 @@ public class GameServer {
                 llh.receiveMessage(connection, object);
             }
         });
+        start();
     }
 
     public void start() {
