@@ -29,8 +29,9 @@ public class LowLevelHandlerFront extends LowLevelHandler {
         public Network.JoinGameResponse.Response joinGameResponse = null;
         public enum CurrentStateState{
             NOT_IN_GAME,
+            NO_PLAYER_STATE,
             WAITING_FOR_PLAYER_CHOICE,
-            WAITING_FOR_OTHER_PLAYERS
+            WAITING_FOR_SERVER_RESPONSE
         }
         public CurrentStateState currentStateState = CurrentStateState.NOT_IN_GAME;
     }
@@ -55,6 +56,15 @@ public class LowLevelHandlerFront extends LowLevelHandler {
             try {
                 //System.out.println("Applying changes");
                 gameData.applyChangesUnsafe(checkedChanges);
+                System.out.println("Changes were applied, game data on client:");
+                System.out.println("Current state = " + gameData.currentState);
+                System.out.println("Current player = " + gameData.currentPlayer);
+                System.out.println("Players:");
+                gameData.players.printAllToConsole();
+                System.out.println("Airports:");
+                gameData.airports.printAllToConsole();
+                System.out.println("Airlines:");
+                gameData.airlines.printAllToConsole();
                 checkedChanges = null;
             }
             catch (Exception e){
@@ -137,6 +147,7 @@ public class LowLevelHandlerFront extends LowLevelHandler {
         }
         else if(message instanceof Network.StartGameMessage){
             flags.gamePreparationsState = Flags.GamePreparationsState.RUNNING;
+            flags.currentStateState = Flags.CurrentStateState.NO_PLAYER_STATE;
             System.out.println("game is running");
         }
         else if(message instanceof Network.ReloadGameDataResponse){
@@ -176,6 +187,12 @@ public class LowLevelHandlerFront extends LowLevelHandler {
         }
         return false;
     }
+
+    public void sendInvestmentResponse(Integer shares){
+        addMessage(serverCon, new Network.PlayerInvestmentChoiceResponse(shares));
+        flags.currentStateState = Flags.CurrentStateState.WAITING_FOR_SERVER_RESPONSE;
+    }
+
 
     public int getMyId(){
         return myId;

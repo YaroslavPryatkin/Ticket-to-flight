@@ -3,6 +3,7 @@ package com.game.Ticket_To_Flight.backend;
 import com.badlogic.gdx.math.Vector2;
 import com.esotericsoftware.kryonet.Connection;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airport;
+import com.game.Ticket_To_Flight.backend.gameLogicEntities.Player;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.AirlineType;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.AirportType;
 import com.game.Ticket_To_Flight.backend.server.GameServer;
@@ -58,6 +59,13 @@ public class LowLevelHandlerBack extends LowLevelHandler {
                     Network.JoinGameResponse.Response.SUCCESS, dto.getId()));
             }
         }
+        else if(message instanceof Network.PlayerInvestmentChoiceResponse){
+
+        }
+        else if(message instanceof Network.PlayerAbilityChoiceResponse){
+
+        }
+        else throw new IllegalArgumentException("Unknown message");
     }
 
     private boolean sendToAllPlayers(Network.GameMessage message) {
@@ -135,6 +143,7 @@ public class LowLevelHandlerBack extends LowLevelHandler {
     public boolean addAirport(int id, AirportType type, Vector2 position, String airportName){
         return addAirport(id, type.getId(), position, airportName);
     }
+
     public boolean addAirport(int id, Integer type, Vector2 position, String airportName){
         if(dataChanges.airportsToAdd == null){
             dataChanges.airportsToAdd = new HashSet<>();
@@ -196,6 +205,15 @@ public class LowLevelHandlerBack extends LowLevelHandler {
 
     }
 
+    public void setCurrentPLayer(Player pl){
+        setCurrentPLayer(pl.getId());
+    }
+    public void setCurrentPLayer(Integer pl){
+        dataChanges.currentPlayer = pl;
+    }
 
+    public void setCurrentState(GameData.State gameState){
+        dataChanges.currentState = gameState;
+    }
     //------------------------------------- for use in main logic
 }

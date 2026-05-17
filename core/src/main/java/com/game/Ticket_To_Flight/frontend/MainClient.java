@@ -29,7 +29,15 @@ public class MainClient {
             GamePraparationStage();
         }
         else {
+            if(gameData.currentState == GameData.State.WORLD_UPDATE){
+                //do nothing
+            }
+            if(gameData.currentState == GameData.State.INVESTMENTS && llh.getMyId() == gameData.currentPlayer){
+                //ask for shares
+            }
             mainDrawer.drawMap(delta);
+
+
         }
     }
 
@@ -43,6 +51,7 @@ public class MainClient {
         }
         else if(llh.flags.gamePreparationsState == Flags.GamePreparationsState.READY_TO_JOIN_THE_GAME){
             if(llh.flags.joinGameResponse == null) {
+
                 //ui спросить имя
                 llh.sendJoinRequest("test");
             }

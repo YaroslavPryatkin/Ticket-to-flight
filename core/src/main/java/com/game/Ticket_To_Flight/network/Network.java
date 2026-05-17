@@ -146,6 +146,7 @@ public class Network {
     public static class PlayerInvestmentChoiceResponse extends GameMessage{
         public PlayerInvestmentChoiceResponse(){}
         public Integer amountOfShares =null;
+        public PlayerInvestmentChoiceResponse(Integer shares ){this.amountOfShares = shares;}
     }
 
     public static class PlayerAbilityChoiceResponse extends GameMessage{

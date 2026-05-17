@@ -119,7 +119,7 @@ public class GameData {
         TAXES
     }
     public State currentState;
-    public Player currentPlayer;
+    public Integer currentPlayer = null;
 
     public SetHolder<WorldEventType> worldEvents = new SetHolder<>();
     public SetHolder<Airport> airports = new SetHolder<>();
@@ -437,7 +437,7 @@ public class GameData {
 
     public void applyChangesUnsafe(DataChanges changes){
         if (changes.currentState != null) this.currentState = changes.currentState;
-        if (changes.currentPlayer != null) this.currentPlayer = players.get(changes.currentPlayer);
+        if (changes.currentPlayer != null) this.currentPlayer = changes.currentPlayer;
         worldEvents.clearAndAddAllFromLookUp(changes.newWorldEvents, GameData.worldEventTypes);
         airports.changeSetDTOI(changes.airportsToAdd, changes.airportsToRemove,
             (dto)->dto.restore());
