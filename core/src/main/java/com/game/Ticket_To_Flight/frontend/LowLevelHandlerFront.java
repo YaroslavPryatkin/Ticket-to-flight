@@ -215,4 +215,8 @@ public class LowLevelHandlerFront extends LowLevelHandler {
     }
     //------------------------------------- for use from MainClient
 
+    public void setNewMessage(Network.GameMessage gm) {
+        System.out.println("Accepted investment!");
+        addMessage(serverCon, gm);
+    }
 }

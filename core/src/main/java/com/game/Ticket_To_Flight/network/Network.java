@@ -2,6 +2,7 @@ package com.game.Ticket_To_Flight.network;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.EndPoint;
+import com.game.Ticket_To_Flight.backend.gameLogicEntities.Player;
 import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
 
 import java.lang.reflect.Field;
@@ -61,7 +62,8 @@ public class Network {
         ArrayList.class,
         HashMap.class,
         HashSet.class,
-        TreeMap.class
+        TreeMap.class,
+        UserInvestment.class
     };
 
     // NOT to register
@@ -199,5 +201,14 @@ public class Network {
 
     public static class StartGameMessage extends GameMessage {
         public StartGameMessage(){}
+    }
+
+    public static class UserInvestment extends GameMessage {
+        public UserInvestment(int player_id, int used_income) {
+            this.used_income = used_income;
+            this.player_id = player_id;
+        }
+        public int player_id;
+        public int used_income;
     }
 }

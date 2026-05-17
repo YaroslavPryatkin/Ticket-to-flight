@@ -27,7 +27,9 @@ import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airport;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airline;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.PassengerType;
 import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
+import com.game.Ticket_To_Flight.frontend.LowLevelHandlerFront;
 import com.game.Ticket_To_Flight.frontend.MainClient;
+import com.game.Ticket_To_Flight.network.Network;
 import com.game.Ticket_To_Flight.packages.PackageCreateWorldMap;
 
 import java.util.ArrayList;
@@ -80,10 +82,13 @@ public class WorldMapRenderer extends ScreenAdapter {
 
     private MainClient client;
     private final GameData gameData;
+    private final LowLevelHandlerFront llh;
 
     public WorldMapRenderer(MainClient client) {
         this.client = client;
         this.gameData = client.getGameData();
+        this.llh = client.getLlh();
+
         this.batch = new SpriteBatch();
 
         this.WORLD_WIDTH = Gdx.graphics.getWidth();
@@ -113,7 +118,8 @@ public class WorldMapRenderer extends ScreenAdapter {
         createInvestWindow();
         setupInput();
         //showInvestWindow();
-        showPlaneWindow();
+        //showPlaneWindow();
+        showAuctionWindow();
         createHUD();
     }
 
@@ -201,6 +207,19 @@ public class WorldMapRenderer extends ScreenAdapter {
         btnStyle.fontColor = Color.WHITE;
         btnStyle.up = skin_invest_window.getDrawable("dark-bg"); // Будет темная кнопка
         skin_invest_window.add("default", btnStyle);
+
+        Pixmap redPix = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
+        redPix.setColor(new Color(0.8f, 0.2f, 0.2f, 0.9f)); // Красный цвет
+        redPix.fill();
+        skin_invest_window.add("red-bg", new Texture(redPix));
+        redPix.dispose();
+
+        TextButton.TextButtonStyle btnStyleRed = new TextButton.TextButtonStyle();
+        btnStyleRed.font = skin_invest_window.getFont("default-font");
+        btnStyleRed.fontColor = Color.WHITE;
+        btnStyleRed.up = skin_invest_window.getDrawable("red-bg");
+
+        skin_invest_window.add("red", btnStyleRed);
     }
 
     private void createHUD() {
@@ -471,7 +490,7 @@ public class WorldMapRenderer extends ScreenAdapter {
 
         Label subtitleLabel = new Label("invest your incomes to money", skin_invest_window);
 
-        final Slider slider = new Slider(1, 20, 1, false, skin_invest_window);
+        final Slider slider = new Slider(1, 10, 1, false, skin_invest_window);
         final Label amountLabel = new Label("1", skin_invest_window);
 
         slider.addListener(new ChangeListener() {
@@ -486,6 +505,7 @@ public class WorldMapRenderer extends ScreenAdapter {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 int investedAmount = (int) slider.getValue();
+                llh.setNewMessage(new Network.UserInvestment(gameData.currentPlayer, investedAmount));
                 overlayWindow.remove();
                 showSuccessWindow("Income was invested successfully!");
             }
@@ -529,6 +549,62 @@ public class WorldMapRenderer extends ScreenAdapter {
         successWindow.setPosition(centerX, centerY);
 
         uiStage.addActor(successWindow);
+    }
+
+    public void showAuctionWindow() {
+        isOverlayActive = true;
+
+        final Table overlayWindow = new Table();
+        overlayWindow.setFillParent(true);
+        overlayWindow.setBackground(skin_invest_window.getDrawable("blue-bg"));
+        overlayWindow.setTouchable(com.badlogic.gdx.scenes.scene2d.Touchable.enabled);
+
+        Label titleLabel = new Label("Auction", skin_invest_window);
+        titleLabel.setFontScale(1.2f);
+
+        Label subtitleLabel = new Label("Bet more to walk first in this round", skin_invest_window);
+
+        final Slider slider = new Slider(1, 10, 1, false, skin_invest_window);
+        final Label amountLabel = new Label("1", skin_invest_window);
+
+        slider.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, com.badlogic.gdx.scenes.scene2d.Actor actor) {
+                amountLabel.setText(String.valueOf((int) slider.getValue()));
+            }
+        });
+
+        TextButton betBtn = new TextButton("Bet", skin_invest_window, "default"); // Темная
+        TextButton passBtn = new TextButton("Pass", skin_invest_window, "red");   // Красная
+
+        passBtn.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, com.badlogic.gdx.scenes.scene2d.Actor actor) {
+                overlayWindow.remove();
+            }
+        });
+
+        betBtn.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, com.badlogic.gdx.scenes.scene2d.Actor actor) {
+                int currentBet = (int) slider.getValue();
+                overlayWindow.remove();
+            }
+        });
+
+        overlayWindow.add(titleLabel).colspan(2).padBottom(10).row();
+        overlayWindow.add(subtitleLabel).colspan(2).padBottom(25).row();
+
+        overlayWindow.add(slider).width(250).padRight(15);
+        overlayWindow.add(amountLabel).width(40).left().row();
+
+        Table buttonTable = new Table();
+        buttonTable.add(betBtn).width(120).padRight(20);
+        buttonTable.add(passBtn).width(120);
+
+        overlayWindow.add(buttonTable).colspan(2).padTop(30).row();
+
+        uiStage.addActor(overlayWindow);
     }
 
     public void showPlaneWindow() {
@@ -609,6 +685,7 @@ public class WorldMapRenderer extends ScreenAdapter {
     @Override
     public void render(float delta) {
         client.mainCycleWithUpdate(delta);
+        renderNoLogic(delta);
         gameData.releaseReadLock();
     }
 

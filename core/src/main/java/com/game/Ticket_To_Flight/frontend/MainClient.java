@@ -7,10 +7,10 @@ import com.game.Ticket_To_Flight.frontend.UI.MainDrawer;
 import com.game.Ticket_To_Flight.frontend.LowLevelHandlerFront.Flags;
 
 public class MainClient {
-    Game myGame;
-    MainDrawer mainDrawer;
+    private final Game myGame;
     private final GameData gameData = new GameData();
     private final LowLevelHandlerFront llh = new LowLevelHandlerFront(gameData);
+    private final MainDrawer mainDrawer;
 
     public MainClient(Game gm){
         this.myGame = gm;
@@ -30,12 +30,18 @@ public class MainClient {
         }
         else {
             if(gameData.currentState == GameData.State.WORLD_UPDATE){
-                //do nothing
+                // mainDrawer.createWorldMap(this);
             }
-            if(gameData.currentState == GameData.State.INVESTMENTS && llh.getMyId() == gameData.currentPlayer){
-                //ask for shares
-            }
-            mainDrawer.drawMap(delta);
+            /*if (llh.getMyId() == gameData.currentPlayer) {
+                if (gameData.currentState == GameData.State.INVESTMENTS) {
+                    //ask for shares
+                    mainDrawer.drawInvestmentWindow();
+                }
+
+                if (gameData.currentState == GameData.State.AUCTION) {
+                    mainDrawer.drawAuctionWindow();
+                }
+            }*/
 
 
         }
@@ -71,6 +77,10 @@ public class MainClient {
 
 
     public GameData getGameData(){return gameData;}
+
+    public LowLevelHandlerFront getLlh() {
+        return this.llh;
+    }
 
     /*
     public void sendWorldMapPacket() {
