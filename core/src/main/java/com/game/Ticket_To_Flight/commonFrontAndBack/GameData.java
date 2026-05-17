@@ -91,17 +91,17 @@ public class GameData {
         try {
             File file = new File(path);
             if (!file.exists()) {
-                System.err.println("File not found: " + path);
+                System.err.println("File not found: [" + path + "]");
                 return;
             }
             CollectionType setType = mapper.getTypeFactory().constructCollectionType(Set.class, clazz);
             Set<T> loadedData = mapper.readValue(file, setType);
             holder.clear();
             holder.addAll(loadedData);
-            System.out.println("Successfully downloaded json [" + clazz.getSimpleName() + "]: " + holder.size());
+           // System.out.println("Successfully downloaded json [" + clazz.getSimpleName() + "]: " + holder.size());
 
         } catch (IOException e) {
-            System.err.println("Error during json parsing for " + path + ": " + e.getMessage());
+            System.err.println("Error during json parsing for [" + path + "]: " + e.getMessage());
             e.printStackTrace();
         }
     }

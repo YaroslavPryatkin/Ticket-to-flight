@@ -25,15 +25,15 @@ public class LowLevelHandlerFront extends LowLevelHandler {
             WAITING_FOR_OTHER_PLAYERS_TO_JOIN, // waiting for other players
             RUNNING
         }
-        public GamePreparationsState gamePreparationsState = GamePreparationsState.WAITING_FOR_CONNECT_CALL;
-        public Network.JoinGameResponse.Response joinGameResponse = null;
+        public volatile GamePreparationsState gamePreparationsState = GamePreparationsState.WAITING_FOR_CONNECT_CALL;
+        public volatile Network.JoinGameResponse.Response joinGameResponse = null;
         public enum CurrentStateState{
             NOT_IN_GAME,
             NO_PLAYER_STATE,
             WAITING_FOR_PLAYER_CHOICE,
             WAITING_FOR_SERVER_RESPONSE
         }
-        public CurrentStateState currentStateState = CurrentStateState.NOT_IN_GAME;
+        public volatile CurrentStateState currentStateState = CurrentStateState.NOT_IN_GAME;
     }
 
     public Flags flags = new Flags();
@@ -56,15 +56,7 @@ public class LowLevelHandlerFront extends LowLevelHandler {
             try {
                 //System.out.println("Applying changes");
                 gameData.applyChangesUnsafe(checkedChanges);
-                System.out.println("Changes were applied, game data on client:");
-                System.out.println("Current state = " + gameData.currentState);
-                System.out.println("Current player = " + gameData.currentPlayer);
-                System.out.println("Players:");
-                gameData.players.printAllToConsole();
-                System.out.println("Airports:");
-                gameData.airports.printAllToConsole();
-                System.out.println("Airlines:");
-                gameData.airlines.printAllToConsole();
+                changeFlagDependingOnNewState(checkedChanges.currentState);
                 checkedChanges = null;
             }
             catch (Exception e){
@@ -117,6 +109,18 @@ public class LowLevelHandlerFront extends LowLevelHandler {
         addMessage(serverCon, new Network.ReloadGameDataRequest());
     }
 
+    private void changeFlagDependingOnNewState(GameData.State st){
+        if(st == null) return;
+        if(st == GameData.State.WORLD_UPDATE ||
+            st == GameData.State.INCOME||
+            st == GameData.State.TAXES ||
+            st == GameData.State.EVENT
+        )
+            flags.currentStateState = Flags.CurrentStateState.NO_PLAYER_STATE;
+        else
+            flags.currentStateState = Flags.CurrentStateState.WAITING_FOR_PLAYER_CHOICE;
+    }
+
     //------------------------------------- data changes part
 
     //------------------------------------- messages part
@@ -135,6 +139,7 @@ public class LowLevelHandlerFront extends LowLevelHandler {
             changesQueue.offer(((Network.DataChangesMessage) message).dc);
         }
         else if(message instanceof Network.JoinGameResponse){
+
             Network.JoinGameResponse resp = (Network.JoinGameResponse) message;
             flags.joinGameResponse = resp.response;
             if(resp.response == Network.JoinGameResponse.Response.SUCCESS) {
@@ -147,7 +152,6 @@ public class LowLevelHandlerFront extends LowLevelHandler {
         }
         else if(message instanceof Network.StartGameMessage){
             flags.gamePreparationsState = Flags.GamePreparationsState.RUNNING;
-            flags.currentStateState = Flags.CurrentStateState.NO_PLAYER_STATE;
             System.out.println("game is running");
         }
         else if(message instanceof Network.ReloadGameDataResponse){
@@ -174,13 +178,21 @@ public class LowLevelHandlerFront extends LowLevelHandler {
 
     public boolean connectToServer(){
         if(flags.gamePreparationsState != Flags.GamePreparationsState.WAITING_FOR_CONNECT_CALL) return false;
-        gameClient.connect();
+        //System.out.println("Looking for server");
         flags.gamePreparationsState = Flags.GamePreparationsState.SEARCHING_FOR_SERVER;
+        gameClient.connect();
+
+        if(!isConnected()) {
+            flags.gamePreparationsState = Flags.GamePreparationsState.WAITING_FOR_CONNECT_CALL;
+            return false;
+        }
         return true;
     }
 
     public boolean sendJoinRequest(String name){
+        //System.out.println("Trying to add join game request message");
         if(flags.gamePreparationsState == Flags.GamePreparationsState.READY_TO_JOIN_THE_GAME && serverCon.isConnected()){
+            //System.out.println("Adding join game request message");
             addMessage(serverCon, new Network.JoinGameRequest(name));
             flags.gamePreparationsState = Flags.GamePreparationsState.WAITING_FOR_SERVER_RESPONSE;
             return true;
@@ -196,6 +208,10 @@ public class LowLevelHandlerFront extends LowLevelHandler {
 
     public int getMyId(){
         return myId;
+    }
+
+    public boolean isConnected(){
+        return serverCon!=null && serverCon.isConnected();
     }
     //------------------------------------- for use from MainClient
 

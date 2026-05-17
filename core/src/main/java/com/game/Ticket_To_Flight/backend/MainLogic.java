@@ -41,8 +41,9 @@ public class MainLogic extends MainLoopBack {
     }
 
     private void beforeStartCycle(){
-        if(llh.areAllPlayersReadyToStart())
+        if(llh.areAllPlayersReadyToStart()) {
             llh.startGame();
+        }
     }
 
 }

@@ -13,6 +13,7 @@ import com.game.Ticket_To_Flight.commonFrontAndBack.LowLevelHandler;
 import com.game.Ticket_To_Flight.network.Network;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class LowLevelHandlerBack extends LowLevelHandler {
     private final GameServer gameClient = new GameServer(this);
@@ -22,13 +23,14 @@ public class LowLevelHandlerBack extends LowLevelHandler {
             WAITING_FOR_PLAYERS,
             RUNNING
         }
-        public GamePreparationsState gamePreparationsState = GamePreparationsState.WAITING_FOR_PLAYERS;
+        public volatile GamePreparationsState gamePreparationsState = GamePreparationsState.WAITING_FOR_PLAYERS;
     }
 
     public LowLevelHandlerBack.Flags flags = new LowLevelHandlerBack.Flags();
 
     private final Map<Integer, Connection> players = new HashMap<>();
 
+    private final Queue<Connection> playersToAdd = new ConcurrentLinkedQueue<>();
     private final Map<Connection, GameData.PlayerDTO> playersBeforeGame = new HashMap<>();
     private final Set<String> chosenNames = new HashSet<>();
 
@@ -41,23 +43,14 @@ public class LowLevelHandlerBack extends LowLevelHandler {
 
     @Override
     public void handleNewConnection(Connection con){
-            playersBeforeGame.put(con, null);
+            playersToAdd.add(con);
     }
 
     @Override
     protected void handleIncomingMessage(Connection con, Network.GameMessage message){
         if(message instanceof Network.JoinGameRequest) {
             Network.JoinGameRequest req = (Network.JoinGameRequest) message;
-            if (chosenNames.contains(req.playerName))
-                addMessage(con, new Network.JoinGameResponse(
-                    Network.JoinGameResponse.Response.NAME_ALREADY_EXISTS, null));
-            else{
-                chosenNames.add(req.playerName);
-                GameData.PlayerDTO dto = new GameData.PlayerDTO(req.playerName);
-                playersBeforeGame.put(con, dto);
-                addMessage(con, new Network.JoinGameResponse(
-                    Network.JoinGameResponse.Response.SUCCESS, dto.getId()));
-            }
+            handleJoinGameRequest(con, req.playerName);
         }
         else if(message instanceof Network.PlayerInvestmentChoiceResponse){
 
@@ -86,6 +79,9 @@ public class LowLevelHandlerBack extends LowLevelHandler {
     @Override
     public boolean update(){
 
+        if(flags.gamePreparationsState == Flags.GamePreparationsState.WAITING_FOR_PLAYERS) {
+            addAllPayersToAdd();
+        }
         handleAllIncomingMessages();
         sendAllWaitingMessages();
 
@@ -93,13 +89,26 @@ public class LowLevelHandlerBack extends LowLevelHandler {
     }
     //------------------------------------- update part
 
-    //------------------------------------- for use in main logic
-    public boolean applyAndSendDataChanges(){
-        boolean res = true;
-        gameData.applyChangesUnsafe(dataChanges);
-        sendToAllPlayers(new Network.DataChangesMessage(dataChanges));
-        this.dataChanges = new GameData.DataChanges();
-        return res;
+    //------------------------------------- starting the game
+
+    private void handleJoinGameRequest(Connection con, String playerName){
+        if (chosenNames.contains(playerName))
+            addMessage(con, new Network.JoinGameResponse(
+                Network.JoinGameResponse.Response.NAME_ALREADY_EXISTS, null));
+        else{
+            chosenNames.add(playerName);
+            GameData.PlayerDTO dto = new GameData.PlayerDTO(playerName);
+            playersBeforeGame.put(con, dto);
+            addMessage(con, new Network.JoinGameResponse(
+                Network.JoinGameResponse.Response.SUCCESS, dto.getId()));
+        }
+    }
+
+    private void addAllPayersToAdd(){
+        while(!playersToAdd.isEmpty()){
+            System.out.println("Adding player");
+            playersBeforeGame.putIfAbsent(playersToAdd.poll(), null);
+        }
     }
 
     public boolean areAllPlayersReadyToStart(){
@@ -110,9 +119,12 @@ public class LowLevelHandlerBack extends LowLevelHandler {
             Connection con = entry.getKey();
 
             if (!con.isConnected()) {
+                System.out.println("removed a player due to con.isConnected() == false");
                 iterator.remove();
             }
         }
+
+        //System.out.println("Checking if players are ready. Amount of players == " + playersBeforeGame.size());
 
         if (playersBeforeGame.isEmpty()) return false;
 
@@ -138,6 +150,27 @@ public class LowLevelHandlerBack extends LowLevelHandler {
         applyAndSendDataChanges();
         sendToAllPlayers(new Network.StartGameMessage());
         flags.gamePreparationsState = Flags.GamePreparationsState.RUNNING;
+    }
+
+    //------------------------------------- starting the game
+
+    //------------------------------------- for use in main logic
+
+    public boolean applyAndSendDataChanges(){
+        boolean res = true;
+        gameData.applyChangesUnsafe(dataChanges);
+        System.out.println("Changes were applied, current game data:");
+        System.out.println("Current state = " + gameData.currentState);
+        System.out.println("Current player = " + gameData.currentPlayer);
+        System.out.println("Players:");
+        gameData.players.printAllToConsole();
+        System.out.println("Airports:");
+        gameData.airports.printAllToConsole();
+        System.out.println("Airlines:");
+        gameData.airlines.printAllToConsole();
+        sendToAllPlayers(new Network.DataChangesMessage(dataChanges));
+        this.dataChanges = new GameData.DataChanges();
+        return res;
     }
 
     public boolean addAirport(int id, AirportType type, Vector2 position, String airportName){
