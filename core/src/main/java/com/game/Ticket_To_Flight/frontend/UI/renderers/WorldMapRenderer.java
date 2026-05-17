@@ -43,8 +43,8 @@ public class WorldMapRenderer extends ScreenAdapter {
     private final Texture airportTexture;
     private final Texture airlineTexture;
 
-    private List<Airport> airportsToDraw = new ArrayList<>();
-    private List<Airline> airlinesToDraw = new ArrayList<>();
+    //private List<Airport> airportsToDraw = new ArrayList<>();
+    //private List<Airline> airlinesToDraw = new ArrayList<>();
 
     private final OrthographicCamera camera;
     private final Viewport viewport;
@@ -84,6 +84,9 @@ public class WorldMapRenderer extends ScreenAdapter {
     private final GameData gameData;
     private final LowLevelHandlerFront llh;
 
+    private boolean updateAirportData;
+    private boolean updateAirlineData;
+
     public WorldMapRenderer(MainClient client) {
         this.client = client;
         this.gameData = client.getGameData();
@@ -111,6 +114,9 @@ public class WorldMapRenderer extends ScreenAdapter {
         linePixmap.fill();
         this.airlineTexture = new Texture(linePixmap);
         linePixmap.dispose();
+
+        this.updateAirportData = true;
+        this.updateAirlineData = true;
 
         this.uiStage = new Stage(new ExtendViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
 
@@ -241,14 +247,6 @@ public class WorldMapRenderer extends ScreenAdapter {
         uiStage.addActor(topBar);
     }
 
-    public void updateAirportData(List<Airport> airports) {
-        this.airportsToDraw = airports;
-    }
-
-    public void updateAirlinesData(List<Airline> airlines) {
-        this.airlinesToDraw = airlines;
-    }
-
     private void clampCamera() {
         float maxZoomX = WORLD_WIDTH / viewport.getWorldWidth();
         float maxZoomY = WORLD_HEIGHT / viewport.getWorldHeight();
@@ -279,7 +277,7 @@ public class WorldMapRenderer extends ScreenAdapter {
                 Vector3 worldClick = new Vector3(screenX, screenY, 0);
                 camera.unproject(worldClick);
 
-                for (Airport airport : airportsToDraw) {
+                for (Airport airport : gameData.airports) {
                     float distance = Vector2.dst(airport.getX(), airport.getY(), worldClick.x, worldClick.y);
 
                     if (distance <= airport.getRadius()) {
@@ -289,7 +287,7 @@ public class WorldMapRenderer extends ScreenAdapter {
                 }
 
                 float clickTolerance = 10f;
-                for (Airline airline : airlinesToDraw) {
+                for (Airline airline : gameData.airlines) {
                     float distanceToLine = distanceToSegment(
                         worldClick.x, worldClick.y,
                         airline.getPortA().getX(), airline.getPortA().getY(),
@@ -521,8 +519,6 @@ public class WorldMapRenderer extends ScreenAdapter {
     }
 
     public void showSuccessWindow(String message) {
-        isOverlayActive = true;
-
         final Window successWindow = new Window(" Success", skin_default_window);
         successWindow.pad(30);
         successWindow.padTop(50);
@@ -581,6 +577,7 @@ public class WorldMapRenderer extends ScreenAdapter {
             @Override
             public void changed(ChangeEvent event, com.badlogic.gdx.scenes.scene2d.Actor actor) {
                 overlayWindow.remove();
+                showSuccessWindow("You left the auction");
             }
         });
 
@@ -588,6 +585,7 @@ public class WorldMapRenderer extends ScreenAdapter {
             @Override
             public void changed(ChangeEvent event, com.badlogic.gdx.scenes.scene2d.Actor actor) {
                 int currentBet = (int) slider.getValue();
+
                 overlayWindow.remove();
             }
         });
@@ -605,6 +603,45 @@ public class WorldMapRenderer extends ScreenAdapter {
         overlayWindow.add(buttonTable).colspan(2).padTop(30).row();
 
         uiStage.addActor(overlayWindow);
+    }
+
+    public void addAirportsOnTheMap() {
+        for (Airport airport : gameData.airports) {
+            batch.setColor(airport.getColor());
+            float currentRadius = airport.getRadius();
+            float diameter = currentRadius * 2f;
+            float drawX = airport.getX() - currentRadius;
+            float drawY = airport.getY() - currentRadius;
+
+            batch.draw(airportTexture, drawX, drawY, diameter, diameter);
+        }
+    }
+
+    public void addAirlinesOnTheMap() {
+        float lineThickness = 6f;
+        for (Airline airline : gameData.airlines) {
+            if (airline.getPlayer() != null) {
+                batch.setColor(airline.getPlayer().getColor());
+            } else {
+                batch.setColor(Color.LIGHT_GRAY);
+            }
+
+            Airport a = airline.getPortA();
+            Airport b = airline.getPortB();
+
+            float dx = b.getX() - a.getX();
+            float dy = b.getY() - a.getY();
+            float length = (float) Math.sqrt(dx * dx + dy * dy);
+            float angle = (float) Math.toDegrees(Math.atan2(dy, dx));
+
+            batch.draw(airlineTexture,
+                a.getX(), a.getY() - lineThickness / 2f,
+                0, lineThickness / 2f,
+                length, lineThickness,
+                1f, 1f,
+                angle,
+                0, 0, 1, 1, false, false);
+        }
     }
 
     public void showPlaneWindow() {
@@ -701,39 +738,14 @@ public class WorldMapRenderer extends ScreenAdapter {
 
         batch.draw(mapTexture, 0, 0, WORLD_WIDTH, WORLD_HEIGHT);
 
-        float lineThickness = 6f;
-        for (Airline airline : airlinesToDraw) {
-            if (airline.getPlayer() != null) {
-                batch.setColor(airline.getPlayer().getColor());
-            } else {
-                batch.setColor(Color.LIGHT_GRAY);
-            }
-
-            Airport a = airline.getPortA();
-            Airport b = airline.getPortB();
-
-            float dx = b.getX() - a.getX();
-            float dy = b.getY() - a.getY();
-            float length = (float) Math.sqrt(dx * dx + dy * dy);
-            float angle = (float) Math.toDegrees(Math.atan2(dy, dx));
-
-            batch.draw(airlineTexture,
-                a.getX(), a.getY() - lineThickness / 2f,
-                0, lineThickness / 2f,
-                length, lineThickness,
-                1f, 1f,
-                angle,
-                0, 0, 1, 1, false, false);
+        if (updateAirlineData) {
+            addAirlinesOnTheMap();
+            updateAirlineData = true;
         }
 
-        for (Airport airport : airportsToDraw) {
-            batch.setColor(airport.getColor());
-            float currentRadius = airport.getRadius();
-            float diameter = currentRadius * 2f;
-            float drawX = airport.getX() - currentRadius;
-            float drawY = airport.getY() - currentRadius;
-
-            batch.draw(airportTexture, drawX, drawY, diameter, diameter);
+        if (updateAirportData) {
+            addAirportsOnTheMap();
+            updateAirportData = true;
         }
 
 

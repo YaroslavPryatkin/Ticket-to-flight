@@ -42,7 +42,7 @@ public class Airport extends Identifiable {
         if (this.type.id == 4) {
             return Color.RED;
         }
-        return null;
+        return Color.WHITE;
     }
 
     public Float getX() {

@@ -29,8 +29,35 @@ public class MainClient {
             GamePraparationStage();
         }
         else {
-            if(gameData.currentState == GameData.State.WORLD_UPDATE){
+            if(gameData.currentState == GameData.State.WORLD_UPDATE) {
                 // mainDrawer.createWorldMap(this);
+            }
+            else if (gameData.currentState == GameData.State.INVESTMENTS) {
+                mainDrawer.drawInvestmentWindow();
+            }
+            else if (gameData.currentState == GameData.State.AUCTION) {
+                mainDrawer.drawAuctionWindow();
+            }
+            else if (gameData.currentState == GameData.State.ABILITIES) {
+               // mainDrawer.drawAbilitiesWindow();
+            }
+            else if (gameData.currentState == GameData.State.PLANES) {
+                // mainDrawer.drawPlanesWindow();
+            }
+            else if (gameData.currentState == GameData.State.AIRLINES) {
+                // mainDrawer.reDrawAirlinesWindow();
+            }
+            else if (gameData.currentState == GameData.State.EVENT) {
+                //mainDrawer.eventWindow();
+            }
+            else if (gameData.currentState == GameData.State.FLIGHTS) {
+                // smth
+            }
+            else if (gameData.currentState == GameData.State.INCOME) {
+                // change Income
+            }
+            else if (gameData.currentState == GameData.State.TAXES) {
+                // Taxes
             }
             /*if (llh.getMyId() == gameData.currentPlayer) {
                 if (gameData.currentState == GameData.State.INVESTMENTS) {

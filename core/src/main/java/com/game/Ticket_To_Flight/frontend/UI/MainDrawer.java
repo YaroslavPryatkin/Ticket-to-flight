@@ -29,18 +29,6 @@ public class MainDrawer {
         WorldMapScreen.showAuctionWindow();
     }
 
-    public void drawAirports(PackageInitAirports packet) {
-        if (this.WorldMapScreen != null) {
-            this.WorldMapScreen.updateAirportData(packet.getAirports());
-        }
-    }
-
-    public void drawAirlines(PackageInitAirlines packet) {
-        if (this.WorldMapScreen != null) {
-            this.WorldMapScreen.updateAirlinesData(packet.getAirlines());
-        }
-    }
-
     public void drawMap(float delta){
         WorldMapScreen.renderNoLogic(delta);
     }
