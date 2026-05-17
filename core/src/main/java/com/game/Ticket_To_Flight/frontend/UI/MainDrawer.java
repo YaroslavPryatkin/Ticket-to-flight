@@ -29,4 +29,9 @@ public class MainDrawer {
             this.currentMapScreen.updateAirlinesData(packet.getAirlines());
         }
     }
+
+    public void drawMap(float delta){
+        currentMapScreen.renderNoLogic(delta);
+    }
+
 }

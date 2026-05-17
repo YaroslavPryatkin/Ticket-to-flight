@@ -608,12 +608,11 @@ public class WorldMapRenderer extends ScreenAdapter {
 
     @Override
     public void render(float delta) {
-        client.mainCycleWithUpdate();
-        renderNoLogic(delta);
+        client.mainCycleWithUpdate(delta);
         gameData.releaseReadLock();
     }
 
-    private void renderNoLogic(float delta){
+    public void renderNoLogic(float delta){
         Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 

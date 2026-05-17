@@ -17,16 +17,19 @@ public class MainClient {
         this.mainDrawer = new MainDrawer(myGame, this);
     }
 
-    public void mainCycleWithUpdate(){
+    public void mainCycleWithUpdate(float delta){
         llh.update();
         gameData.acquireReadLock();
-        mainCycle();
+        mainCycle(delta);
     }
 
 
-    private void mainCycle(){
+    private void mainCycle(float delta){
         if(llh.flags.gamePreparationsState != Flags.GamePreparationsState.RUNNING){
             GamePraparationStage();
+        }
+        else {
+            mainDrawer.drawMap(delta);
         }
     }
 

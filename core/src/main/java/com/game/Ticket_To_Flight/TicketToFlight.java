@@ -13,7 +13,6 @@ public class TicketToFlight extends Game {
         GameData.loadAllJsons();
         MainLogic logic = MainLogic.getInstance();
         MainClient cl = new MainClient(this);
-        //cl.sendWorldMapPacket();
 
     }
 }
