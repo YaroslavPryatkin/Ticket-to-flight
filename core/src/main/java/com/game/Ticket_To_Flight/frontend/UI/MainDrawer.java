@@ -2,9 +2,7 @@ package com.game.Ticket_To_Flight.frontend.UI;
 
 import com.badlogic.gdx.Game;
 import com.game.Ticket_To_Flight.frontend.MainClient;
-import com.game.Ticket_To_Flight.frontend.UI.renderers.WorldMapRenderer;
-import com.game.Ticket_To_Flight.packages.PackageInitAirlines;
-import com.game.Ticket_To_Flight.packages.PackageInitAirports;
+import com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.WorldMapRenderer;
 
 public class MainDrawer {
     private final Game myGame;
