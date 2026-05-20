@@ -73,6 +73,7 @@ public class WorldMapRenderer extends ScreenAdapter {
         multiplexer.addProcessor(uiStage);
         multiplexer.addProcessor(inputCtrl);
         Gdx.input.setInputProcessor(multiplexer);
+        uiManager.showAuctionWindow();
     }
 
     private void clampCamera() {
@@ -158,7 +159,7 @@ public class WorldMapRenderer extends ScreenAdapter {
         batch.draw(mapTexture, 0, 0, WORLD_WIDTH, WORLD_HEIGHT);
         addAirlinesOnTheMap();
         addAirportsOnTheMap();
-        batch.setColor(Color.WHITE); // Сбрасываем цвет после отрисовки линий и аэропортов
+        batch.setColor(Color.WHITE);
         batch.end();
 
         uiStage.act(delta);
