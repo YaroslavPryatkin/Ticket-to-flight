@@ -135,6 +135,10 @@ public class GameUIManager {
         uiStage.addActor(successWindow);
     }
 
+    public void showAbilitiesWindow() {
+        uiStage.addActor(new AbilitiesWindow(skin_invest_window, this, llh));
+    }
+
     public void showPlaneWindow() {
         uiStage.addActor(new PlaneWindow(skin_invest_window, this));
     }

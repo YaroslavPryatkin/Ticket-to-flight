@@ -105,6 +105,29 @@ public class StyleFactory {
         btnStyleRed.fontColor = Color.WHITE;
         btnStyleRed.up = skin.getDrawable("red-bg");
 
+        Pixmap btnDisabledPixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
+        btnDisabledPixmap.setColor(new Color(0.1f, 0.1f, 0.1f, 0.9f));
+        btnDisabledPixmap.fill();
+        skin.add("btn-disabled", new Texture(btnDisabledPixmap));
+        btnDisabledPixmap.dispose();
+
+        Pixmap scrollKnobPix = new Pixmap(10, 10, Pixmap.Format.RGBA8888);
+        scrollKnobPix.setColor(Color.LIGHT_GRAY);
+        scrollKnobPix.fill();
+        skin.add("scroll-knob", new Texture(scrollKnobPix));
+        scrollKnobPix.dispose();
+
+        Pixmap scrollTrackPix = new Pixmap(10, 10, Pixmap.Format.RGBA8888);
+        scrollTrackPix.setColor(new Color(0.1f, 0.1f, 0.1f, 0.5f)); // Полупрозрачный темный фон
+        scrollTrackPix.fill();
+        skin.add("scroll-track", new Texture(scrollTrackPix));
+        scrollTrackPix.dispose();
+
+        ScrollPane.ScrollPaneStyle scrollStyle = new ScrollPane.ScrollPaneStyle();
+        scrollStyle.vScrollKnob = skin.getDrawable("scroll-knob"); // Вертикальный ползунок
+        scrollStyle.vScroll = skin.getDrawable("scroll-track");    // Вертикальная дорожка
+        skin.add("default", scrollStyle);
+
         skin.add("red", btnStyleRed);
         return skin;
     }

@@ -31,6 +31,7 @@ public class LowLevelHandlerFront extends LowLevelHandler {
         public enum CurrentStateState{
             NOT_IN_GAME,
             NO_PLAYER_STAGE,
+            PLAYER_STAGE,
             WAITING_FOR_PLAYER_CHOICE,
             WAITING_FOR_SERVER_RESPONSE
         }

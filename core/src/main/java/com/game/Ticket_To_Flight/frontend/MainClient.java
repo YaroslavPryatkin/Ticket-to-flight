@@ -2,44 +2,56 @@ package com.game.Ticket_To_Flight.frontend;
 
 import com.badlogic.gdx.Game;
 import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
+import com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.WorldMapRenderer;
 import com.game.Ticket_To_Flight.network.Network;
-import com.game.Ticket_To_Flight.frontend.UI.MainDrawer;
 import com.game.Ticket_To_Flight.frontend.LowLevelHandlerFront.Flags;
 
 public class MainClient {
     private final Game myGame;
     private final GameData gameData = new GameData();
     private final LowLevelHandlerFront llh = new LowLevelHandlerFront(gameData);
-    private final MainDrawer mainDrawer;
+    //private final MainDrawer mainDrawer;
+    private WorldMapRenderer worldMapRenderer;
 
     public MainClient(Game gm){
         this.myGame = gm;
-        this.mainDrawer = new MainDrawer(myGame, this);
+        this.worldMapRenderer = new WorldMapRenderer(this);
+        this.myGame.setScreen(this.worldMapRenderer);
+        mainCycleWithUpdate(0.0166666f);
     }
 
-    public void mainCycleWithUpdate(float delta){
+    public void mainCycleWithUpdate(float delta) {
         llh.update();
         gameData.acquireReadLock();
         mainCycle(delta);
     }
 
-
     private void mainCycle(float delta){
         if(llh.flags.gamePreparationsState != Flags.GamePreparationsState.RUNNING){
-            GamePraparationStage();
+            //GamePraparationStage();
         }
         else {
             if(gameData.currentState == GameData.State.WORLD_UPDATE) {
-                // mainDrawer.createWorldMap(this);
+                //this.myGame.setScreen(this.worldMapRenderer);
             }
             else if (gameData.currentState == GameData.State.INVESTMENTS) {
-                mainDrawer.drawInvestmentWindow();
+                if (llh.flags.currentStateState == Flags.CurrentStateState.PLAYER_STAGE) {
+                    worldMapRenderer.drawInvestmentWindow();
+                    llh.flags.currentStateState = LowLevelHandlerFront.Flags.CurrentStateState.WAITING_FOR_PLAYER_CHOICE;
+                }
             }
             else if (gameData.currentState == GameData.State.AUCTION) {
-                mainDrawer.drawAuctionWindow();
+                if (llh.flags.currentStateState == Flags.CurrentStateState.PLAYER_STAGE) {
+                    worldMapRenderer.drawAuctionWindow();
+                    llh.flags.currentStateState = Flags.CurrentStateState.WAITING_FOR_PLAYER_CHOICE;
+                }
+                worldMapRenderer.drawAuctionWindow();
             }
             else if (gameData.currentState == GameData.State.ABILITIES) {
-               // mainDrawer.drawAbilitiesWindow();
+               if (llh.flags.currentStateState == Flags.CurrentStateState.PLAYER_STAGE) {
+                   worldMapRenderer.drawAbilitiesWindow();
+                   llh.flags.currentStateState = Flags.CurrentStateState.WAITING_FOR_PLAYER_CHOICE;
+               }
             }
             else if (gameData.currentState == GameData.State.PLANES) {
                 // mainDrawer.drawPlanesWindow();
