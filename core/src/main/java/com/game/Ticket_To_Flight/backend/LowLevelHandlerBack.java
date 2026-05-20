@@ -1,5 +1,6 @@
 package com.game.Ticket_To_Flight.backend;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.esotericsoftware.kryonet.Connection;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airport;
@@ -119,7 +120,7 @@ public class LowLevelHandlerBack extends LowLevelHandler {
                 Network.JoinGameResponse.Response.NAME_ALREADY_EXISTS, null));
         else{
             chosenNames.add(playerName);
-            GameData.PlayerDTO dto = new GameData.PlayerDTO(playerName);
+            GameData.PlayerDTO dto = new GameData.PlayerDTO(playerName, Color.WHITE);
             playersBeforeGame.put(con, dto);
             addMessage(con, new Network.JoinGameResponse(
                 Network.JoinGameResponse.Response.SUCCESS, dto.getId()));

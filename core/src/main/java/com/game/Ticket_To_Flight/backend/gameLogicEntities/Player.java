@@ -3,6 +3,7 @@ package com.game.Ticket_To_Flight.backend.gameLogicEntities;
 import com.badlogic.gdx.graphics.Color;
 import com.game.Ticket_To_Flight.Utilities.SetHolder;
 import com.game.Ticket_To_Flight.Utilities.MapHolder;
+import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.AbilityType;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.PlaneType;
 import com.game.Ticket_To_Flight.Utilities.Identifiable;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -17,28 +18,14 @@ public class Player extends Identifiable {
     public MapHolder<PlaneType, Integer> planes = new MapHolder<>();
     public SetHolder<Airline> airlines = new SetHolder<>();
     public String name;
-    public Color color = Color.WHITE;
-
-    //for server
-    public Player() {
-        super( idGenerator.incrementAndGet());
-    }
-    //for server
-    public Player(int id) {super(id);}
+    public AbilityType ability = null;
+    public Color color;
 
     //for client
-
-    public Player(int id, double money, double income, int amountOfShares, int actionPoints, MapHolder<PlaneType, Integer> planes, SetHolder<Airline> airlines){
-        super(id);
-        this.money = money;
-        this.income=income;
-        this.planes = planes;
-        this.airlines = airlines;
-        this.amountOfShares = amountOfShares;
-        this.actionPoints = actionPoints;
-    }
-
-    public Player(int id, double money, double income, int amountOfShares, int actionPoints, MapHolder<PlaneType, Integer> planes, SetHolder<Airline> airlines, String name, Color color){
+    public Player(
+        int id, double money, double income, int amountOfShares, int actionPoints,
+        MapHolder<PlaneType, Integer> planes, SetHolder<Airline> airlines,
+        String name, AbilityType ability,  Color color){
         super(id);
         this.money = money;
         this.income=income;
@@ -47,7 +34,8 @@ public class Player extends Identifiable {
         this.amountOfShares = amountOfShares;
         this.actionPoints = actionPoints;
         this.name = name;
-        this.color = Color.WHITE;
+        this.ability = ability;
+        this.color = color;
     }
 
     public Double getIncome() {return income;}

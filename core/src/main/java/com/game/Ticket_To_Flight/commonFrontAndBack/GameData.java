@@ -119,6 +119,7 @@ public class GameData {
         INCOME,
         TAXES
     }
+    public Integer roundNumber = 0;
     public State currentState = State.NO_STATE;
     public Integer currentPlayer = null;
 
@@ -244,7 +245,8 @@ public class GameData {
     }
     public static class PlayerDTO extends Identifiable{
         private PlayerDTO(){
-            super(0); name = null; money = 0; income = 0; amountOfShares=0; actionPoints=0; planes = null; airlines = null;}
+            super(0); name = null; money = 0; income = 0; amountOfShares=0;
+            actionPoints=0; planes = null; airlines = null; ability = null; color = null;}
         private static final AtomicInteger idGenerator = new AtomicInteger(0);
 
         private final String name;
@@ -254,7 +256,8 @@ public class GameData {
         private final int actionPoints;
         private final Map<Integer, Integer> planes;
         private final Set<Integer> airlines;
-        private Color color;
+        private final Integer ability;
+        private final  Color color;
 
         public PlayerDTO(Player player) {
             super(player.getId());
@@ -269,30 +272,37 @@ public class GameData {
             }
             this.planes = new HashMap<>();
             this.planes.putAll(player.planes);
+            if(player.ability != null)
+                this.ability = player.ability.getId();
+            else
+                this.ability = null;
+            this.color = player.color;
+
         }
 
-        public PlayerDTO(
-            int id, String name, double money, double income, int amountOfShares, int actionPoints,
-            MapHolder<PlaneType, Integer> planes, SetHolder<Airline> airlines){
-            super(id);
-            this.name = name;
-            this.money = money;
-            this.income=income;
-            this.amountOfShares = amountOfShares;
-            this.actionPoints = actionPoints;
-            this.airlines = new HashSet<>();
-            for(Airline line : airlines){
-                this.airlines.add(line.getId());
-            }
-            this.planes = new HashMap<>();
-            this.planes.putAll(planes);
-        }
+//        public PlayerDTO(
+//            int id, String name, double money, double income, int amountOfShares, int actionPoints,
+//            MapHolder<PlaneType, Integer> planes, SetHolder<Airline> airlines){
+//            super(id);
+//            this.name = name;
+//            this.money = money;
+//            this.income=income;
+//            this.amountOfShares = amountOfShares;
+//            this.actionPoints = actionPoints;
+//            this.airlines = new HashSet<>();
+//            for(Airline line : airlines){
+//                this.airlines.add(line.getId());
+//            }
+//            this.planes = new HashMap<>();
+//            this.planes.putAll(planes);
+//            if()
+//        }
 
         /**
          * Should not be called anywhere except Low Level Handler
          * Creates player in default state
          */
-        public PlayerDTO(String name){
+        public PlayerDTO(String name, Color color){
             super( idGenerator.incrementAndGet());
             this.name = name;
             money = 0;
@@ -301,6 +311,8 @@ public class GameData {
             actionPoints=0;
             planes = new HashMap<>();
             airlines = new HashSet<>();
+            ability = null;
+            this.color = color;
         }
 
         public Player restore(SetHolder<Airline> lookUpAirlines){
@@ -319,7 +331,7 @@ public class GameData {
             }
             return new Player(
                 this.getId(), this.money, this.income, this.amountOfShares,
-                this.actionPoints, planes, lines, this.name, this.color);
+                this.actionPoints, planes, lines, this.name, GameData.abilityTypes.get(this.ability), this.color);
         }
     }
 
