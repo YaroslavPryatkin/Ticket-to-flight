@@ -20,11 +20,11 @@ public class MainDrawer {
     }
 
     public void drawInvestmentWindow() {
-        WorldMapScreen.showInvestWindow();
+        //WorldMapScreen.showInvestWindow();
     }
 
     public void drawAuctionWindow() {
-        WorldMapScreen.showAuctionWindow();
+        //WorldMapScreen.showAuctionWindow();
     }
 
     public void drawMap(float delta){

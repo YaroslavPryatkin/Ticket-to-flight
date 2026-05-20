@@ -12,10 +12,9 @@ public class InvestWindow extends Table {
     public InvestWindow(Skin skin, GameUIManager uiManager, LowLevelHandlerFront llh) {
         uiManager.setOverlayActive(true);
 
-        final Table overlayWindow = new Table();
-        overlayWindow.setFillParent(true);
-        overlayWindow.setBackground(skin.getDrawable("blue-bg"));
-        overlayWindow.setTouchable(com.badlogic.gdx.scenes.scene2d.Touchable.enabled);
+        this.setFillParent(true);
+        this.setBackground(skin.getDrawable("blue-bg"));
+        this.setTouchable(com.badlogic.gdx.scenes.scene2d.Touchable.enabled);
 
         Label titleLabel = new Label("Investing", skin);
         titleLabel.setFontScale(1.5f);
@@ -37,17 +36,17 @@ public class InvestWindow extends Table {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 int investedAmount = (int) slider.getValue();
-                System.out.println("Sending response " + investedAmount );
+                System.out.println("Sending response " + investedAmount);
                 llh.sendInvestmentResponse(investedAmount);
-                overlayWindow.remove();
+                remove();
                 uiManager.showSuccessWindow("Income was invested successfully!");
             }
         });
 
-        overlayWindow.add(titleLabel).padBottom(15).row();
-        overlayWindow.add(subtitleLabel).padBottom(40).row();
-        overlayWindow.add(slider).width(300).padBottom(10).row();
-        overlayWindow.add(amountLabel).padBottom(40).row();
-        overlayWindow.add(submitBtn).width(150).height(50);
+        this.add(titleLabel).padBottom(15).row();
+        this.add(subtitleLabel).padBottom(40).row();
+        this.add(slider).width(300).padBottom(10).row();
+        this.add(amountLabel).padBottom(40).row();
+        this.add(submitBtn).width(150).height(50);
     }
 }

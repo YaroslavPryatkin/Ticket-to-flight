@@ -9,10 +9,12 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.GameUIManager;
 
 public class AuctionWindow extends Table {
-    private final GameUIManager uiManager;
+    //private final GameUIManager uiManager;
 
     public AuctionWindow(Skin skin, GameUIManager uiManager) {
-        this.uiManager = uiManager;
+        //this.uiManager = uiManager;
+
+        uiManager.setOverlayActive(true);
 
         this.setFillParent(true);
         this.setBackground(skin.getDrawable("blue-bg"));

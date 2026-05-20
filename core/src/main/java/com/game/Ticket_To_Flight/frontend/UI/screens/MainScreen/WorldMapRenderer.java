@@ -73,7 +73,7 @@ public class WorldMapRenderer extends ScreenAdapter {
         multiplexer.addProcessor(uiStage);
         multiplexer.addProcessor(inputCtrl);
         Gdx.input.setInputProcessor(multiplexer);
-        uiManager.showAuctionWindow();
+        uiManager.showInvestWindow();
     }
 
     private void clampCamera() {
@@ -130,14 +130,6 @@ public class WorldMapRenderer extends ScreenAdapter {
                 angle,
                 0, 0, 1, 1, false, false);
         }
-    }
-
-    public void showInvestWindow() {
-        uiManager.showInvestWindow();
-    }
-
-    public void showAuctionWindow() {
-        uiManager.showAuctionWindow();
     }
 
     @Override
