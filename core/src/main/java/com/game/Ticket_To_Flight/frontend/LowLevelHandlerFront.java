@@ -1,6 +1,7 @@
 package com.game.Ticket_To_Flight.frontend;
 
 import com.esotericsoftware.kryonet.Connection;
+import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airline;
 import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
 import com.game.Ticket_To_Flight.commonFrontAndBack.LowLevelHandler;
 import com.game.Ticket_To_Flight.network.Network;
@@ -256,6 +257,16 @@ public class LowLevelHandlerFront extends LowLevelHandler {
 
     public void sendInvestmentResponse(Integer shares){
         sendMessageToServer(new Network.PlayerInvestmentChoiceResponse(shares));
+        flags.currentStateState = Flags.CurrentStateState.WAITING_FOR_SERVER_RESPONSE;
+    }
+
+    public void sendAuctionResponse(Integer shares) {
+        sendMessageToServer(new Network.PlayerAuctionChoiceResponse(shares));
+        flags.currentStateState = Flags.CurrentStateState.WAITING_FOR_SERVER_RESPONSE;
+    }
+
+    public void sendBuyAirlineResponse(Airline airline) {
+        sendMessageToServer(new Network.PlayerAirlineChoiceResponse());
         flags.currentStateState = Flags.CurrentStateState.WAITING_FOR_SERVER_RESPONSE;
     }
 

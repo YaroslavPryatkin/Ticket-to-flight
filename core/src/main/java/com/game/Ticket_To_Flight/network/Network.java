@@ -150,6 +150,12 @@ public class Network {
         public PlayerInvestmentChoiceResponse(Integer shares ){this.amountOfShares = shares;}
     }
 
+    public static class PlayerAuctionChoiceResponse extends GameMessage {
+        public PlayerAuctionChoiceResponse(){}
+        public Integer amountOfShares = null;
+        public PlayerAuctionChoiceResponse(Integer shares) {this.amountOfShares = shares;}
+    }
+
     public static class PlayerAbilityChoiceResponse extends GameMessage{
         public PlayerAbilityChoiceResponse(){}
         public Integer ability =null;

@@ -2,6 +2,7 @@ package com.game.Ticket_To_Flight.frontend;
 
 import com.badlogic.gdx.Game;
 import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
+import com.game.Ticket_To_Flight.frontend.UI.screens.MainMenu.MainMenuRenderer;
 import com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.WorldMapRenderer;
 import com.game.Ticket_To_Flight.network.Network;
 import com.game.Ticket_To_Flight.frontend.LowLevelHandlerFront.Flags;
@@ -10,13 +11,15 @@ public class MainClient {
     private final Game myGame;
     private final GameData gameData = new GameData();
     private final LowLevelHandlerFront llh = new LowLevelHandlerFront(gameData);
-    //private final MainDrawer mainDrawer;
     private WorldMapRenderer worldMapRenderer;
+    private MainMenuRenderer mainMenuRenderer;
 
     public MainClient(Game gm){
         this.myGame = gm;
-        this.worldMapRenderer = new WorldMapRenderer(this);
-        this.myGame.setScreen(this.worldMapRenderer);
+        // this.worldMapRenderer = new WorldMapRenderer(this);
+        this.mainMenuRenderer = new MainMenuRenderer(this);
+        //this.myGame.setScreen(this.worldMapRenderer);
+        this.myGame.setScreen(this.mainMenuRenderer);
         mainCycleWithUpdate(0.0166666f);
     }
 
@@ -34,56 +37,48 @@ public class MainClient {
             if(gameData.currentState == GameData.State.WORLD_UPDATE) {
                 //this.myGame.setScreen(this.worldMapRenderer);
             }
-            else if (gameData.currentState == GameData.State.INVESTMENTS) {
+            else if (gameData.currentState == GameData.State.INVESTMENTS && llh.getMyId() == gameData.currentPlayer) {
                 if (llh.flags.currentStateState == Flags.CurrentStateState.PLAYER_STAGE) {
                     worldMapRenderer.drawInvestmentWindow();
                     llh.flags.currentStateState = LowLevelHandlerFront.Flags.CurrentStateState.WAITING_FOR_PLAYER_CHOICE;
                 }
             }
-            else if (gameData.currentState == GameData.State.AUCTION) {
+            else if (gameData.currentState == GameData.State.AUCTION && llh.getMyId() == gameData.currentPlayer) {
                 if (llh.flags.currentStateState == Flags.CurrentStateState.PLAYER_STAGE) {
                     worldMapRenderer.drawAuctionWindow();
                     llh.flags.currentStateState = Flags.CurrentStateState.WAITING_FOR_PLAYER_CHOICE;
                 }
                 worldMapRenderer.drawAuctionWindow();
             }
-            else if (gameData.currentState == GameData.State.ABILITIES) {
+            else if (gameData.currentState == GameData.State.ABILITIES && llh.getMyId() == gameData.currentPlayer) {
                if (llh.flags.currentStateState == Flags.CurrentStateState.PLAYER_STAGE) {
                    worldMapRenderer.drawAbilitiesWindow();
                    llh.flags.currentStateState = Flags.CurrentStateState.WAITING_FOR_PLAYER_CHOICE;
                }
             }
-            else if (gameData.currentState == GameData.State.PLANES) {
-                // mainDrawer.drawPlanesWindow();
+            else if (gameData.currentState == GameData.State.PLANES && llh.getMyId() == gameData.currentPlayer) {
+                if (llh.flags.currentStateState == Flags.CurrentStateState.PLAYER_STAGE) {
+                    worldMapRenderer.drawPlaneWindow();
+                    llh.flags.currentStateState = Flags.CurrentStateState.WAITING_FOR_PLAYER_CHOICE;
+                }
             }
-            else if (gameData.currentState == GameData.State.AIRLINES) {
+            else if (gameData.currentState == GameData.State.AIRLINES && llh.getMyId() == gameData.currentPlayer) {
                 // mainDrawer.reDrawAirlinesWindow();
             }
-            else if (gameData.currentState == GameData.State.EVENT) {
+            else if (gameData.currentState == GameData.State.EVENT && llh.getMyId() == gameData.currentPlayer) {
                 //mainDrawer.eventWindow();
             }
-            else if (gameData.currentState == GameData.State.FLIGHTS) {
+            else if (gameData.currentState == GameData.State.FLIGHTS && llh.getMyId() == gameData.currentPlayer) {
                 // smth
             }
-            else if (gameData.currentState == GameData.State.INCOME) {
+            else if (gameData.currentState == GameData.State.INCOME && llh.getMyId() == gameData.currentPlayer) {
                 // change Income
             }
-            else if (gameData.currentState == GameData.State.TAXES) {
+            else if (gameData.currentState == GameData.State.TAXES && llh.getMyId() == gameData.currentPlayer) {
                 // Taxes
             }
-            /*if (llh.getMyId() == gameData.currentPlayer) {
-                if (gameData.currentState == GameData.State.INVESTMENTS) {
-                    //ask for shares
-                    mainDrawer.drawInvestmentWindow();
-                }
-
-                if (gameData.currentState == GameData.State.AUCTION) {
-                    mainDrawer.drawAuctionWindow();
-                }
-            }*/
-
-
         }
+        //worldMapRenderer.renderNoLogic(delta);
     }
 
 

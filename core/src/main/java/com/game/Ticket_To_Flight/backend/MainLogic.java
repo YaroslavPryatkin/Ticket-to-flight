@@ -56,7 +56,9 @@ public class MainLogic extends MainLoopBack {
                 }
             }
             else if (gameData.currentState == GameData.State.AUCTION) {
-
+                if (llh.flags.currentPlayerState == Flags.CurrentPlayerState.ANSWERED) {
+                    llh.applyAndSendDataChanges();
+                }
             }
             else if (gameData.currentState == GameData.State.ABILITIES) {
 
@@ -98,6 +100,11 @@ public class MainLogic extends MainLoopBack {
         else{
             llh.sendError("Amount of shares should be < maximum amount of shares");
         }
+    }
+
+    @Override
+    public void handleAuctionResponse(Integer shares) {
+
     }
 
 }

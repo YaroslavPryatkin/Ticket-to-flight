@@ -42,7 +42,7 @@ public class GameUIManager {
     private Airline selectedAirline;
     private HUDOverlay hudOverlay;
 
-    private boolean isBuyingPhase = true; // maybe delete
+    private boolean isBuyingPhase = false; // maybe delete
 
     private boolean isOverlayActive = false;
 
@@ -69,11 +69,11 @@ public class GameUIManager {
 
     public void updateHUDData() {
         if (hudOverlay != null) {
-            int round = 1;
+            int round = gameData.roundNumber;
             String stage = gameData.currentState.toString();
             int time = 120;
-            double money = 10000; // ask
-            double income = 10000;// ask
+            double money = gameData.players.get(llh.getMyId()).getMoney();
+            double income = gameData.players.get(llh.getMyId()).getIncome();
 
             hudOverlay.updateHUD(round, stage, time, money, income);
         }
@@ -96,9 +96,9 @@ public class GameUIManager {
         selectedAirline = airline;
 
         double currentPlayerMoney = 1000000;
-        boolean currentBuyingPhase = this.isBuyingPhase;
+        boolean currentBuyingPhase = (gameData.currentState == GameData.State.AIRLINES);
 
-        currentTooltip = new AirlineTooltipWindow(skin_default_window, this, airline, currentPlayerMoney, currentBuyingPhase);
+        currentTooltip = new AirlineTooltipWindow(skin_default_window, this, airline, currentPlayerMoney, currentBuyingPhase, llh);
 
         uiStage.addActor(currentTooltip);
 
@@ -116,7 +116,7 @@ public class GameUIManager {
     }
 
     public void showAuctionWindow() {
-        uiStage.addActor(new AuctionWindow(skin_invest_window, this));
+        uiStage.addActor(new AuctionWindow(skin_invest_window, this, llh));
     }
 
     public void showInvestWindow() {

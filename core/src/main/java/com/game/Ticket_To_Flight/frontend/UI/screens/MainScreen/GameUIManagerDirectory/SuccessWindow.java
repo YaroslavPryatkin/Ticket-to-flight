@@ -9,7 +9,7 @@ import com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.GameUIManager;
 public class SuccessWindow extends Window {
 
     public SuccessWindow(Skin skin, GameUIManager uiManager, String message) {
-        super(" Success", skin);
+        super(message, skin);
 
         this.pad(30);
         this.padTop(50);

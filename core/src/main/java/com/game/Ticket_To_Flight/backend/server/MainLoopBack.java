@@ -74,6 +74,8 @@ public abstract class MainLoopBack {
 
     }
 
+    public void handleAuctionResponse(Integer response) {}
+
     public void handleAbilityChoiceResponse(Integer response){
 
     }
