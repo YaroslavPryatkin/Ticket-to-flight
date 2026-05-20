@@ -62,8 +62,7 @@ public class Network {
         ArrayList.class,
         HashMap.class,
         HashSet.class,
-        TreeMap.class,
-        UserInvestment.class
+        TreeMap.class
     };
 
     // NOT to register
@@ -201,14 +200,5 @@ public class Network {
 
     public static class StartGameMessage extends GameMessage {
         public StartGameMessage(){}
-    }
-
-    public static class UserInvestment extends GameMessage {
-        public UserInvestment(int player_id, int used_income) {
-            this.used_income = used_income;
-            this.player_id = player_id;
-        }
-        public int player_id;
-        public int used_income;
     }
 }

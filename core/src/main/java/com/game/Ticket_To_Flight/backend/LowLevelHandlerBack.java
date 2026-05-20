@@ -2,10 +2,13 @@ package com.game.Ticket_To_Flight.backend;
 
 import com.badlogic.gdx.math.Vector2;
 import com.esotericsoftware.kryonet.Connection;
+import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airline;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airport;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Player;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.AirlineType;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.AirportType;
+import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.PlaneType;
+import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.WorldEventType;
 import com.game.Ticket_To_Flight.backend.server.GameServer;
 import com.game.Ticket_To_Flight.backend.server.MainLoopBack;
 import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
@@ -28,7 +31,8 @@ public class LowLevelHandlerBack extends LowLevelHandler {
 
     public LowLevelHandlerBack.Flags flags = new LowLevelHandlerBack.Flags();
 
-    private final Map<Integer, Connection> players = new HashMap<>();
+    private final Map<Integer, Connection> int2con = new HashMap<>();
+    private final Map<Connection, Integer> con2int = new HashMap<>();
 
     private final Queue<Connection> playersToAdd = new ConcurrentLinkedQueue<>();
     private final Map<Connection, GameData.PlayerDTO> playersBeforeGame = new HashMap<>();
@@ -53,17 +57,21 @@ public class LowLevelHandlerBack extends LowLevelHandler {
             handleJoinGameRequest(con, req.playerName);
         }
         else if(message instanceof Network.PlayerInvestmentChoiceResponse){
-
+            Network.PlayerInvestmentChoiceResponse resp = (Network.PlayerInvestmentChoiceResponse) message;
+            System.out.println("Player " + con2int.get(con) + " has chosen to buy " + resp.amountOfShares + " shares");
         }
         else if(message instanceof Network.PlayerAbilityChoiceResponse){
 
+        }
+        else if(message instanceof Network.ReloadGameDataRequest){
+            sendReloadGameResponse(con);
         }
         else throw new IllegalArgumentException("Unknown message");
     }
 
     private boolean sendToAllPlayers(Network.GameMessage message) {
         boolean res = true;
-        for (Connection con : players.values()) {
+        for (Connection con : int2con.values()) {
             if (con != null && con.isConnected()) {
                 addMessage(con, message);
             }
@@ -143,7 +151,8 @@ public class LowLevelHandlerBack extends LowLevelHandler {
         }
         for(Map.Entry<Connection, GameData.PlayerDTO> e : playersBeforeGame.entrySet()){
             if(e.getKey().isConnected()) {
-                players.put(e.getValue().getId(), e.getKey());
+                int2con.put(e.getValue().getId(), e.getKey());
+                con2int.put(e.getKey(), e.getValue().getId());
                 dataChanges.playersToAdd.add(e.getValue());
             }
         }
@@ -153,6 +162,15 @@ public class LowLevelHandlerBack extends LowLevelHandler {
     }
 
     //------------------------------------- starting the game
+
+    //------------------------------------- reload game part
+
+    private void sendReloadGameResponse(Connection con){
+        GameData.DataChanges reloadDC = gameData.createDataChangesFromThis();
+        addMessage(con, new Network.ReloadGameDataResponse(reloadDC));
+    }
+
+    //------------------------------------- reload game part
 
     //------------------------------------- for use in main logic
 
@@ -241,6 +259,7 @@ public class LowLevelHandlerBack extends LowLevelHandler {
     public void setCurrentPLayer(Player pl){
         setCurrentPLayer(pl.getId());
     }
+
     public void setCurrentPLayer(Integer pl){
         dataChanges.currentPlayer = pl;
     }

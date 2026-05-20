@@ -107,6 +107,7 @@ public class GameData {
     }
 
     public enum State {
+        UNKNOWN,
         WORLD_UPDATE,
         INVESTMENTS,
         AUCTION,
@@ -118,7 +119,7 @@ public class GameData {
         INCOME,
         TAXES
     }
-    public State currentState;
+    public State currentState = State.UNKNOWN;
     public Integer currentPlayer = null;
 
     public SetHolder<WorldEventType> worldEvents = new SetHolder<>();
@@ -127,8 +128,6 @@ public class GameData {
     public SetHolder<Player> players = new SetHolder<>();
     public SetHolder<Airline> availableAirlines = new SetHolder<>();
     public MapHolder<PlaneType, Integer> availablePlanes = new MapHolder<>(GameData.planeTypes);
-    public MapHolder<Player, Integer> actionPoints = new MapHolder<>(players);
-    public MapHolder<Player,Integer> amountOfShares = new MapHolder<>(players);
 
 
     public static class AirlineDTO extends Identifiable {
@@ -201,9 +200,7 @@ public class GameData {
             this.type = port.type.getId();
             this.position = port.position;
             this.passengers=new HashMap<>();
-            for(Map.Entry<Integer,Integer> psg : port.passengers.entrySet()){
-                this.passengers.put(psg.getKey(), psg.getValue());
-            }
+            this.passengers.putAll(port.passengers);
             this.name = port.airportName;
         }
 
@@ -246,12 +243,15 @@ public class GameData {
         }
     }
     public static class PlayerDTO extends Identifiable{
-        private PlayerDTO(){super(0); name = null; money = 0; income = 0; planes = null; airlines = null;}
+        private PlayerDTO(){
+            super(0); name = null; money = 0; income = 0; amountOfShares=0; actionPoints=0; planes = null; airlines = null;}
         private static final AtomicInteger idGenerator = new AtomicInteger(0);
 
         private final String name;
         private final double money;
         private final double income;
+        private final int amountOfShares;
+        private final int actionPoints;
         private final Map<Integer, Integer> planes;
         private final Set<Integer> airlines;
         private Color color;
@@ -261,6 +261,8 @@ public class GameData {
             this.name = player.name;
             this.money = player.money;
             this.income = player.income;
+            this.amountOfShares = player.amountOfShares;
+            this.actionPoints = player.actionPoints;
             this.airlines = new HashSet<>();
             for(Airline line : player.airlines){
                 this.airlines.add(line.getId());
@@ -269,11 +271,15 @@ public class GameData {
             this.planes.putAll(player.planes);
         }
 
-        public PlayerDTO(int id, String name, double money, double income, MapHolder<PlaneType, Integer> planes, SetHolder<Airline> airlines){
+        public PlayerDTO(
+            int id, String name, double money, double income, int amountOfShares, int actionPoints,
+            MapHolder<PlaneType, Integer> planes, SetHolder<Airline> airlines){
             super(id);
             this.name = name;
             this.money = money;
             this.income=income;
+            this.amountOfShares = amountOfShares;
+            this.actionPoints = actionPoints;
             this.airlines = new HashSet<>();
             for(Airline line : airlines){
                 this.airlines.add(line.getId());
@@ -291,6 +297,8 @@ public class GameData {
             this.name = name;
             money = 0;
             income = 0;
+            amountOfShares = 0;
+            actionPoints=0;
             planes = new HashMap<>();
             airlines = new HashSet<>();
         }
@@ -309,7 +317,9 @@ public class GameData {
             catch(Exception e){
                 return null;
             }
-            return new Player(this.getId(), this.money, this.income, planes, lines, this.name, this.color);
+            return new Player(
+                this.getId(), this.money, this.income, this.amountOfShares,
+                this.actionPoints, planes, lines, this.name, this.color);
         }
     }
 
@@ -331,8 +341,8 @@ public class GameData {
         public  Set<Integer> newWorldEvents= null;
 
 
-        public  Map<Integer, Integer> availablePlanesToRemove= null;
         public  Map<Integer, Integer> availablePlanesToAdd= null;
+        public  Map<Integer, Integer> availablePlanesToRemove= null;
         public  Map<Integer, Map<Integer, Integer>> airportPassengersToAdd= null;
         public  Map<Integer, Map<Integer, Integer>> airportPassengersToRemove= null;
 
@@ -453,12 +463,10 @@ public class GameData {
             (old, params)->{Integer res = old+params.get(0) - params.get(1); return res == 0 ? null : res;},
             (i)->0);
 
-        actionPoints.merge(changes.playerActionPointsChange, (o)->o, (o, n)->n+o);
-        actionPoints.removeAllRefsToNotExistingObjects();
-
-        amountOfShares.merge(changes.playerAmountOfSharesChange, (o)->o, (o, n)->n+o);
-        amountOfShares.removeAllRefsToNotExistingObjects();
-
+        players.changeAsStructWithSetterInteger(Player::setActionPoints, Player::getActionPoints,
+            changes.playerActionPointsChange, (f, s)->f+s);
+        players.changeAsStructWithSetterInteger(Player::setAmountOfShares, Player::getAmountOfShares,
+            changes.playerAmountOfSharesChange, (f, s)->f+s);
         players.changeAsStructWithSetterInteger(Player::setIncome, Player::getIncome,
             changes.playerIncomeChange, (f, s)->f+s);
         players.changeAsStructWithSetterInteger(Player::setMoney, Player::getMoney,
@@ -521,12 +529,10 @@ public class GameData {
             ) ||
             !playersTmp.checkChangeAsStructInteger(Player::getMoney, changes.playerMoneyChange,
                 (current, change) -> current + change >= 0) ||
-            !playersTmp.containsAllKeys(changes.playerActionPointsChange) ||
-            !playersTmp.containsAllKeys(changes.playerAmountOfSharesChange) ||
-            !actionPoints.checkMergeElements(changes.playerActionPointsChange, null,
-                (o, n)->o+n>=0 && o+n<=GameData.maxActionsPerTurn) ||
-            !amountOfShares.checkMergeElements(changes.playerAmountOfSharesChange, null,
+            !playersTmp.checkChangeAsStructInteger(Player::getAmountOfShares, changes.playerAmountOfSharesChange,
                 (o, n)->o+n>=0 && o+n<=GameData.maxAmountOfShares) ||
+            !playersTmp.checkChangeAsStructInteger(Player::getActionPoints, changes.playerActionPointsChange,
+                (o, n)->o+n>=0 && o+n<=GameData.maxActionsPerTurn) ||
             !playersTmp.checkChangeAsStructInteger((pl)->pl.airlines,
                 Arrays.asList(changes.playerAirlinesToAdd, changes.playerAirlinesToRemove),
                 (f,s)->f.checkChangeSetIILookUp(s.get(0), s.get(1), airlinesTmp)
@@ -561,6 +567,47 @@ public class GameData {
         applyChangesUnsafe(changes);
 
         return true;
+    }
+
+    public void clearGameData(){
+        currentState = State.UNKNOWN;
+        currentPlayer = null;
+        worldEvents.clear();
+        airports.clear();
+        airlines.clear();
+        players.clear();
+        availableAirlines.clear();
+        availablePlanes.clear();
+    }
+
+    public DataChanges createDataChangesFromThis(){
+        GameData.DataChanges res = new DataChanges();
+        res.currentState = currentState;
+        res.currentPlayer = currentPlayer;
+        res.playersToAdd = new HashSet<>();
+        for(Player pl : players){
+            res.playersToAdd.add(new PlayerDTO(pl)); // all player field are here
+        }
+        res.airportsToAdd = new HashSet<>();
+        for(Airport port : airports){
+            res.airportsToAdd.add(new AirportDTO(port)); // airport passengers to add is here
+        }
+        res.airlinesToAdd = new HashSet<>();
+        for(Airline line : airlines){
+            res.airlinesToAdd.add(new AirlineDTO(line));
+        }
+        res.availableAirlinesToAdd = new HashSet<>();
+        for(Airline line : availableAirlines){
+            res.availableAirlinesToAdd.add(line.getId());
+        }
+        res.availablePlanesToAdd = new HashMap<>();
+        res.availablePlanesToAdd.putAll(availablePlanes);
+        res.newWorldEvents = new HashSet<>();
+        for(WorldEventType event : worldEvents){
+            res.newWorldEvents.add(event.getId());
+        }
+
+        return res;
     }
 
 

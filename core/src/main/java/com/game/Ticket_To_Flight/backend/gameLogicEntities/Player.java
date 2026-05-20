@@ -12,6 +12,8 @@ public class Player extends Identifiable {
 
     public double money = 0;
     public double income = 0;
+    public int amountOfShares = 0;
+    public int actionPoints = 0;
     public MapHolder<PlaneType, Integer> planes = new MapHolder<>();
     public SetHolder<Airline> airlines = new SetHolder<>();
     public String name;
@@ -26,20 +28,24 @@ public class Player extends Identifiable {
 
     //for client
 
-    public Player(int id, double money, double income, MapHolder<PlaneType, Integer> planes, SetHolder<Airline> airlines){
+    public Player(int id, double money, double income, int amountOfShares, int actionPoints, MapHolder<PlaneType, Integer> planes, SetHolder<Airline> airlines){
         super(id);
         this.money = money;
         this.income=income;
         this.planes = planes;
         this.airlines = airlines;
+        this.amountOfShares = amountOfShares;
+        this.actionPoints = actionPoints;
     }
 
-    public Player(int id, double money, double income, MapHolder<PlaneType, Integer> planes, SetHolder<Airline> airlines, String name, Color color){
+    public Player(int id, double money, double income, int amountOfShares, int actionPoints, MapHolder<PlaneType, Integer> planes, SetHolder<Airline> airlines, String name, Color color){
         super(id);
         this.money = money;
         this.income=income;
         this.planes = planes;
         this.airlines = airlines;
+        this.amountOfShares = amountOfShares;
+        this.actionPoints = actionPoints;
         this.name = name;
         this.color = Color.WHITE;
     }
@@ -48,6 +54,10 @@ public class Player extends Identifiable {
     public void setIncome(Double val){income = val;}
     public Double getMoney() {return money;}
     public void setMoney(Double val) {money = val;}
+    public Integer getAmountOfShares() {return amountOfShares;}
+    public void setAmountOfShares(Integer val) {amountOfShares = val;}
+    public Integer getActionPoints() {return actionPoints;}
+    public void setActionPoints(Integer val) {actionPoints = val;}
 
     public String getName() {
         return name;

@@ -9,6 +9,7 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class LowLevelHandlerFront extends LowLevelHandler {
@@ -49,6 +50,31 @@ public class LowLevelHandlerFront extends LowLevelHandler {
     private volatile GameData.DataChanges checkedChanges;
     private final AtomicBoolean isValidationRunning = new AtomicBoolean(false);
     public final Queue<GameData.DataChanges> changesQueue = new ConcurrentLinkedQueue<>();
+    private final AtomicBoolean interruptValidator = new AtomicBoolean(false);
+    private volatile Future<?> currentValidationTask = null;
+
+    public void resetGameData(GameData.DataChanges dataChanges) {
+        if (isValidationRunning.get()) {
+            interruptValidator.set(true);
+            if (currentValidationTask != null) {
+                currentValidationTask.cancel(true);
+            }
+        }
+        changesQueue.clear();
+
+        gameData.acquireWriteLock();
+        try {
+            checkedChanges = null;
+            gameData.clearGameData();
+            gameData.applyChangesUnsafe(dataChanges);
+            changeFlagDependingOnNewState(dataChanges.currentState);
+        } catch (Exception e) {
+            dataInconsistent();
+        } finally {
+            gameData.releaseWriteLock();
+        }
+    }
+
 
     public void updateChanges() {
         if (checkedChanges != null) {
@@ -74,39 +100,57 @@ public class LowLevelHandlerFront extends LowLevelHandler {
     private void startAsyncValidation() {
         isValidationRunning.set(true);
 
-        validationExecutor.execute(() -> {
+        currentValidationTask = validationExecutor.submit(() -> {
             boolean isValid = false;
             GameData.DataChanges change = null;
+
             try {
                 gameData.acquireReadLock();
-                change = changesQueue.poll();
-                while(!changesQueue.isEmpty()) {
-                    change.merge(changesQueue.poll());
+
+                if (interruptValidator.compareAndSet(true, false)) {
+                    return;
                 }
+
+                change = changesQueue.poll();
+                if (change != null) {
+                    while (!changesQueue.isEmpty()) {
+                        GameData.DataChanges newDataChanges = changesQueue.poll();
+                        if (newDataChanges != null) {
+                            change.merge(newDataChanges);
+                        }
+                    }
+                }
+
                 isValid = gameData.checkChanges(change);
 
+                if (interruptValidator.compareAndSet(true, false)) {
+                    return;
+                }
+
+                if (isValid) {
+                    checkedChanges = change;
+                } else {
+                    dataInconsistent();
+                }
+
             } catch (Exception e) {
-                System.out.println("checking exception " + e.toString());
-                e.printStackTrace();
+
+                if (interruptValidator.compareAndSet(true, false)) {
+                    return;
+                }
+                System.out.println("Error: " + e.toString());
+                dataInconsistent();
             } finally {
                 gameData.releaseReadLock();
                 isValidationRunning.set(false);
             }
-
-            if (isValid) {
-                checkedChanges = change;
-            }
-            else{
-                dataInconsistent();
-            }
-
         });
     }
 
     private void dataInconsistent(){
         checkedChanges = null;
         changesQueue.clear();
-        addMessage(serverCon, new Network.ReloadGameDataRequest());
+        sendMessageToServer(new Network.ReloadGameDataRequest());
     }
 
     private void changeFlagDependingOnNewState(GameData.State st){
@@ -139,8 +183,8 @@ public class LowLevelHandlerFront extends LowLevelHandler {
             changesQueue.offer(((Network.DataChangesMessage) message).dc);
         }
         else if(message instanceof Network.JoinGameResponse){
-
             Network.JoinGameResponse resp = (Network.JoinGameResponse) message;
+
             flags.joinGameResponse = resp.response;
             if(resp.response == Network.JoinGameResponse.Response.SUCCESS) {
                 flags.gamePreparationsState = Flags.GamePreparationsState.WAITING_FOR_OTHER_PLAYERS_TO_JOIN;
@@ -155,8 +199,13 @@ public class LowLevelHandlerFront extends LowLevelHandler {
             System.out.println("game is running");
         }
         else if(message instanceof Network.ReloadGameDataResponse){
-            //will later be reload
+            Network.ReloadGameDataResponse resp = (Network.ReloadGameDataResponse) message;
+            resetGameData(resp.dc);
         }
+    }
+
+    private void sendMessageToServer(Network.GameMessage message){
+        addMessage(serverCon, message);
     }
 
     //------------------------------------- messages part
@@ -193,7 +242,7 @@ public class LowLevelHandlerFront extends LowLevelHandler {
         //System.out.println("Trying to add join game request message");
         if(flags.gamePreparationsState == Flags.GamePreparationsState.READY_TO_JOIN_THE_GAME && serverCon.isConnected()){
             //System.out.println("Adding join game request message");
-            addMessage(serverCon, new Network.JoinGameRequest(name));
+            sendMessageToServer(new Network.JoinGameRequest(name));
             flags.gamePreparationsState = Flags.GamePreparationsState.WAITING_FOR_SERVER_RESPONSE;
             return true;
         }
@@ -201,10 +250,9 @@ public class LowLevelHandlerFront extends LowLevelHandler {
     }
 
     public void sendInvestmentResponse(Integer shares){
-        addMessage(serverCon, new Network.PlayerInvestmentChoiceResponse(shares));
+        sendMessageToServer(new Network.PlayerInvestmentChoiceResponse(shares));
         flags.currentStateState = Flags.CurrentStateState.WAITING_FOR_SERVER_RESPONSE;
     }
-
 
     public int getMyId(){
         return myId;
@@ -214,9 +262,4 @@ public class LowLevelHandlerFront extends LowLevelHandler {
         return serverCon!=null && serverCon.isConnected();
     }
     //------------------------------------- for use from MainClient
-
-    public void setNewMessage(Network.GameMessage gm) {
-        System.out.println("Accepted investment!");
-        addMessage(serverCon, gm);
-    }
 }

@@ -37,7 +37,8 @@ public class InvestWindow extends Table {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 int investedAmount = (int) slider.getValue();
-                llh.setNewMessage(new Network.UserInvestment(llh.getMyId(), investedAmount));
+                System.out.println("Sending response " + investedAmount );
+                llh.sendInvestmentResponse(investedAmount);
                 overlayWindow.remove();
                 uiManager.showSuccessWindow("Income was invested successfully!");
             }
