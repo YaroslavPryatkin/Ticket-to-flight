@@ -28,7 +28,8 @@ public class MainLogic extends MainLoopBack {
         }
         else{
             if(gameData.currentState == GameData.State.NO_STATE){
-                llh.setCurrentPLayer((Integer) null);
+                llh.setCurrentRound(1);
+                llh.setCurrentPLayer(-1);
                 llh.setCurrentState(GameData.State.WORLD_UPDATE);
                 llh.applyAndSendDataChanges();
             }
@@ -47,6 +48,9 @@ public class MainLogic extends MainLoopBack {
             }
             else if (gameData.currentState == GameData.State.INVESTMENTS) {
                 if(llh.flags.currentPlayerState == Flags.CurrentPlayerState.ANSWERED){
+                    llh.setCurrentState(GameData.State.AUCTION);
+                    llh.setCurrentPLayer(1);
+                    llh.flags.currentPlayerState = Flags.CurrentPlayerState.WAITING_FOR_RESPONSE;
                     System.out.println("good answer to investment");
                     llh.applyAndSendDataChanges();
                 }
@@ -89,7 +93,7 @@ public class MainLogic extends MainLoopBack {
         if(addedAmountOfShares <= 0) llh.sendError("Amount of shares should be > 0");
         Player pl = gameData.players.get(gameData.currentPlayer);
         if(pl.amountOfShares + addedAmountOfShares <= GameData.maxAmountOfShares){
-
+            llh.addAmountOfShares(addedAmountOfShares);
         }
         else{
             llh.sendError("Amount of shares should be < maximum amount of shares");

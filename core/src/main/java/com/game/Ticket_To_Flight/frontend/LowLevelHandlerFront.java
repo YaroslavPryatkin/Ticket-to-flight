@@ -189,13 +189,13 @@ public class LowLevelHandlerFront extends LowLevelHandler {
             flags.joinGameResponse = resp.response;
             if(resp.response == Network.JoinGameResponse.Response.SUCCESS) {
                 flags.gamePreparationsState = Flags.GamePreparationsState.WAITING_FOR_OTHER_PLAYERS_TO_JOIN;
-                myId = resp.id;
             }
             else{
                 flags.gamePreparationsState = Flags.GamePreparationsState.READY_TO_JOIN_THE_GAME;
             }
         }
         else if(message instanceof Network.StartGameMessage){
+            myId = ((Network.StartGameMessage) message).myId;
             flags.gamePreparationsState = Flags.GamePreparationsState.RUNNING;
             System.out.println("game is running");
         }

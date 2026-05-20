@@ -46,6 +46,8 @@ public class Player extends Identifiable {
     public void setAmountOfShares(Integer val) {amountOfShares = val;}
     public Integer getActionPoints() {return actionPoints;}
     public void setActionPoints(Integer val) {actionPoints = val;}
+    public AbilityType getAbility() {return ability;}
+    public void setAbility(AbilityType val) {ability = val;}
 
     public String getName() {
         return name;

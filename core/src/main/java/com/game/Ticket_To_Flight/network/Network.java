@@ -188,18 +188,19 @@ public class Network {
     }
 
     public static class JoinGameResponse extends GameMessage{
-        public JoinGameResponse(){}
+        private JoinGameResponse(){}
         public enum Response {
             SUCCESS,
             NAME_ALREADY_EXISTS
         }
         public Response response=null;
-        public Integer id=null;
-        public JoinGameResponse(Response response, Integer id){this.response = response; this.id = id;}
+        public JoinGameResponse(Response response){this.response = response;}
     }
 
     public static class StartGameMessage extends GameMessage {
-        public StartGameMessage(){}
+        private StartGameMessage(){}
+        public Integer myId;
+        public StartGameMessage(Integer id){myId = id;}
     }
 
     public static class ErrorMessage extends GameMessage {

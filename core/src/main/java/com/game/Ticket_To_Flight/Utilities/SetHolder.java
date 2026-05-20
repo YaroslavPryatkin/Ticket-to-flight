@@ -30,15 +30,15 @@ public class SetHolder<T extends Identifiable> implements Set<T> {
 
     // --- Specialized Lookup Methods ---
 
-    public T get(Integer id) {
-        return storage.get(id);
-    }
     public T remove(Integer id) {return storage.remove(id);}
 
-    public T get(T item) {
-        return (item == null) ? null : storage.get(item.getId());
+    public T get(T item){
+        return storage.get(item.getId());
     }
 
+    public T get(Integer id){
+        return storage.get(id);
+    }
     /**
      * Checks if the storage contains the exact same instance (by reference)
      * as the provided object.
@@ -72,7 +72,7 @@ public class SetHolder<T extends Identifiable> implements Set<T> {
      * @param function function to apply
      * @return this
      */
-    public <V> SetHolder<T> changeAsStructInteger(
+    public <V> SetHolder<T> changeAsStruct(
         Function<T, V> getField,
         Map<Integer, V> other,
         BiConsumer<V, V> function
@@ -97,7 +97,7 @@ public class SetHolder<T extends Identifiable> implements Set<T> {
      * @param function function to apply
      * @return this
      */
-    public <V> SetHolder<T> changeAsStructWithSetterInteger(
+    public <V> SetHolder<T> changeAsStructWithSetter(
         BiConsumer<T,V> setField,
         Function<T, V> getField,
         Map<Integer, V> other,
@@ -118,12 +118,41 @@ public class SetHolder<T extends Identifiable> implements Set<T> {
     }
 
     /**
+     * Applies a function to all pairs (this[key].field, converterFunction(other[key])) for every same key in this and other
+     * @param getField getter
+     * @param other parameter
+     * @param function function to apply
+     * @return this
+     */
+    public <V> SetHolder<T> changeAsStructWithSetter(
+        BiConsumer<T,V> setField,
+        Function<T, V> getField,
+        Function<Integer,V> converterFunction,
+        Map<Integer, Integer> other,
+        BiFunction<V, V, V> function
+    ) {
+        if(setField == null || getField == null || other == null || function == null) return this;
+        for (Map.Entry<Integer, Integer> entry : other.entrySet()) {
+            T realItem = this.get(entry.getKey());
+            if (realItem != null) {
+                V currentValue = getField.apply(realItem);
+
+                // Calculate new value and assign it using the setter
+                Integer entryId = entry.getValue();
+                V newVal = function.apply(currentValue, converterFunction.apply(entryId));
+                setField.accept(realItem, newVal);
+            }
+        }
+        return this;
+    }
+
+    /**
      * Validates the proposed structural changes.
      * Returns false if any affected object is missing from storage,
      * or if the checkFunction fails for any object.
      * Note: no checking is done to ensure this[key].getField() != null
      */
-    public <V> boolean checkChangeAsStructInteger(
+    public <V> boolean checkChangeAsStruct(
         Function<T, V> getField,
         Map<Integer, V> other,
         BiPredicate<V, V> checkFunction
@@ -179,7 +208,7 @@ public class SetHolder<T extends Identifiable> implements Set<T> {
      * Useful for mutable field objects (like internal collections or wrappers).
      * @return this
      */
-    public <C, V> SetHolder<T> changeAsStructInteger(
+    public <C, V> SetHolder<T> changeAsStruct(
         Function<T, C> getField,
         List<Map<Integer, V>> params,
         BiConsumer<C, List<V>> function
@@ -200,75 +229,13 @@ public class SetHolder<T extends Identifiable> implements Set<T> {
         return this;
     }
 
-
-
-    /**
-     * Applies a function to calculate a new value for a field,
-     * then uses the setter to assign it back to the object.
-     * Useful for immutable fields (like Integer, String, Enum).
-     * @return this
-     */
-    public <V> SetHolder<T> changeAsStructWithSetterType(
-        BiConsumer<T, V> setter, // Takes the target object and the new value
-        Function<T, V> getField,
-        List<Map<T, V>> params,
-        BiFunction<V, List<V>, V> function
-    ) {
-        Set<T> allKeys = collectAllKeysType(params);
-
-        for (T key : allKeys) {
-            T realItem = this.get(key);
-            if (realItem != null) {
-                V currentValue = getField.apply(realItem);
-                List<V> paramValues = collectParamValuesType(key, params);
-
-                // Calculate new value and assign it using the setter
-                V newValue = function.apply(currentValue, paramValues);
-                setter.accept(realItem, newValue);
-            }
-        }
-        return this;
-    }
-
-    /**
-     * Validates the proposed structural changes.
-     * Returns false if any affected object is missing from storage,
-     * or if the checkFunction fails for any object.
-     */
-    public <V> boolean checkChangeAsStructType(
-        Function<T, V> getField,
-        List<Map<T, V>> params,
-        BiPredicate<V, List<V>> checkFunction
-    ) {
-        Set<T> allKeys = collectAllKeysType(params);
-
-        for (T key : allKeys) {
-            T realItem = this.get(key);
-            // 1. All objects affected by params must exist in the current storage
-            if (realItem == null) {
-                return false;
-            }
-
-            V currentValue = getField.apply(realItem);
-            List<V> paramValues = collectParamValuesType(key, params);
-
-            // 2. Validate the specific logic via the provided predicate
-            if (!checkFunction.test(currentValue, paramValues)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-
     /**
      * Validates the proposed structural changes.
      * Returns false if any affected object is missing from storage,
      * or if the checkFunction fails for any object.
      * Note: does not check that this[key].getField() != null
      */
-    public <C, V> boolean checkChangeAsStructInteger(
+    public <C, V> boolean checkChangeAsStruct(
         Function<T, C> getField,
         List<Map<Integer, V>> params,
         BiPredicate<C, List<V>> checkFunction
@@ -1111,6 +1078,10 @@ public class SetHolder<T extends Identifiable> implements Set<T> {
     public boolean containsAllKeys(Map<?, ?> c) {
         if(c==null) return true;
         return containsAll(c.keySet());
+    }
+    public boolean containsAllValues(Map<?, ?> c) {
+        if(c==null) return true;
+        return containsAll(c.values());
     }
 
     @Override

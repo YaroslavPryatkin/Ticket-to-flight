@@ -121,13 +121,14 @@ public class GameData {
     }
     public Integer roundNumber = 0;
     public State currentState = State.NO_STATE;
-    public Integer currentPlayer = null;
+    public Integer currentPlayer = -1; // -1 if it is no player turn
 
     public SetHolder<WorldEventType> worldEvents = new SetHolder<>();
     public SetHolder<Airport> airports = new SetHolder<>();
     public SetHolder<Airline> airlines = new SetHolder<>();
     public SetHolder<Player> players = new SetHolder<>();
     public SetHolder<Airline> availableAirlines = new SetHolder<>();
+    public SetHolder<AbilityType> availableAbilities = new SetHolder<>();
     public MapHolder<PlaneType, Integer> availablePlanes = new MapHolder<>(GameData.planeTypes);
 
 
@@ -346,8 +347,10 @@ public class GameData {
         public  Set<Integer> airlinesToRemove= null;
         public  Set<Integer> availableAirlinesToAdd= null;
         public  Set<Integer> availableAirlinesToRemove= null;
+        public  Set<Integer> availableAbilitiesToAdd= null;
+        public  Set<Integer> availableAbilitiesToRemove= null;
 
-
+        public Integer roundNumber = null;
         public  GameData.State currentState= null;
         public  Integer currentPlayer= null;
         public  Set<Integer> newWorldEvents= null;
@@ -363,6 +366,7 @@ public class GameData {
         public  Map<Integer, Double> playerIncomeChange= null;
         public  Map<Integer, Integer> playerActionPointsChange= null;
         public  Map<Integer, Integer> playerAmountOfSharesChange= null;
+        public  Map<Integer, Integer> playerAbilityChoice = null;
 
         public  Map<Integer, Set<Integer>> playerAirlinesToAdd= null;
         public  Map<Integer, Set<Integer>> playerAirlinesToRemove= null;
@@ -378,13 +382,15 @@ public class GameData {
          */
         public DataChanges merge(DataChanges other) {
             if (other == null) return this;
-
+            if(other.roundNumber != null) this.roundNumber = other.roundNumber;
             if (other.currentState != null) this.currentState = other.currentState;
             if (other.currentPlayer != null) this.currentPlayer = other.currentPlayer;
 
             this.newWorldEvents = SetHolder.merge(this.newWorldEvents, other.newWorldEvents);
             this.availableAirlinesToAdd = SetHolder.merge(this.availableAirlinesToAdd, other.availableAirlinesToAdd);
             this.availableAirlinesToRemove = SetHolder.merge(this.availableAirlinesToRemove, other.availableAirlinesToRemove);
+            this.availableAbilitiesToAdd = SetHolder.merge(this.availableAbilitiesToAdd, other.availableAbilitiesToAdd);
+            this.availableAbilitiesToRemove = SetHolder.merge(this.availableAbilitiesToRemove, other.availableAbilitiesToRemove);
             this.playersToAdd = SetHolder.merge(this.playersToAdd, other.playersToAdd);
             this.playersToRemove = SetHolder.merge(this.playersToRemove, other.playersToRemove);
             this.airportsToAdd = SetHolder.merge(this.airportsToAdd, other.airportsToAdd);
@@ -419,6 +425,9 @@ public class GameData {
 
             this.playerAmountOfSharesChange = MapHolder.merge(
                 this.playerAmountOfSharesChange, other.playerAmountOfSharesChange, v -> v, DataChanges::sumIntOrNull);
+
+            this.playerAbilityChoice = MapHolder.merge(
+                this.playerAbilityChoice, other.playerAbilityChoice, v -> v, (o, n) -> (n==null) ? o : n);
 
             this.playerAirlinesToAdd = MapHolder.merge(
                 this.playerAirlinesToAdd, other.playerAirlinesToAdd, v->v,
@@ -458,8 +467,11 @@ public class GameData {
     }
 
     public void applyChangesUnsafe(DataChanges changes){
+        if(changes.roundNumber!=null) this.roundNumber = changes.roundNumber;
         if (changes.currentState != null) this.currentState = changes.currentState;
+
         if (changes.currentPlayer != null) this.currentPlayer = changes.currentPlayer;
+
         worldEvents.clearAndAddAllFromLookUp(changes.newWorldEvents, GameData.worldEventTypes);
         airports.changeSetDTOI(changes.airportsToAdd, changes.airportsToRemove,
             (dto)->dto.restore());
@@ -469,21 +481,25 @@ public class GameData {
             (dto)->dto.restore(this.airlines));
         availableAirlines.changeSetII(changes.availableAirlinesToAdd, changes.availableAirlinesToRemove, this.airlines);
         availableAirlines.retainAll(airlines);
+        availableAbilities.changeSetII(changes.availableAbilitiesToAdd, changes.availableAbilitiesToRemove, GameData.abilityTypes);
 
         availablePlanes.merge(Arrays.asList(changes.availablePlanesToAdd, changes.availablePlanesToRemove),
             (params)-> {Integer res = params.get(0) - params.get(1); return res == 0 ? null : res;},
             (old, params)->{Integer res = old+params.get(0) - params.get(1); return res == 0 ? null : res;},
             (i)->0);
 
-        players.changeAsStructWithSetterInteger(Player::setActionPoints, Player::getActionPoints,
+        players.changeAsStructWithSetter(Player::setAbility, Player::getAbility,
+            (i)->GameData.abilityTypes.get(i), changes.playerAbilityChoice,
+            (f,s)->(s==null) ? f : s);
+        players.changeAsStructWithSetter(Player::setActionPoints, Player::getActionPoints,
             changes.playerActionPointsChange, (f, s)->f+s);
-        players.changeAsStructWithSetterInteger(Player::setAmountOfShares, Player::getAmountOfShares,
+        players.changeAsStructWithSetter(Player::setAmountOfShares, Player::getAmountOfShares,
             changes.playerAmountOfSharesChange, (f, s)->f+s);
-        players.changeAsStructWithSetterInteger(Player::setIncome, Player::getIncome,
+        players.changeAsStructWithSetter(Player::setIncome, Player::getIncome,
             changes.playerIncomeChange, (f, s)->f+s);
-        players.changeAsStructWithSetterInteger(Player::setMoney, Player::getMoney,
+        players.changeAsStructWithSetter(Player::setMoney, Player::getMoney,
             changes.playerMoneyChange, (f, s)->f+s);
-        players.changeAsStructInteger((pl) -> pl,
+        players.changeAsStruct((pl) -> pl,
             Arrays.asList(changes.playerAirlinesToAdd, changes.playerAirlinesToRemove),
             (cur, params)-> {
             cur.airlines.changeSetII(params.get(0), params.get(1), airlines,
@@ -491,7 +507,7 @@ public class GameData {
                 (line)->{line.player = cur; return line;});
             cur.airlines.retainAll(airlines);
         });
-        players.changeAsStructInteger((pl) -> pl.planes,
+        players.changeAsStruct((pl) -> pl.planes,
             Arrays.asList(changes.playerPlanesToAdd, changes.playerPlanesToRemove),
             (f, s)-> f.merge(s,
                 (params)-> {Integer res = params.get(0) - params.get(1); return res == 0 ? null : res;},
@@ -500,7 +516,7 @@ public class GameData {
             )
         );
 
-        airports.changeAsStructInteger((pl) -> pl.passengers,
+        airports.changeAsStruct((pl) -> pl.passengers,
             Arrays.asList(changes.airportPassengersToAdd, changes.airportPassengersToRemove),
             (f, s)-> f.merge(s,
                 (params)-> {Integer res = params.get(0) - params.get(1); return res == 0 ? null : res;},
@@ -532,6 +548,8 @@ public class GameData {
 
         if( !availableAirlines.checkChangeSetIILookUp(
             changes.availableAirlinesToAdd, changes.availableAirlinesToRemove, airlinesTmp) ||
+            !availableAbilities.checkChangeSetIILookUp(
+                changes.availableAbilitiesToAdd, changes.availableAbilitiesToRemove, GameData.abilityTypes) ||
             !GameData.planeTypes.containsAllKeys(changes.availablePlanesToAdd) ||
             !availablePlanes.checkMergeElements(
                 Arrays.asList(changes.availablePlanesToAdd, changes.availablePlanesToRemove),
@@ -539,17 +557,19 @@ public class GameData {
                 (old, params)->old+params.get(0)-params.get(1)>=0,
                 (i)->0
             ) ||
-            !playersTmp.checkChangeAsStructInteger(Player::getMoney, changes.playerMoneyChange,
+            !playersTmp.checkChangeAsStruct(Player::getMoney, changes.playerMoneyChange,
                 (current, change) -> current + change >= 0) ||
-            !playersTmp.checkChangeAsStructInteger(Player::getAmountOfShares, changes.playerAmountOfSharesChange,
+            !playersTmp.checkChangeAsStruct(Player::getAmountOfShares, changes.playerAmountOfSharesChange,
                 (o, n)->o+n>=0 && o+n<=GameData.maxAmountOfShares) ||
-            !playersTmp.checkChangeAsStructInteger(Player::getActionPoints, changes.playerActionPointsChange,
+            !playersTmp.checkChangeAsStruct(Player::getActionPoints, changes.playerActionPointsChange,
                 (o, n)->o+n>=0 && o+n<=GameData.maxActionsPerTurn) ||
-            !playersTmp.checkChangeAsStructInteger((pl)->pl.airlines,
+            !playersTmp.checkChangeAsStruct((pl)->pl.airlines,
                 Arrays.asList(changes.playerAirlinesToAdd, changes.playerAirlinesToRemove),
                 (f,s)->f.checkChangeSetIILookUp(s.get(0), s.get(1), airlinesTmp)
             )||
-            !playersTmp.checkChangeAsStructInteger((pl)->pl.planes,
+            !playersTmp.containsAllKeys(changes.playerAbilityChoice) ||
+            !GameData.abilityTypes.containsAllValues(changes.playerAbilityChoice)||
+            !playersTmp.checkChangeAsStruct((pl)->pl.planes,
                 Arrays.asList(changes.playerPlanesToAdd, changes.playerPlanesToRemove),
                 (f,s)->f.checkMergeElements(s,
                     (params)->params.get(0)-params.get(1)>=0,
@@ -557,7 +577,7 @@ public class GameData {
                     (i)->0
                 ) && GameData.planeTypes.containsAll(s.get(0).keySet())
             ) ||
-            !airportsTmp.checkChangeAsStructInteger((port)->port.passengers,
+            !airportsTmp.checkChangeAsStruct((port)->port.passengers,
                 Arrays.asList(changes.airportPassengersToAdd, changes.airportPassengersToRemove),
                 (f,s)->f.checkMergeElements(s,
                     (params)->params.get(0)-params.get(1)>=0,
@@ -582,6 +602,7 @@ public class GameData {
     }
 
     public void clearGameData(){
+        roundNumber = null;
         currentState = State.NO_STATE;
         currentPlayer = null;
         worldEvents.clear();
@@ -594,6 +615,7 @@ public class GameData {
 
     public DataChanges createDataChangesFromThis(){
         GameData.DataChanges res = new DataChanges();
+        res.roundNumber = roundNumber;
         res.currentState = currentState;
         res.currentPlayer = currentPlayer;
         res.playersToAdd = new HashSet<>();
@@ -611,6 +633,10 @@ public class GameData {
         res.availableAirlinesToAdd = new HashSet<>();
         for(Airline line : availableAirlines){
             res.availableAirlinesToAdd.add(line.getId());
+        }
+        res.availableAbilitiesToAdd = new HashSet<>();
+        for(AbilityType ab : availableAbilities){
+            res.availableAbilitiesToAdd.add(ab.getId());
         }
         res.availablePlanesToAdd = new HashMap<>();
         res.availablePlanesToAdd.putAll(availablePlanes);

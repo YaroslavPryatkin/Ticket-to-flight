@@ -40,8 +40,7 @@ public class LowLevelHandlerBack extends LowLevelHandler {
     private final Map<Connection, Integer> con2int = new HashMap<>();
 
     private final Queue<Connection> playersToAdd = new ConcurrentLinkedQueue<>();
-    private final Map<Connection, GameData.PlayerDTO> playersBeforeGame = new HashMap<>();
-    private final Set<String> chosenNames = new HashSet<>();
+    private final Map<Connection, String> playersBeforeGame = new HashMap<>();
 
     private GameData.DataChanges dataChanges = new GameData.DataChanges();
 
@@ -115,15 +114,13 @@ public class LowLevelHandlerBack extends LowLevelHandler {
     //------------------------------------- starting the game
 
     private void handleJoinGameRequest(Connection con, String playerName){
-        if (chosenNames.contains(playerName))
+        if (playersBeforeGame.values().contains(playerName))
             addMessage(con, new Network.JoinGameResponse(
-                Network.JoinGameResponse.Response.NAME_ALREADY_EXISTS, null));
+                Network.JoinGameResponse.Response.NAME_ALREADY_EXISTS));
         else{
-            chosenNames.add(playerName);
-            GameData.PlayerDTO dto = new GameData.PlayerDTO(playerName, Color.WHITE);
-            playersBeforeGame.put(con, dto);
+            playersBeforeGame.put(con, playerName);
             addMessage(con, new Network.JoinGameResponse(
-                Network.JoinGameResponse.Response.SUCCESS, dto.getId()));
+                Network.JoinGameResponse.Response.SUCCESS));
         }
     }
 
@@ -135,10 +132,10 @@ public class LowLevelHandlerBack extends LowLevelHandler {
     }
 
     public boolean areAllPlayersReadyToStart(){
-        Iterator<Map.Entry<Connection, GameData.PlayerDTO>> iterator = playersBeforeGame.entrySet().iterator();
+        Iterator<Map.Entry<Connection, String>> iterator = playersBeforeGame.entrySet().iterator();
 
         while (iterator.hasNext()) {
-            Map.Entry<Connection, GameData.PlayerDTO> entry = iterator.next();
+            Map.Entry<Connection, String> entry = iterator.next();
             Connection con = entry.getKey();
 
             if (!con.isConnected()) {
@@ -151,7 +148,7 @@ public class LowLevelHandlerBack extends LowLevelHandler {
 
         if (playersBeforeGame.isEmpty()) return false;
 
-        for (GameData.PlayerDTO player : playersBeforeGame.values()) {
+        for (String player : playersBeforeGame.values()) {
             if (player == null) {
                 return false;
             }
@@ -164,16 +161,16 @@ public class LowLevelHandlerBack extends LowLevelHandler {
         if(dataChanges.playersToAdd == null) {
             dataChanges.playersToAdd = new HashSet<>();
         }
-        for(Map.Entry<Connection, GameData.PlayerDTO> e : playersBeforeGame.entrySet()){
+        for(Map.Entry<Connection, String> e : playersBeforeGame.entrySet()){
             if(e.getKey().isConnected()) {
-                int2con.put(e.getValue().getId(), e.getKey());
-                con2int.put(e.getKey(), e.getValue().getId());
-                dataChanges.playersToAdd.add(e.getValue());
+                GameData.PlayerDTO dto = new GameData.PlayerDTO(e.getValue(), ColorSupplier.getColor());
+                int2con.put(dto.getId(), e.getKey());
+                con2int.put(e.getKey(), dto.getId());
+                dataChanges.playersToAdd.add(dto);
+                addMessage(e.getKey(), new Network.StartGameMessage(dto.getId()));
             }
         }
-
         applyAndSendDataChanges();
-        sendToAllPlayers(new Network.StartGameMessage());
         flags.gamePreparationsState = Flags.GamePreparationsState.RUNNING;
     }
 
@@ -272,6 +269,13 @@ public class LowLevelHandlerBack extends LowLevelHandler {
 
     }
 
+    public void addAmountOfShares (Integer amountOfShares){
+        if(dataChanges.playerAmountOfSharesChange == null)
+            dataChanges.playerAmountOfSharesChange = new HashMap<>();
+        dataChanges.playerAmountOfSharesChange
+            .compute(gameData.currentPlayer, (k,v)->(v==null) ? amountOfShares : amountOfShares+v);
+    }
+
     public void setCurrentPLayer(Player pl){
         if(pl == null) setCurrentPLayer((Integer)null);
         else setCurrentPLayer(pl.getId());
@@ -283,6 +287,10 @@ public class LowLevelHandlerBack extends LowLevelHandler {
 
     public void setCurrentState(GameData.State gameState){
         dataChanges.currentState = gameState;
+    }
+
+    public void setCurrentRound(Integer roundNumber){
+        dataChanges.roundNumber = roundNumber;
     }
 
     public void sendError(String error){

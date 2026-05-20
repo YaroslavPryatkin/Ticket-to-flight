@@ -28,7 +28,7 @@ public class MainClient {
 
     private void mainCycle(float delta){
         if(llh.flags.gamePreparationsState != Flags.GamePreparationsState.RUNNING){
-            //GamePraparationStage();
+            GamePreparationStage();
         }
         else {
             if(gameData.currentState == GameData.State.WORLD_UPDATE) {
@@ -87,7 +87,7 @@ public class MainClient {
     }
 
 
-    private void GamePraparationStage(){
+    private void GamePreparationStage(){
         if(llh.flags.gamePreparationsState == Flags.GamePreparationsState.WAITING_FOR_CONNECT_CALL){
             llh.connectToServer();
         }
