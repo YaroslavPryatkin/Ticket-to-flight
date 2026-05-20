@@ -2,7 +2,6 @@ package com.game.Ticket_To_Flight.network;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.EndPoint;
-import com.game.Ticket_To_Flight.backend.gameLogicEntities.Player;
 import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
 
 import java.lang.reflect.Field;
@@ -54,6 +53,7 @@ public class Network {
         JoinGameRequest.class,
         JoinGameResponse.class,
         GameData.State.class,
+        ErrorMessage.class,
         Arrays.asList().getClass(),
         Collections.emptyList().getClass(),
         Collections.emptyMap().getClass(),
@@ -200,5 +200,22 @@ public class Network {
 
     public static class StartGameMessage extends GameMessage {
         public StartGameMessage(){}
+    }
+
+    public static class ErrorMessage extends GameMessage {
+        public final static ErrorMessage NOT_YOUR_TURN = new ErrorMessage("NYT");
+        public ErrorMessage(){}
+        private String message = "";
+        public ErrorMessage(String message) {this.message = message;}
+        public String getMessage(){return message;}
+        @Override
+        public boolean equals(Object other){
+            if(other instanceof ErrorMessage){
+                return this.message.equals(((ErrorMessage) other).message);
+            }
+            return this.message.equals(other);
+        }
+        @Override
+        public String toString(){return this.getMessage();}
     }
 }

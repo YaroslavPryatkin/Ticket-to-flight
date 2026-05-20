@@ -107,7 +107,7 @@ public class GameData {
     }
 
     public enum State {
-        UNKNOWN,
+        NO_STATE,
         WORLD_UPDATE,
         INVESTMENTS,
         AUCTION,
@@ -119,7 +119,7 @@ public class GameData {
         INCOME,
         TAXES
     }
-    public State currentState = State.UNKNOWN;
+    public State currentState = State.NO_STATE;
     public Integer currentPlayer = null;
 
     public SetHolder<WorldEventType> worldEvents = new SetHolder<>();
@@ -570,7 +570,7 @@ public class GameData {
     }
 
     public void clearGameData(){
-        currentState = State.UNKNOWN;
+        currentState = State.NO_STATE;
         currentPlayer = null;
         worldEvents.clear();
         airports.clear();

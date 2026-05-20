@@ -2,13 +2,10 @@ package com.game.Ticket_To_Flight.backend;
 
 import com.badlogic.gdx.math.Vector2;
 import com.esotericsoftware.kryonet.Connection;
-import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airline;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airport;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Player;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.AirlineType;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.AirportType;
-import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.PlaneType;
-import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.WorldEventType;
 import com.game.Ticket_To_Flight.backend.server.GameServer;
 import com.game.Ticket_To_Flight.backend.server.MainLoopBack;
 import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
@@ -27,6 +24,13 @@ public class LowLevelHandlerBack extends LowLevelHandler {
             RUNNING
         }
         public volatile GamePreparationsState gamePreparationsState = GamePreparationsState.WAITING_FOR_PLAYERS;
+        public enum CurrentPlayerState {
+            NO_PLAYER_STAGE,
+            WAITING_FOR_RESPONSE,
+            ANSWERED,
+            BAD_RESPONSE
+        }
+        public volatile CurrentPlayerState currentPlayerState = CurrentPlayerState.NO_PLAYER_STAGE;
     }
 
     public LowLevelHandlerBack.Flags flags = new LowLevelHandlerBack.Flags();
@@ -57,14 +61,17 @@ public class LowLevelHandlerBack extends LowLevelHandler {
             handleJoinGameRequest(con, req.playerName);
         }
         else if(message instanceof Network.PlayerInvestmentChoiceResponse){
-            Network.PlayerInvestmentChoiceResponse resp = (Network.PlayerInvestmentChoiceResponse) message;
-            System.out.println("Player " + con2int.get(con) + " has chosen to buy " + resp.amountOfShares + " shares");
-        }
-        else if(message instanceof Network.PlayerAbilityChoiceResponse){
-
+            if(playerTurnCheck(con)) {
+                flags.currentPlayerState = Flags.CurrentPlayerState.ANSWERED;
+                Network.PlayerInvestmentChoiceResponse resp = (Network.PlayerInvestmentChoiceResponse) message;
+                logic.handleInvestmentResponse(resp.amountOfShares);
+            }
         }
         else if(message instanceof Network.ReloadGameDataRequest){
-            sendReloadGameResponse(con);
+            if(con2int.containsKey(con)){
+                sendReloadGameResponse(con);
+            }
+
         }
         else throw new IllegalArgumentException("Unknown message");
     }
@@ -81,6 +88,13 @@ public class LowLevelHandlerBack extends LowLevelHandler {
         return res;
     }
 
+    private boolean playerTurnCheck(Connection con){
+        Integer player = con2int.get(con);
+        if(player == null) return false;
+        if(player == gameData.currentPlayer) return true;
+        addMessage(con, Network.ErrorMessage.NOT_YOUR_TURN);
+        return false;
+    }
     //------------------------------------- messages part
 
     //------------------------------------- update part
@@ -156,6 +170,7 @@ public class LowLevelHandlerBack extends LowLevelHandler {
                 dataChanges.playersToAdd.add(e.getValue());
             }
         }
+
         applyAndSendDataChanges();
         sendToAllPlayers(new Network.StartGameMessage());
         flags.gamePreparationsState = Flags.GamePreparationsState.RUNNING;
@@ -257,7 +272,8 @@ public class LowLevelHandlerBack extends LowLevelHandler {
     }
 
     public void setCurrentPLayer(Player pl){
-        setCurrentPLayer(pl.getId());
+        if(pl == null) setCurrentPLayer((Integer)null);
+        else setCurrentPLayer(pl.getId());
     }
 
     public void setCurrentPLayer(Integer pl){
@@ -267,5 +283,14 @@ public class LowLevelHandlerBack extends LowLevelHandler {
     public void setCurrentState(GameData.State gameState){
         dataChanges.currentState = gameState;
     }
+
+    public void sendError(String error){
+        flags.currentPlayerState = Flags.CurrentPlayerState.BAD_RESPONSE;
+        Connection con = int2con.get(gameData.currentPlayer);
+        if(con!=null){
+            addMessage(con, new Network.ErrorMessage(error));
+        }
+    }
+
     //------------------------------------- for use in main logic
 }

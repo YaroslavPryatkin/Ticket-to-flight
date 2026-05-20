@@ -30,7 +30,7 @@ public class LowLevelHandlerFront extends LowLevelHandler {
         public volatile Network.JoinGameResponse.Response joinGameResponse = null;
         public enum CurrentStateState{
             NOT_IN_GAME,
-            NO_PLAYER_STATE,
+            NO_PLAYER_STAGE,
             WAITING_FOR_PLAYER_CHOICE,
             WAITING_FOR_SERVER_RESPONSE
         }
@@ -160,7 +160,7 @@ public class LowLevelHandlerFront extends LowLevelHandler {
             st == GameData.State.TAXES ||
             st == GameData.State.EVENT
         )
-            flags.currentStateState = Flags.CurrentStateState.NO_PLAYER_STATE;
+            flags.currentStateState = Flags.CurrentStateState.NO_PLAYER_STAGE;
         else
             flags.currentStateState = Flags.CurrentStateState.WAITING_FOR_PLAYER_CHOICE;
     }
@@ -202,6 +202,10 @@ public class LowLevelHandlerFront extends LowLevelHandler {
             Network.ReloadGameDataResponse resp = (Network.ReloadGameDataResponse) message;
             resetGameData(resp.dc);
         }
+        else if(message instanceof Network.ErrorMessage){
+            System.out.println(((Network.ErrorMessage) message).getMessage());
+        }
+        else throw new IllegalArgumentException("Unknown message");
     }
 
     private void sendMessageToServer(Network.GameMessage message){

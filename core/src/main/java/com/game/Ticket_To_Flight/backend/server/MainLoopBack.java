@@ -70,5 +70,12 @@ public abstract class MainLoopBack {
 
     protected abstract void mainCycle();
 
+    public void handleInvestmentResponse(Integer response){
+
+    }
+
+    public void handleAbilityChoiceResponse(Integer response){
+
+    }
 
 }
