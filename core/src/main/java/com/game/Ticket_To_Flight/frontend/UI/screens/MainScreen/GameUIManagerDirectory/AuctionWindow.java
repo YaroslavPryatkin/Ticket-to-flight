@@ -6,12 +6,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.game.Ticket_To_Flight.frontend.LowLevelHandlerFront;
 import com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.GameUIManager;
 
 public class AuctionWindow extends Table {
     //private final GameUIManager uiManager;
 
-    public AuctionWindow(Skin skin, GameUIManager uiManager) {
+    public AuctionWindow(Skin skin, GameUIManager uiManager, LowLevelHandlerFront llh) {
         //this.uiManager = uiManager;
 
         uiManager.setOverlayActive(true);
@@ -41,6 +42,7 @@ public class AuctionWindow extends Table {
         passBtn.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, com.badlogic.gdx.scenes.scene2d.Actor actor) {
+                llh.sendAuctionResponse(-1);
                 remove();
                 uiManager.setOverlayActive(false);
                 uiManager.showSuccessWindow("You left the auction");
@@ -51,7 +53,7 @@ public class AuctionWindow extends Table {
             @Override
             public void changed(ChangeEvent event, com.badlogic.gdx.scenes.scene2d.Actor actor) {
                 int currentBet = (int) slider.getValue();
-
+                llh.sendAuctionResponse(currentBet);
                 remove();
                 uiManager.setOverlayActive(false);
             }

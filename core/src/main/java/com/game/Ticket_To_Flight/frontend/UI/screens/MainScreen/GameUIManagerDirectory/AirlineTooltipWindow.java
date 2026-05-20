@@ -9,15 +9,17 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airline;
+import com.game.Ticket_To_Flight.frontend.LowLevelHandlerFront;
 import com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.GameUIManager;
 
 public class AirlineTooltipWindow extends Window {
 
-    public AirlineTooltipWindow(Skin skin, final GameUIManager uiManager, final Airline airline, final double playerMoney, boolean isBuyingPhase) {
+    public AirlineTooltipWindow(Skin skin, final GameUIManager uiManager, final Airline airline, final double playerMoney, boolean isBuyingPhase, LowLevelHandlerFront llh) {
         super("Route Details", skin);
         this.pad(20);
 
         Table table = new Table();
+
 
         if (airline.getPlayer() != null) {
             table.add(new Label("Owned by: " + airline.getPlayer().getName(), skin));
@@ -40,12 +42,10 @@ public class AirlineTooltipWindow extends Window {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
                     if (buyButton.isDisabled() || playerMoney < airline.getPrice()) return;
-
                     System.out.println("Buying route!");
-
-                    // TODO: Отправить запрос на покупку: uiManager.getLlh().setNewMessage(...)
-
+                    llh.sendBuyAirlineResponse(airline);
                     uiManager.removeTooltip();
+                    uiManager.showSuccessWindow("Airline was bought successfully!");
                 }
             });
 

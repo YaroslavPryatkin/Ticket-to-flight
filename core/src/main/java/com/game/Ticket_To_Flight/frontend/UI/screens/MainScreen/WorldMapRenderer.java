@@ -73,8 +73,9 @@ public class WorldMapRenderer extends ScreenAdapter {
         multiplexer.addProcessor(uiStage);
         multiplexer.addProcessor(inputCtrl);
         Gdx.input.setInputProcessor(multiplexer);
-        uiManager.showAbilitiesWindow();
-
+        //uiManager.showAbilitiesWindow();
+        //uiManager.showAuctionWindow();
+        //uiManager.showInvestWindow();
     }
 
     private void clampCamera() {
@@ -152,7 +153,6 @@ public class WorldMapRenderer extends ScreenAdapter {
     @Override
     public void render(float delta) {
         client.mainCycleWithUpdate(delta);
-        renderNoLogic(delta);
         gameData.releaseReadLock();
     }
 

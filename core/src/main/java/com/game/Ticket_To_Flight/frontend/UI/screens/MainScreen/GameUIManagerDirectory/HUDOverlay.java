@@ -23,9 +23,9 @@ public class HUDOverlay extends Table {
         timeLabel = new Label("Time: 120s", skin);
         timeLabel.setColor(Color.ORANGE);
 
-        moneyLabel = new Label("Money: $0", skin);
+        moneyLabel = new Label("Money: ", skin);
 
-        incomeLabel = new Label("Income: +$0", skin);
+        incomeLabel = new Label("Income: ", skin);
         incomeLabel.setColor(Color.GREEN);
 
         Table leftStats = new Table();
