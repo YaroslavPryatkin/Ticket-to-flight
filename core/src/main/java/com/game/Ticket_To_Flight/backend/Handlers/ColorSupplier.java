@@ -1,4 +1,4 @@
-package com.game.Ticket_To_Flight.backend;
+package com.game.Ticket_To_Flight.backend.Handlers;
 
 import com.badlogic.gdx.graphics.Color;
 

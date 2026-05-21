@@ -146,14 +146,17 @@ public class Network {
 
     public static class PlayerInvestmentChoiceResponse extends GameMessage{
         public PlayerInvestmentChoiceResponse(){}
-        public Integer amountOfShares =null;
+        public Integer amountOfShares = null;
         public PlayerInvestmentChoiceResponse(Integer shares ){this.amountOfShares = shares;}
     }
 
+    /**
+     * Sending null means pass
+     */
     public static class PlayerAuctionChoiceResponse extends GameMessage {
         public PlayerAuctionChoiceResponse(){}
-        public Integer amountOfShares = null;
-        public PlayerAuctionChoiceResponse(Integer shares) {this.amountOfShares = shares;}
+        public Integer betAmount = null;
+        public PlayerAuctionChoiceResponse(Integer betAmount) {this.betAmount = betAmount;}
     }
 
     public static class PlayerAbilityChoiceResponse extends GameMessage{

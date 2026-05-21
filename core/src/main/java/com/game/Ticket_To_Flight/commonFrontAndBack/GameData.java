@@ -248,7 +248,8 @@ public class GameData {
     public static class PlayerDTO extends Identifiable{
         private PlayerDTO(){
             super(0); name = null; money = 0; income = 0; amountOfShares=0;
-            actionPoints=0; planes = null; airlines = null; ability = null; color = null;}
+            actionPoints=0; planes = null; airlines = null; ability = null; color = null;
+            hasPassed = false; auctionBet=null;}
         private static final AtomicInteger idGenerator = new AtomicInteger(0);
 
         private final String name;
@@ -256,6 +257,8 @@ public class GameData {
         private final double income;
         private final int amountOfShares;
         private final int actionPoints;
+        private final  boolean hasPassed;
+        private final Double auctionBet;
         private final Map<Integer, Integer> planes;
         private final Set<Integer> airlines;
         private final Integer ability;
@@ -279,26 +282,9 @@ public class GameData {
             else
                 this.ability = null;
             this.color = player.color;
-
+            this.hasPassed = player.hasPassed;
+            this.auctionBet = player.auctionBet;
         }
-
-//        public PlayerDTO(
-//            int id, String name, double money, double income, int amountOfShares, int actionPoints,
-//            MapHolder<PlaneType, Integer> planes, SetHolder<Airline> airlines){
-//            super(id);
-//            this.name = name;
-//            this.money = money;
-//            this.income=income;
-//            this.amountOfShares = amountOfShares;
-//            this.actionPoints = actionPoints;
-//            this.airlines = new HashSet<>();
-//            for(Airline line : airlines){
-//                this.airlines.add(line.getId());
-//            }
-//            this.planes = new HashMap<>();
-//            this.planes.putAll(planes);
-//            if()
-//        }
 
         /**
          * Should not be called anywhere except Low Level Handler
@@ -315,6 +301,8 @@ public class GameData {
             airlines = new HashSet<>();
             ability = null;
             this.color = color;
+            this.hasPassed = false;
+            this.auctionBet = null;
         }
 
         public Player restore(SetHolder<Airline> lookUpAirlines){
@@ -333,7 +321,8 @@ public class GameData {
             }
             return new Player(
                 this.getId(), this.money, this.income, this.amountOfShares,
-                this.actionPoints, planes, lines, this.name, GameData.abilityTypes.get(this.ability), this.color);
+                this.actionPoints, planes, lines, this.name, GameData.abilityTypes.get(this.ability),
+                this.color, this.hasPassed, this.auctionBet);
         }
     }
 
@@ -363,11 +352,13 @@ public class GameData {
         public  Map<Integer, Map<Integer, Integer>> airportPassengersToRemove= null;
 
 
+        public  Map<Integer, Boolean> playerHasPassedSet = null;
         public  Map<Integer, Double> playerMoneyChange= null;
         public  Map<Integer, Double> playerIncomeChange= null;
         public  Map<Integer, Integer> playerActionPointsChange= null;
         public  Map<Integer, Integer> playerAmountOfSharesChange= null;
         public  Map<Integer, Integer> playerAbilityChoice = null;
+        public  Map<Integer, Double> playerAuctionBetChanges = null;
 
         public  Map<Integer, Set<Integer>> playerAirlinesToAdd= null;
         public  Map<Integer, Set<Integer>> playerAirlinesToRemove= null;
@@ -419,8 +410,13 @@ public class GameData {
             this.playerMoneyChange = MapHolder.merge(
                 this.playerMoneyChange, other.playerMoneyChange, v -> v, DataChanges::sumDoubleOrNull);
 
+            this.playerAuctionBetChanges = MapHolder.merge(
+                this.playerAuctionBetChanges, other.playerAuctionBetChanges, v -> v, DataChanges::sumDoubleOrNull);
+
             this.playerIncomeChange = MapHolder.merge(
                 this.playerIncomeChange, other.playerIncomeChange, v -> v, DataChanges::sumDoubleOrNull);
+
+            this.playerHasPassedSet.putAll(other.playerHasPassedSet);
 
             this.playerActionPointsChange = MapHolder.merge(
                 this.playerActionPointsChange, other.playerActionPointsChange, v -> v, DataChanges::sumIntOrNull);
@@ -498,6 +494,9 @@ public class GameData {
             (old, params)->{Integer res = old+params.get(0) - params.get(1); return res == 0 ? null : res;},
             (i)->0);
 
+        players.changeAsStructWithSetter(Player::setHasPassed, Player::getHasPassed, changes.playerHasPassedSet,
+            (f,s) -> (s==null) ? f : s);
+
         players.changeAsStructWithSetter(Player::setAbility, Player::getAbility,
             (i)->GameData.abilityTypes.get(i), changes.playerAbilityChoice,
             (f,s)->(s==null) ? f : s);
@@ -509,6 +508,9 @@ public class GameData {
             changes.playerIncomeChange, (f, s)->f+s);
         players.changeAsStructWithSetter(Player::setMoney, Player::getMoney,
             changes.playerMoneyChange, (f, s)->f+s);
+        players.changeAsStructWithSetter(Player::setAuctionBet, Player::getAuctionBet,
+            changes.playerAuctionBetChanges, (f, s)->f+s);
+
         players.changeAsStruct((pl) -> pl,
             Arrays.asList(changes.playerAirlinesToAdd, changes.playerAirlinesToRemove),
             (cur, params)-> {
@@ -568,7 +570,10 @@ public class GameData {
                 (old, params)->old+params.get(0)-params.get(1)>=0,
                 (i)->0
             ) ||
+            !playersTmp.containsAllKeys(changes.playerHasPassedSet) ||
             !playersTmp.checkChangeAsStruct(Player::getMoney, changes.playerMoneyChange,
+                (current, change) -> current + change >= 0) ||
+            !playersTmp.checkChangeAsStruct(Player::getAuctionBet, changes.playerAuctionBetChanges,
                 (current, change) -> current + change >= 0) ||
             !playersTmp.checkChangeAsStruct(Player::getAmountOfShares, changes.playerAmountOfSharesChange,
                 (o, n)->o+n>=0 && o+n<=GameData.maxAmountOfShares) ||

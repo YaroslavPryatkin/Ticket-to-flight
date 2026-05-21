@@ -1,6 +1,6 @@
 package com.game.Ticket_To_Flight.backend.server;
 
-import com.game.Ticket_To_Flight.backend.LowLevelHandlerBack;
+import com.game.Ticket_To_Flight.backend.Handlers.LowLevelHandlerBack;
 import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
 
 public abstract class MainLoopBack {
@@ -64,20 +64,14 @@ public abstract class MainLoopBack {
     }
 
 
-
-
     protected void afterStop(){};
 
     protected abstract void mainCycle();
 
-    public void handleInvestmentResponse(Integer response){
+    public abstract void handleInvestmentResponse(Integer response);
 
-    }
+    public abstract void handleAuctionResponse(Integer response);
 
-    public void handleAuctionResponse(Integer response) {}
-
-    public void handleAbilityChoiceResponse(Integer response){
-
-    }
+    public abstract void handleAbilityChoiceResponse(Integer response);
 
 }

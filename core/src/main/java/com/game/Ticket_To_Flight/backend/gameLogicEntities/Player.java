@@ -15,6 +15,8 @@ public class Player extends Identifiable {
     public double income = 0;
     public int amountOfShares = 0;
     public int actionPoints = 0;
+    public boolean hasPassed = false;
+    public Double auctionBet = null;
     public MapHolder<PlaneType, Integer> planes = new MapHolder<>();
     public SetHolder<Airline> airlines = new SetHolder<>();
     public String name;
@@ -25,7 +27,7 @@ public class Player extends Identifiable {
     public Player(
         int id, double money, double income, int amountOfShares, int actionPoints,
         MapHolder<PlaneType, Integer> planes, SetHolder<Airline> airlines,
-        String name, AbilityType ability,  Color color){
+        String name, AbilityType ability,  Color color,  boolean hasPassed, Double auctionBet){
         super(id);
         this.money = money;
         this.income=income;
@@ -36,6 +38,8 @@ public class Player extends Identifiable {
         this.name = name;
         this.ability = ability;
         this.color = color;
+        this.hasPassed = hasPassed;
+        this.auctionBet = auctionBet;
     }
 
     public Double getIncome() {return income;}
@@ -48,6 +52,10 @@ public class Player extends Identifiable {
     public void setActionPoints(Integer val) {actionPoints = val;}
     public AbilityType getAbility() {return ability;}
     public void setAbility(AbilityType val) {ability = val;}
+    public Boolean getHasPassed() {return hasPassed;}
+    public void setHasPassed(Boolean val) {hasPassed = val;}
+    public Double getAuctionBet() {return auctionBet;}
+    public void setAuctionBet(Double val) {auctionBet = val;}
 
     public String getName() {
         return name;

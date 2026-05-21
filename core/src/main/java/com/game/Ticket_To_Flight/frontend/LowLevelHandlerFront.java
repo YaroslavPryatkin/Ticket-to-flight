@@ -34,9 +34,11 @@ public class LowLevelHandlerFront extends LowLevelHandler {
             NO_PLAYER_STAGE,
             PLAYER_STAGE,
             WAITING_FOR_PLAYER_CHOICE,
-            WAITING_FOR_SERVER_RESPONSE
+            WAITING_FOR_SERVER_RESPONSE,
+            RECEIVED_ERROR_MESSAGE
         }
         public volatile CurrentStateState currentStateState = CurrentStateState.NOT_IN_GAME;
+        public volatile String errorMessage = null;
     }
 
     public Flags flags = new Flags();
@@ -164,7 +166,7 @@ public class LowLevelHandlerFront extends LowLevelHandler {
         )
             flags.currentStateState = Flags.CurrentStateState.NO_PLAYER_STAGE;
         else
-            flags.currentStateState = Flags.CurrentStateState.WAITING_FOR_PLAYER_CHOICE;
+            flags.currentStateState = Flags.CurrentStateState.PLAYER_STAGE;
     }
 
     //------------------------------------- data changes part
@@ -205,7 +207,8 @@ public class LowLevelHandlerFront extends LowLevelHandler {
             resetGameData(resp.dc);
         }
         else if(message instanceof Network.ErrorMessage){
-            System.out.println(((Network.ErrorMessage) message).getMessage());
+            flags.currentStateState = Flags.CurrentStateState.RECEIVED_ERROR_MESSAGE;
+            flags.errorMessage = ((Network.ErrorMessage) message).getMessage();
         }
         else throw new IllegalArgumentException("Unknown message");
     }
@@ -260,10 +263,11 @@ public class LowLevelHandlerFront extends LowLevelHandler {
         flags.currentStateState = Flags.CurrentStateState.WAITING_FOR_SERVER_RESPONSE;
     }
 
-    public void sendAuctionResponse(Integer shares) {
-        sendMessageToServer(new Network.PlayerAuctionChoiceResponse(shares));
+    public void sendAuctionResponse(Integer betAmount) {
+        sendMessageToServer(new Network.PlayerAuctionChoiceResponse(betAmount));
         flags.currentStateState = Flags.CurrentStateState.WAITING_FOR_SERVER_RESPONSE;
     }
+
 
     public void sendBuyAirlineResponse(Airline airline) {
         sendMessageToServer(new Network.PlayerAirlineChoiceResponse());
