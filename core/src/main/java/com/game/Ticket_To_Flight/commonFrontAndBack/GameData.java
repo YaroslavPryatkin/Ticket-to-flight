@@ -122,6 +122,7 @@ public class GameData {
     public Integer roundNumber = 0;
     public State currentState = State.NO_STATE;
     public Integer currentPlayer = -1; // -1 if it is no player turn
+    public List<Player> turnOrder = null;
 
     public SetHolder<WorldEventType> worldEvents = new SetHolder<>();
     public SetHolder<Airport> airports = new SetHolder<>();
@@ -354,7 +355,7 @@ public class GameData {
         public  GameData.State currentState= null;
         public  Integer currentPlayer= null;
         public  Set<Integer> newWorldEvents= null;
-
+        public List<Integer> turnOrder = null;
 
         public  Map<Integer, Integer> availablePlanesToAdd= null;
         public  Map<Integer, Integer> availablePlanesToRemove= null;
@@ -385,6 +386,7 @@ public class GameData {
             if(other.roundNumber != null) this.roundNumber = other.roundNumber;
             if (other.currentState != null) this.currentState = other.currentState;
             if (other.currentPlayer != null) this.currentPlayer = other.currentPlayer;
+            if(other.turnOrder != null) this.turnOrder = other.turnOrder;
 
             this.newWorldEvents = SetHolder.merge(this.newWorldEvents, other.newWorldEvents);
             this.availableAirlinesToAdd = SetHolder.merge(this.availableAirlinesToAdd, other.availableAirlinesToAdd);
@@ -469,8 +471,9 @@ public class GameData {
     public void applyChangesUnsafe(DataChanges changes){
         if(changes.roundNumber!=null) this.roundNumber = changes.roundNumber;
         if (changes.currentState != null) this.currentState = changes.currentState;
-
         if (changes.currentPlayer != null) this.currentPlayer = changes.currentPlayer;
+
+
 
         worldEvents.clearAndAddAllFromLookUp(changes.newWorldEvents, GameData.worldEventTypes);
         airports.changeSetDTOI(changes.airportsToAdd, changes.airportsToRemove,
@@ -482,6 +485,13 @@ public class GameData {
         availableAirlines.changeSetII(changes.availableAirlinesToAdd, changes.availableAirlinesToRemove, this.airlines);
         availableAirlines.retainAll(airlines);
         availableAbilities.changeSetII(changes.availableAbilitiesToAdd, changes.availableAbilitiesToRemove, GameData.abilityTypes);
+
+        if(changes.turnOrder != null){
+            this.turnOrder = new ArrayList<>(players.size());
+            for(Integer i : changes.turnOrder){
+                this.turnOrder.add(this.players.get(i));
+            }
+        }
 
         availablePlanes.merge(Arrays.asList(changes.availablePlanesToAdd, changes.availablePlanesToRemove),
             (params)-> {Integer res = params.get(0) - params.get(1); return res == 0 ? null : res;},
@@ -545,6 +555,7 @@ public class GameData {
             (dto)->dto.restore(airlinesTmp));
 
         if (changes.currentPlayer != null && !playersTmp.contains(changes.currentPlayer)) return false;
+        if(!playersTmp.containsAll(changes.turnOrder)) return false;
 
         if( !availableAirlines.checkChangeSetIILookUp(
             changes.availableAirlinesToAdd, changes.availableAirlinesToRemove, airlinesTmp) ||
@@ -605,6 +616,7 @@ public class GameData {
         roundNumber = null;
         currentState = State.NO_STATE;
         currentPlayer = null;
+        turnOrder = null;
         worldEvents.clear();
         airports.clear();
         airlines.clear();
@@ -618,6 +630,12 @@ public class GameData {
         res.roundNumber = roundNumber;
         res.currentState = currentState;
         res.currentPlayer = currentPlayer;
+
+        if(this.turnOrder != null) {
+            res.turnOrder = new ArrayList<>(this.turnOrder.size());
+            for(Player pl : this.turnOrder)
+                res.turnOrder.add(pl.getId());
+        }
         res.playersToAdd = new HashSet<>();
         for(Player pl : players){
             res.playersToAdd.add(new PlayerDTO(pl)); // all player field are here
