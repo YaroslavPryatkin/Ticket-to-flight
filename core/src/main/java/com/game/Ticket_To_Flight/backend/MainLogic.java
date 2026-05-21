@@ -5,6 +5,7 @@ import com.game.Ticket_To_Flight.backend.gameLogicEntities.Player;
 import com.game.Ticket_To_Flight.backend.server.MainLoopBack;
 import com.game.Ticket_To_Flight.backend.Handlers.LowLevelHandlerBack.Flags;
 import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
+import com.game.Ticket_To_Flight.commonFrontAndBack.StatisGameData;
 
 public class MainLogic extends MainLoopBack {
     private static MainLogic instance;
@@ -90,7 +91,7 @@ public class MainLogic extends MainLoopBack {
         if(addedAmountOfShares == null) return;
         if(addedAmountOfShares <= 0) llh.sendError("Amount of shares should be > 0");
         Player pl = gameData.players.get(gameData.currentPlayer);
-        if(pl.amountOfShares + addedAmountOfShares <= GameData.maxAmountOfShares){
+        if(pl.amountOfShares + addedAmountOfShares <= StatisGameData.maxAmountOfShares){
             llh.dataChangesCreator.addAmountOfShares(addedAmountOfShares);
         }
         else{

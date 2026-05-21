@@ -3,7 +3,7 @@ package com.game.Ticket_To_Flight.backend.gameLogicEntities.templates;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.game.Ticket_To_Flight.Utilities.Identifiable;
-import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
+import com.game.Ticket_To_Flight.commonFrontAndBack.StatisGameData;
 
 public class AirportType extends Identifiable {
     public final double cost;
@@ -30,7 +30,7 @@ public class AirportType extends Identifiable {
         super(id);
         this.cost = cost;
         this.gateAmount = gateAmount;
-        this.cityType = GameData.cityTypes.get(cityType);
+        this.cityType = StatisGameData.cityTypes.get(cityType);
         this.description = description;
     }
 

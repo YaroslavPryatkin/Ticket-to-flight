@@ -4,9 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.game.Ticket_To_Flight.Utilities.ClosedInterval;
 import com.game.Ticket_To_Flight.Utilities.Identifiable;
-import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
-
-import java.util.concurrent.CyclicBarrier;
+import com.game.Ticket_To_Flight.commonFrontAndBack.StatisGameData;
 
 public class PassengerType extends Identifiable {
     public final double solvency;
@@ -57,7 +55,7 @@ public class PassengerType extends Identifiable {
         this.yieldRange = new ClosedInterval<>(minYield, maxYield);
         this.capacityRange = new ClosedInterval<>(minCapacity, maxCapacity);
         this.stationsRange = new ClosedInterval<>(minStations, maxStations);
-        this.typeTo = GameData.cityTypes.get(typeTo);
+        this.typeTo = StatisGameData.cityTypes.get(typeTo);
         this.description = description;
     }
 

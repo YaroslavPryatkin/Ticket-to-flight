@@ -1,0 +1,26 @@
+[
+  {
+    "id": 0,
+    "description": "No ability"
+  },
+  {
+    "id": 1,
+    "description": "Be the first to buy planes."
+  },
+  {
+    "id": 2,
+    "description": "Be the first one to buy airlines."
+  },
+  {
+    "id": 3,
+    "description": "Be the first one to make routes."
+  },
+  {
+    "id": 4,
+    "description": "Get 2 additional action points"
+  },
+  {
+    "id": 5,
+    "description": "Buy 3 new gates at the airport"
+  }
+]

@@ -2,8 +2,6 @@ package com.game.Ticket_To_Flight.commonFrontAndBack;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.type.CollectionType;
 import com.game.Ticket_To_Flight.Utilities.SetHolder;
 import com.game.Ticket_To_Flight.Utilities.Identifiable;
 import com.game.Ticket_To_Flight.Utilities.MapHolder;
@@ -13,8 +11,6 @@ import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airport;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Player;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.*;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -38,73 +34,6 @@ public class GameData {
         lock.writeLock().unlock();
     }
 
-
-    public static SetHolder<AirportType> airportTypes = new SetHolder<>();
-    public static SetHolder<AirlineType> airlineTypes = new SetHolder<>();
-    public static SetHolder<PlaneType> planeTypes = new SetHolder<>();
-    public static SetHolder<CityType> cityTypes = new SetHolder<>();
-    public static SetHolder<PassengerType> passengerTypes = new SetHolder<>();
-    public static SetHolder<WorldEventType> worldEventTypes = new SetHolder<>();
-    public static SetHolder<AbilityType> abilityTypes = new SetHolder<>();
-    public static Integer maxActionsPerTurn = 5;
-    public static Integer maxAmountOfShares = 20;
-
-    private static boolean jsonDownloaded = false;
-    private static String jsonFolder = "assets/StaticData";
-    private static List<SetHolder<? extends Identifiable>> staticHolder = List.of(
-        cityTypes,
-        airlineTypes,
-        airportTypes,
-        passengerTypes,
-        planeTypes
-    );
-    private static List<String> jsonNames = List.of(
-        "CityTypes.json",
-        "AirlineTypes.json",
-        "AirportTypes.json",
-        "PassengerTypes.json",
-        "PlaneTypes.json"
-    );
-    private static List<Class<? extends Identifiable>> staticClasses = List.of(
-        CityType.class,
-        AirlineType.class,
-        AirportType.class,
-        PassengerType.class,
-        PlaneType.class
-    );
-
-    public static void loadAllJsons() {
-        if(jsonDownloaded) return;
-        jsonDownloaded = true;
-        ObjectMapper mapper = new ObjectMapper();
-
-        for (int i = 0; i < jsonNames.size(); i++) {
-            String path = jsonFolder + File.separator + jsonNames.get(i);
-            Class<? extends Identifiable> clazz = staticClasses.get(i);
-            SetHolder<? extends Identifiable> holder = staticHolder.get(i);
-
-            loadSingleJson(path, (SetHolder) holder, clazz, mapper);
-        }
-    }
-
-    private static <T extends Identifiable> void loadSingleJson(String path, SetHolder<T> holder, Class<T> clazz, ObjectMapper mapper) {
-        try {
-            File file = new File(path);
-            if (!file.exists()) {
-                System.err.println("File not found: [" + path + "]");
-                return;
-            }
-            CollectionType setType = mapper.getTypeFactory().constructCollectionType(Set.class, clazz);
-            Set<T> loadedData = mapper.readValue(file, setType);
-            holder.clear();
-            holder.addAll(loadedData);
-           // System.out.println("Successfully downloaded json [" + clazz.getSimpleName() + "]: " + holder.size());
-
-        } catch (IOException e) {
-            System.err.println("Error during json parsing for [" + path + "]: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
 
     public enum State {
         NO_STATE,
@@ -130,7 +59,7 @@ public class GameData {
     public SetHolder<Player> players = new SetHolder<>();
     public SetHolder<Airline> availableAirlines = new SetHolder<>();
     public SetHolder<AbilityType> availableAbilities = new SetHolder<>();
-    public MapHolder<PlaneType, Integer> availablePlanes = new MapHolder<>(GameData.planeTypes);
+    public MapHolder<PlaneType, Integer> availablePlanes = new MapHolder<>(StatisGameData.planeTypes);
 
 
     public static class AirlineDTO extends Identifiable {
@@ -178,7 +107,7 @@ public class GameData {
         }
 
         public Airline restore(SetHolder<Airport> lookUpAirports, SetHolder<Player> lookUpPlayers){
-            AirlineType type = GameData.airlineTypes.get(this.type);
+            AirlineType type = StatisGameData.airlineTypes.get(this.type);
             Airport portA = lookUpAirports.get(this.portA);
             Airport portB = lookUpAirports.get(this.portB);
             if(type == null || portA == null || portB == null) return null;
@@ -233,9 +162,9 @@ public class GameData {
         }
 
         public Airport restore(){
-            AirportType type = GameData.airportTypes.get(this.type);
+            AirportType type = StatisGameData.airportTypes.get(this.type);
             if(type == null) return null;
-            MapHolder<PassengerType, Integer> passengers = new MapHolder<>(GameData.passengerTypes);
+            MapHolder<PassengerType, Integer> passengers = new MapHolder<>(StatisGameData.passengerTypes);
             try {
                 passengers.putAll(this.passengers);
             }
@@ -312,7 +241,7 @@ public class GameData {
                 if(line == null) return null;
                 lines.add(line);
             }
-            MapHolder<PlaneType, Integer> planes = new MapHolder<>(GameData.planeTypes);
+            MapHolder<PlaneType, Integer> planes = new MapHolder<>(StatisGameData.planeTypes);
             try {
                 planes.putAll(this.planes);
             }
@@ -321,7 +250,7 @@ public class GameData {
             }
             return new Player(
                 this.getId(), this.money, this.income, this.amountOfShares,
-                this.actionPoints, planes, lines, this.name, GameData.abilityTypes.get(this.ability),
+                this.actionPoints, planes, lines, this.name, StatisGameData.abilityTypes.get(this.ability),
                 this.color, this.hasPassed, this.auctionBet);
         }
     }
@@ -471,7 +400,7 @@ public class GameData {
 
 
 
-        worldEvents.clearAndAddAllFromLookUp(changes.newWorldEvents, GameData.worldEventTypes);
+        worldEvents.clearAndAddAllFromLookUp(changes.newWorldEvents, StatisGameData.worldEventTypes);
         airports.changeSetDTOI(changes.airportsToAdd, changes.airportsToRemove,
             (dto)->dto.restore());
         airlines.changeSetDTOI(changes.airlinesToAdd, changes.airlinesToRemove,
@@ -480,7 +409,7 @@ public class GameData {
             (dto)->dto.restore(this.airlines));
         availableAirlines.changeSetII(changes.availableAirlinesToAdd, changes.availableAirlinesToRemove, this.airlines);
         availableAirlines.retainAll(airlines);
-        availableAbilities.changeSetII(changes.availableAbilitiesToAdd, changes.availableAbilitiesToRemove, GameData.abilityTypes);
+        availableAbilities.changeSetII(changes.availableAbilitiesToAdd, changes.availableAbilitiesToRemove, StatisGameData.abilityTypes);
 
         if(changes.turnOrder != null){
             this.turnOrder = new ArrayList<>(players.size());
@@ -498,7 +427,7 @@ public class GameData {
             (f,s) -> (s==null) ? f : s);
 
         players.changeAsStructWithSetter(Player::setAbility, Player::getAbility,
-            (i)->GameData.abilityTypes.get(i), changes.playerAbilityChoice,
+            (i)-> StatisGameData.abilityTypes.get(i), changes.playerAbilityChoice,
             (f,s)->(s==null) ? f : s);
         players.changeAsStructWithSetter(Player::setActionPoints, Player::getActionPoints,
             changes.playerActionPointsChange, (f, s)->f+s);
@@ -540,7 +469,7 @@ public class GameData {
     }
 
     public boolean checkChanges(DataChanges changes){
-        if( !GameData.worldEventTypes.containsAll(changes.newWorldEvents) ||
+        if( !StatisGameData.worldEventTypes.containsAll(changes.newWorldEvents) ||
             !players.checkChangeSetTI(changes.playersToAdd, changes.playersToRemove) ||
             !airports.checkChangeSetTI(changes.airportsToAdd, changes.airportsToRemove) ||
             !airlines.checkChangeSetTI(changes.airlinesToAdd, changes.airlinesToRemove)
@@ -562,8 +491,8 @@ public class GameData {
         if( !availableAirlines.checkChangeSetIILookUp(
             changes.availableAirlinesToAdd, changes.availableAirlinesToRemove, airlinesTmp) ||
             !availableAbilities.checkChangeSetIILookUp(
-                changes.availableAbilitiesToAdd, changes.availableAbilitiesToRemove, GameData.abilityTypes) ||
-            !GameData.planeTypes.containsAllKeys(changes.availablePlanesToAdd) ||
+                changes.availableAbilitiesToAdd, changes.availableAbilitiesToRemove, StatisGameData.abilityTypes) ||
+            !StatisGameData.planeTypes.containsAllKeys(changes.availablePlanesToAdd) ||
             !availablePlanes.checkMergeElements(
                 Arrays.asList(changes.availablePlanesToAdd, changes.availablePlanesToRemove),
                 (params)->params.get(0)-params.get(1)>=0,
@@ -576,22 +505,22 @@ public class GameData {
             !playersTmp.checkChangeAsStruct(Player::getAuctionBet, changes.playerAuctionBetChanges,
                 (current, change) -> current + change >= 0) ||
             !playersTmp.checkChangeAsStruct(Player::getAmountOfShares, changes.playerAmountOfSharesChange,
-                (o, n)->o+n>=0 && o+n<=GameData.maxAmountOfShares) ||
+                (o, n)->o+n>=0 && o+n<= StatisGameData.maxAmountOfShares) ||
             !playersTmp.checkChangeAsStruct(Player::getActionPoints, changes.playerActionPointsChange,
-                (o, n)->o+n>=0 && o+n<=GameData.maxActionsPerTurn) ||
+                (o, n)->o+n>=0 && o+n<= StatisGameData.maxActionsPerTurn) ||
             !playersTmp.checkChangeAsStruct((pl)->pl.airlines,
                 Arrays.asList(changes.playerAirlinesToAdd, changes.playerAirlinesToRemove),
                 (f,s)->f.checkChangeSetIILookUp(s.get(0), s.get(1), airlinesTmp)
             )||
             !playersTmp.containsAllKeys(changes.playerAbilityChoice) ||
-            !GameData.abilityTypes.containsAllValues(changes.playerAbilityChoice)||
+            !StatisGameData.abilityTypes.containsAllValues(changes.playerAbilityChoice)||
             !playersTmp.checkChangeAsStruct((pl)->pl.planes,
                 Arrays.asList(changes.playerPlanesToAdd, changes.playerPlanesToRemove),
                 (f,s)->f.checkMergeElements(s,
                     (params)->params.get(0)-params.get(1)>=0,
                     (old, params)->old+params.get(0)-params.get(1)>=0,
                     (i)->0
-                ) && GameData.planeTypes.containsAll(s.get(0).keySet())
+                ) && StatisGameData.planeTypes.containsAll(s.get(0).keySet())
             ) ||
             !airportsTmp.checkChangeAsStruct((port)->port.passengers,
                 Arrays.asList(changes.airportPassengersToAdd, changes.airportPassengersToRemove),
@@ -599,7 +528,7 @@ public class GameData {
                     (params)->params.get(0)-params.get(1)>=0,
                     (old, params)->old+params.get(0)-params.get(1)>=0,
                     (i)->0
-                ) && GameData.passengerTypes.containsAll(s.get(0).keySet())
+                ) && StatisGameData.passengerTypes.containsAll(s.get(0).keySet())
             )
         ) return false;
 
