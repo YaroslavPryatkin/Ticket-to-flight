@@ -24,14 +24,14 @@ public class FlightInteractionStrategy implements MapInteractionStrategy {
     public void onAirportClicked(Airport airport) {
         if (selectedDepartureAirport == null) {
             selectedDepartureAirport = airport;
-            airport.setColor(getTransparentColor(airport.getColor(), SELECTED_ALPHA));
+            //airport.setColor(getTransparentColor(airport.getColor(), SELECTED_ALPHA));
             System.out.println("Selected departure: " + airport.getCityName());
         }
         else if (selectedDepartureAirport != airport) {
-            selectedDepartureAirport.setColor(getTransparentColor(selectedDepartureAirport.getColor(), NORMAL_ALPHA));
+         //   selectedDepartureAirport.setColor(getTransparentColor(selectedDepartureAirport.getColor(), NORMAL_ALPHA));
 
             selectedDepartureAirport = airport;
-            airport.setColor(getTransparentColor(airport.getColor(), SELECTED_ALPHA));
+           // airport.setColor(getTransparentColor(airport.getColor(), SELECTED_ALPHA));
             System.out.println("Changed departure to: " + airport.getCityName());
         }
     }
@@ -50,7 +50,7 @@ public class FlightInteractionStrategy implements MapInteractionStrategy {
 
             // llh.sendFlightRequest(selectedDepartureAirport.getId(), airline.getId());
 
-            selectedDepartureAirport.setColor(getTransparentColor(selectedDepartureAirport.getColor(), NORMAL_ALPHA));
+            //selectedDepartureAirport.setColor(getTransparentColor(selectedDepartureAirport.getColor(), NORMAL_ALPHA));
             selectedDepartureAirport = null;
 
         }
@@ -62,7 +62,7 @@ public class FlightInteractionStrategy implements MapInteractionStrategy {
     @Override
     public void onEmptyMapClicked(float worldX, float worldY) {
         if (selectedDepartureAirport != null) {
-            selectedDepartureAirport.setColor(getTransparentColor(selectedDepartureAirport.getColor(), NORMAL_ALPHA));
+            //selectedDepartureAirport.setColor(getTransparentColor(selectedDepartureAirport.getColor(), NORMAL_ALPHA));
             selectedDepartureAirport = null;
             System.out.println("Selection cleared.");
         }
