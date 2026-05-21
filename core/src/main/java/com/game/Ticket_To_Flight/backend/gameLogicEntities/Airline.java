@@ -1,5 +1,6 @@
 package com.game.Ticket_To_Flight.backend.gameLogicEntities;
 
+import com.badlogic.gdx.graphics.Color;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.AirlineType;
 import com.game.Ticket_To_Flight.Utilities.Identifiable;
 

@@ -26,6 +26,10 @@ public class Airport extends Identifiable {
         this.passengers = new MapHolder<>(StatisGameData.passengerTypes);
     }
 
+    public Color setColor(Color color) {
+
+    }
+
     public Color getColor() {
         if (this.type.id == 1) {
             return Color.WHITE;
@@ -78,5 +82,4 @@ public class Airport extends Identifiable {
     public String toString(){
         return "Airport " + airportName + " of type " + type.description;
     }
-
 }

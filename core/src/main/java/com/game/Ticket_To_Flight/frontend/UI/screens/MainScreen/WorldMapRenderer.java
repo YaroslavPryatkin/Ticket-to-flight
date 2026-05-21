@@ -18,6 +18,7 @@ import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airline;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airport;
 import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
 import com.game.Ticket_To_Flight.frontend.MainClient;
+import com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.MapStrategies.MapInteractionStrategy;
 
 public class WorldMapRenderer extends ScreenAdapter {
     private final SpriteBatch batch;
@@ -112,7 +113,8 @@ public class WorldMapRenderer extends ScreenAdapter {
         for (Airline airline : gameData.airlines) {
             if (airline.getPlayer() != null) {
                 batch.setColor(airline.getPlayer().getColor());
-            } else {
+            }
+            else {
                 batch.setColor(Color.LIGHT_GRAY);
             }
 
@@ -148,6 +150,10 @@ public class WorldMapRenderer extends ScreenAdapter {
 
     public void drawAbilitiesWindow() {
         uiManager.showAbilitiesWindow();
+    }
+
+    public void setMapCurrentStrategy(MapInteractionStrategy currentStrategy) {
+        inputCtrl.setCurrentStrategy(currentStrategy);
     }
 
     @Override

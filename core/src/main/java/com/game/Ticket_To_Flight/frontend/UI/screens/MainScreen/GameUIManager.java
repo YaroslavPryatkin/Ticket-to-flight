@@ -89,7 +89,7 @@ public class GameUIManager {
         uiStage.addActor(currentTooltip);
     }
 
-    public void showAirlineTooltip(Airline airline, float clickX, float clickY) {
+    public void showAirlineTooltip(Airline airline) {
         removeTooltip();
 
         selectedAirport = null;
@@ -102,7 +102,7 @@ public class GameUIManager {
 
         uiStage.addActor(currentTooltip);
 
-        Vector2 stageCoords = new Vector2(clickX, clickY);
+        Vector2 stageCoords = new Vector2(10, 10);
         uiStage.screenToStageCoordinates(stageCoords);
 
         currentTooltip.setPosition(stageCoords.x + 10, stageCoords.y + 10);

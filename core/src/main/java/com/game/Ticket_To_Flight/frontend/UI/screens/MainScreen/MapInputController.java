@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airline;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airport;
 import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
+import com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.MapStrategies.MapInteractionStrategy;
 
 public class MapInputController extends InputAdapter {
     private final OrthographicCamera camera;
@@ -15,10 +16,16 @@ public class MapInputController extends InputAdapter {
     private final Vector3 lastMousePos = new Vector3();
     private final float clickTolerance = 10f;
 
+    private MapInteractionStrategy currentStrategy;
+
     public MapInputController(OrthographicCamera camera, GameData gameData, GameUIManager uiManager) {
         this.camera = camera;
         this.gameData = gameData;
         this.uiManager = uiManager;
+    }
+
+    public void setCurrentStrategy(MapInteractionStrategy currentStrategy) {
+        this.currentStrategy = currentStrategy;
     }
 
     private float distanceToSegment(float px, float py, float x1, float y1, float x2, float y2) {
@@ -51,6 +58,23 @@ public class MapInputController extends InputAdapter {
         return (float) Math.sqrt(dx * dx + dy * dy);
     }
 
+    private Airport getClickedAirport(float worldX, float worldY) {
+        for (Airport airport : gameData.airports) {
+            if (Vector2.dst(airport.getX(), airport.getY(), worldX, worldY) <= airport.getRadius()) {
+                return airport;
+            }
+        }
+        return null;
+    }
+
+    private Airline getClickedAirline(float worldX, float worldY) {
+        for (Airline airline : gameData.airlines) {
+            float dist = distanceToSegment(worldX, worldY, airline.getPortA().getX(), airline.getPortA().getY(), airline.getPortB().getX(), airline.getPortB().getY());
+            if (dist <= clickTolerance) return airline;
+        }
+        return null;
+    }
+
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         if (uiManager.isOverlayActive()) return true;
@@ -58,23 +82,16 @@ public class MapInputController extends InputAdapter {
         Vector3 worldClick = new Vector3(screenX, screenY, 0);
         camera.unproject(worldClick);
 
-        for (Airport airport : gameData.airports) {
-            if (Vector2.dst(airport.getX(), airport.getY(), worldClick.x, worldClick.y) <= airport.getRadius()) {
-                uiManager.showAirportTooltip(airport);
-                return true;
-            }
+        Airport clickedAirport = getClickedAirport(worldClick.x, worldClick.y);
+        if (clickedAirport != null) {
+            currentStrategy.onAirportClicked(clickedAirport);
+            return true;
         }
 
-        for (Airline airline : gameData.airlines) {
-            float distanceToLine = distanceToSegment(
-                worldClick.x, worldClick.y,
-                airline.getPortA().getX(), airline.getPortA().getY(),
-                airline.getPortB().getX(), airline.getPortB().getY()
-            );
-            if (distanceToLine <= clickTolerance) {
-                uiManager.showAirlineTooltip(airline, worldClick.x, worldClick.y);
-                return true;
-            }
+        Airline clickedAirline = getClickedAirline(worldClick.x, worldClick.y);
+        if (clickedAirline != null) {
+            currentStrategy.onAirlineClicked(clickedAirline);
+            return true;
         }
 
         uiManager.removeTooltip();
