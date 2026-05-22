@@ -89,8 +89,11 @@ public class MainLogic extends MainLoopBack {
             if(resp.isPass){
                 if(!auctionHandler.pass())
                     llh.sendError("Already passed");
-                else
+                else {
+                    if(auctionHandler.areAllPlayersReady())
+                        auctionHandler.finishAuction();
                     llh.setPassFlag();
+                }
             }
             else {
                 Integer betAmount = resp.betAmount;
