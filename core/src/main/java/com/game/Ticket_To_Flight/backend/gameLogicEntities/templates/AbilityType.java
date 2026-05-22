@@ -8,8 +8,8 @@ public class AbilityType extends Identifiable {
     public String description;
     @JsonCreator
     public AbilityType(
-        @JsonProperty int id,
-        @JsonProperty String description
+        @JsonProperty("id") int id,
+        @JsonProperty("description") String description
     ){
         super(id);
         this.description = description;

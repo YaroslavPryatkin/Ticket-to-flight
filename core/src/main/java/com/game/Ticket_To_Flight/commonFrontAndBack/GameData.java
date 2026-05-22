@@ -50,7 +50,7 @@ public class GameData {
     }
     public Integer roundNumber = 0;
     public State currentState = State.NO_STATE;
-    public Integer currentPlayer = -1; // -1 if it is no player turn
+    public Integer currentPlayer = -1; // id of current player. -1 if it is no player turn
     public List<Player> turnOrder = null;
 
     public SetHolder<WorldEventType> worldEvents = new SetHolder<>();
@@ -59,11 +59,11 @@ public class GameData {
     public SetHolder<Player> players = new SetHolder<>();
     public SetHolder<Airline> availableAirlines = new SetHolder<>();
     public SetHolder<AbilityType> availableAbilities = new SetHolder<>();
-    public MapHolder<PlaneType, Integer> availablePlanes = new MapHolder<>(StatisGameData.planeTypes);
+    public MapHolder<PlaneType, Integer> availablePlanes = new MapHolder<>(StaticGameData.planeTypes);
 
 
     public static class AirlineDTO extends Identifiable {
-        private AirlineDTO(){super(0); type = 0; portA = 0; portB = 0; player = null;};
+        private AirlineDTO(){super(0); type = 0; portA = 0; portB = 0; player = null;}
         private static final AtomicInteger idGenerator = new AtomicInteger(0);
         private final int type;
         private final int portA;
@@ -107,7 +107,7 @@ public class GameData {
         }
 
         public Airline restore(SetHolder<Airport> lookUpAirports, SetHolder<Player> lookUpPlayers){
-            AirlineType type = StatisGameData.airlineTypes.get(this.type);
+            AirlineType type = StaticGameData.airlineTypes.get(this.type);
             Airport portA = lookUpAirports.get(this.portA);
             Airport portB = lookUpAirports.get(this.portB);
             if(type == null || portA == null || portB == null) return null;
@@ -162,9 +162,9 @@ public class GameData {
         }
 
         public Airport restore(){
-            AirportType type = StatisGameData.airportTypes.get(this.type);
+            AirportType type = StaticGameData.airportTypes.get(this.type);
             if(type == null) return null;
-            MapHolder<PassengerType, Integer> passengers = new MapHolder<>(StatisGameData.passengerTypes);
+            MapHolder<PassengerType, Integer> passengers = new MapHolder<>(StaticGameData.passengerTypes);
             try {
                 passengers.putAll(this.passengers);
             }
@@ -187,7 +187,7 @@ public class GameData {
         private final int amountOfShares;
         private final int actionPoints;
         private final  boolean hasPassed;
-        private final Double auctionBet;
+        private final Integer auctionBet;
         private final Map<Integer, Integer> planes;
         private final Set<Integer> airlines;
         private final Integer ability;
@@ -241,7 +241,7 @@ public class GameData {
                 if(line == null) return null;
                 lines.add(line);
             }
-            MapHolder<PlaneType, Integer> planes = new MapHolder<>(StatisGameData.planeTypes);
+            MapHolder<PlaneType, Integer> planes = new MapHolder<>(StaticGameData.planeTypes);
             try {
                 planes.putAll(this.planes);
             }
@@ -250,7 +250,7 @@ public class GameData {
             }
             return new Player(
                 this.getId(), this.money, this.income, this.amountOfShares,
-                this.actionPoints, planes, lines, this.name, StatisGameData.abilityTypes.get(this.ability),
+                this.actionPoints, planes, lines, this.name, StaticGameData.abilityTypes.get(this.ability),
                 this.color, this.hasPassed, this.auctionBet);
         }
     }
@@ -287,7 +287,7 @@ public class GameData {
         public  Map<Integer, Integer> playerActionPointsChange= null;
         public  Map<Integer, Integer> playerAmountOfSharesChange= null;
         public  Map<Integer, Integer> playerAbilityChoice = null;
-        public  Map<Integer, Double> playerAuctionBetChanges = null;
+        public  Map<Integer, Integer> playerAuctionBetChanges = null;
 
         public  Map<Integer, Set<Integer>> playerAirlinesToAdd= null;
         public  Map<Integer, Set<Integer>> playerAirlinesToRemove= null;
@@ -340,7 +340,7 @@ public class GameData {
                 this.playerMoneyChange, other.playerMoneyChange, v -> v, DataChanges::sumDoubleOrNull);
 
             this.playerAuctionBetChanges = MapHolder.merge(
-                this.playerAuctionBetChanges, other.playerAuctionBetChanges, v -> v, DataChanges::sumDoubleOrNull);
+                this.playerAuctionBetChanges, other.playerAuctionBetChanges, v -> v, DataChanges::sumIntOrNull);
 
             this.playerIncomeChange = MapHolder.merge(
                 this.playerIncomeChange, other.playerIncomeChange, v -> v, DataChanges::sumDoubleOrNull);
@@ -400,7 +400,7 @@ public class GameData {
 
 
 
-        worldEvents.clearAndAddAllFromLookUp(changes.newWorldEvents, StatisGameData.worldEventTypes);
+        worldEvents.clearAndAddAllFromLookUp(changes.newWorldEvents, StaticGameData.worldEventTypes);
         airports.changeSetDTOI(changes.airportsToAdd, changes.airportsToRemove,
             (dto)->dto.restore());
         airlines.changeSetDTOI(changes.airlinesToAdd, changes.airlinesToRemove,
@@ -409,7 +409,7 @@ public class GameData {
             (dto)->dto.restore(this.airlines));
         availableAirlines.changeSetII(changes.availableAirlinesToAdd, changes.availableAirlinesToRemove, this.airlines);
         availableAirlines.retainAll(airlines);
-        availableAbilities.changeSetII(changes.availableAbilitiesToAdd, changes.availableAbilitiesToRemove, StatisGameData.abilityTypes);
+        availableAbilities.changeSetII(changes.availableAbilitiesToAdd, changes.availableAbilitiesToRemove, StaticGameData.abilityTypes);
 
         if(changes.turnOrder != null){
             this.turnOrder = new ArrayList<>(players.size());
@@ -419,15 +419,15 @@ public class GameData {
         }
 
         availablePlanes.merge(Arrays.asList(changes.availablePlanesToAdd, changes.availablePlanesToRemove),
-            (params)-> {Integer res = params.get(0) - params.get(1); return res == 0 ? null : res;},
-            (old, params)->{Integer res = old+params.get(0) - params.get(1); return res == 0 ? null : res;},
+            (params)-> {int res = params.get(0) - params.get(1); return res == 0 ? null : res;},
+            (old, params)->{int res = old+params.get(0) - params.get(1); return res == 0 ? null : res;},
             (i)->0);
 
         players.changeAsStructWithSetter(Player::setHasPassed, Player::getHasPassed, changes.playerHasPassedSet,
             (f,s) -> (s==null) ? f : s);
 
         players.changeAsStructWithSetter(Player::setAbility, Player::getAbility,
-            (i)-> StatisGameData.abilityTypes.get(i), changes.playerAbilityChoice,
+            (i)-> StaticGameData.abilityTypes.get(i), changes.playerAbilityChoice,
             (f,s)->(s==null) ? f : s);
         players.changeAsStructWithSetter(Player::setActionPoints, Player::getActionPoints,
             changes.playerActionPointsChange, (f, s)->f+s);
@@ -469,7 +469,7 @@ public class GameData {
     }
 
     public boolean checkChanges(DataChanges changes){
-        if( !StatisGameData.worldEventTypes.containsAll(changes.newWorldEvents) ||
+        if( !StaticGameData.worldEventTypes.containsAll(changes.newWorldEvents) ||
             !players.checkChangeSetTI(changes.playersToAdd, changes.playersToRemove) ||
             !airports.checkChangeSetTI(changes.airportsToAdd, changes.airportsToRemove) ||
             !airlines.checkChangeSetTI(changes.airlinesToAdd, changes.airlinesToRemove)
@@ -491,8 +491,8 @@ public class GameData {
         if( !availableAirlines.checkChangeSetIILookUp(
             changes.availableAirlinesToAdd, changes.availableAirlinesToRemove, airlinesTmp) ||
             !availableAbilities.checkChangeSetIILookUp(
-                changes.availableAbilitiesToAdd, changes.availableAbilitiesToRemove, StatisGameData.abilityTypes) ||
-            !StatisGameData.planeTypes.containsAllKeys(changes.availablePlanesToAdd) ||
+                changes.availableAbilitiesToAdd, changes.availableAbilitiesToRemove, StaticGameData.abilityTypes) ||
+            !StaticGameData.planeTypes.containsAllKeys(changes.availablePlanesToAdd) ||
             !availablePlanes.checkMergeElements(
                 Arrays.asList(changes.availablePlanesToAdd, changes.availablePlanesToRemove),
                 (params)->params.get(0)-params.get(1)>=0,
@@ -505,22 +505,22 @@ public class GameData {
             !playersTmp.checkChangeAsStruct(Player::getAuctionBet, changes.playerAuctionBetChanges,
                 (current, change) -> current + change >= 0) ||
             !playersTmp.checkChangeAsStruct(Player::getAmountOfShares, changes.playerAmountOfSharesChange,
-                (o, n)->o+n>=0 && o+n<= StatisGameData.maxAmountOfShares) ||
+                (o, n)->o+n>=0 && o+n<= StaticGameData.maxAmountOfShares) ||
             !playersTmp.checkChangeAsStruct(Player::getActionPoints, changes.playerActionPointsChange,
-                (o, n)->o+n>=0 && o+n<= StatisGameData.maxActionsPerTurn) ||
+                (o, n)->o+n>=0 && o+n<= StaticGameData.maxActionsPerTurn) ||
             !playersTmp.checkChangeAsStruct((pl)->pl.airlines,
                 Arrays.asList(changes.playerAirlinesToAdd, changes.playerAirlinesToRemove),
                 (f,s)->f.checkChangeSetIILookUp(s.get(0), s.get(1), airlinesTmp)
             )||
             !playersTmp.containsAllKeys(changes.playerAbilityChoice) ||
-            !StatisGameData.abilityTypes.containsAllValues(changes.playerAbilityChoice)||
+            !StaticGameData.abilityTypes.containsAllValues(changes.playerAbilityChoice)||
             !playersTmp.checkChangeAsStruct((pl)->pl.planes,
                 Arrays.asList(changes.playerPlanesToAdd, changes.playerPlanesToRemove),
                 (f,s)->f.checkMergeElements(s,
                     (params)->params.get(0)-params.get(1)>=0,
                     (old, params)->old+params.get(0)-params.get(1)>=0,
                     (i)->0
-                ) && StatisGameData.planeTypes.containsAll(s.get(0).keySet())
+                ) && StaticGameData.planeTypes.containsAll(s.get(0).keySet())
             ) ||
             !airportsTmp.checkChangeAsStruct((port)->port.passengers,
                 Arrays.asList(changes.airportPassengersToAdd, changes.airportPassengersToRemove),
@@ -528,7 +528,7 @@ public class GameData {
                     (params)->params.get(0)-params.get(1)>=0,
                     (old, params)->old+params.get(0)-params.get(1)>=0,
                     (i)->0
-                ) && StatisGameData.passengerTypes.containsAll(s.get(0).keySet())
+                ) && StaticGameData.passengerTypes.containsAll(s.get(0).keySet())
             )
         ) return false;
 
@@ -536,15 +536,6 @@ public class GameData {
         return true;
     }
 
-    public boolean applyChanges(DataChanges changes) {
-        if (changes == null) return true;
-
-        if(!checkChanges(changes)) return false;
-
-        applyChangesUnsafe(changes);
-
-        return true;
-    }
 
     public void clearGameData(){
         roundNumber = null;

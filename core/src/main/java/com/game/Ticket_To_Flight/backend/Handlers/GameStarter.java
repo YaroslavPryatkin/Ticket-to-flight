@@ -15,7 +15,7 @@ public class GameStarter {
     }
 
     public Network.JoinGameResponse handleJoinGameRequest(Connection con, String playerName){
-        if (playersBeforeGame.values().contains(playerName))
+        if (playersBeforeGame.containsValue(playerName))
             return new Network.JoinGameResponse(
                 Network.JoinGameResponse.Response.NAME_ALREADY_EXISTS);
         else{

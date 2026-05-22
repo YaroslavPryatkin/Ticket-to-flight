@@ -6,7 +6,7 @@ import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.AirportType
 import com.game.Ticket_To_Flight.Utilities.Identifiable;
 import com.badlogic.gdx.graphics.Color;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.PassengerType;
-import com.game.Ticket_To_Flight.commonFrontAndBack.StatisGameData;
+import com.game.Ticket_To_Flight.commonFrontAndBack.StaticGameData;
 
 public class Airport extends Identifiable {
     public final AirportType type;
@@ -23,7 +23,7 @@ public class Airport extends Identifiable {
         this.type = type;
         this.position = position;
         this.airportName = AirportName;
-        this.passengers = new MapHolder<>(StatisGameData.passengerTypes);
+        this.passengers = new MapHolder<>(StaticGameData.passengerTypes);
     }
 
     public Color getColor() {

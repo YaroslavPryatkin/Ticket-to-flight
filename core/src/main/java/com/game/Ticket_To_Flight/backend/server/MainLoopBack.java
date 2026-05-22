@@ -2,6 +2,7 @@ package com.game.Ticket_To_Flight.backend.server;
 
 import com.game.Ticket_To_Flight.backend.Handlers.LowLevelHandlerBack;
 import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
+import com.game.Ticket_To_Flight.network.Network;
 
 public abstract class MainLoopBack {
     protected final GameData gameData = new GameData();
@@ -68,10 +69,7 @@ public abstract class MainLoopBack {
 
     protected abstract void mainCycle();
 
-    public abstract void handleInvestmentResponse(Integer response);
+    public abstract void handlePlayerResponse(Network.GameMessage message);
 
-    public abstract void handleAuctionResponse(Integer response);
-
-    public abstract void handleAbilityChoiceResponse(Integer response);
 
 }

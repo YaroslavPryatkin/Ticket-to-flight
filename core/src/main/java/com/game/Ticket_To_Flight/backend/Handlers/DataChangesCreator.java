@@ -7,8 +7,10 @@ import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.AirlineType
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.AirportType;
 import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 
 public class DataChangesCreator {
     private GameData.DataChanges dataChanges = new GameData.DataChanges();
@@ -117,5 +119,63 @@ public class DataChangesCreator {
 
     public void setCurrentRound(Integer roundNumber){
         dataChanges.roundNumber = roundNumber;
+    }
+
+    public void setTurnOrderPl(List<Player> newTurnOrder){
+        if(dataChanges.turnOrder == null) dataChanges.turnOrder = new ArrayList<>(gameData.players.size());
+        else dataChanges.turnOrder.clear();
+        for(Player pl : newTurnOrder){
+            dataChanges.turnOrder.add(pl.getId());
+        }
+    }
+
+    public void setTurnOrderInt(List<Integer> newTurnOrder){
+        if(dataChanges.turnOrder == null) dataChanges.turnOrder = new ArrayList<>(gameData.players.size());
+        else dataChanges.turnOrder.clear();
+        dataChanges.turnOrder.addAll(newTurnOrder);
+    }
+
+    public void setDefaultTurnOrder(){
+        if(dataChanges.turnOrder == null) dataChanges.turnOrder = new ArrayList<>(gameData.players.size());
+        else dataChanges.turnOrder.clear();
+        for(Player pl : gameData.players){
+            dataChanges.turnOrder.add(pl.getId());
+        }
+    }
+
+    public void addHasPassed(){
+        if(dataChanges.playerHasPassedSet == null) dataChanges.playerHasPassedSet = new HashMap<>();
+        dataChanges.playerHasPassedSet.put(gameData.currentPlayer, true);
+    }
+
+    public void removeAllPassed(){
+        if(dataChanges.playerHasPassedSet == null) dataChanges.playerHasPassedSet = new HashMap<>();
+        for(Player pl : gameData.players){
+            dataChanges.playerHasPassedSet.put(pl.getId(), false);
+        }
+    }
+
+    public void playerMakeBet(Integer player, Integer amountOfMoney){
+        if(dataChanges.playerAuctionBetChanges == null) dataChanges.playerAuctionBetChanges = new HashMap<>();
+        if(dataChanges.playerMoneyChange == null) dataChanges.playerMoneyChange = new HashMap<>();
+        dataChanges.playerMoneyChange.compute(player,
+            (k, v) -> (v==null) ? -amountOfMoney : v-amountOfMoney);
+        dataChanges.playerAuctionBetChanges.compute(player,
+            (k, v) -> (v==null) ? amountOfMoney : v +amountOfMoney);
+
+    }
+
+    public void playerReturnBet(Integer player, Double percentage){
+        if(dataChanges.playerAuctionBetChanges == null) dataChanges.playerAuctionBetChanges = new HashMap<>();
+        if(dataChanges.playerMoneyChange == null) dataChanges.playerMoneyChange = new HashMap<>();
+
+        dataChanges.playerMoneyChange.compute(player,
+            (k, v) ->  {
+            double amountOfMoney = gameData.players.get(k).auctionBet * percentage;
+            return (v==null) ? amountOfMoney : v + amountOfMoney;
+            });
+        dataChanges.playerAuctionBetChanges.compute(player,
+            (k, v) ->  -gameData.players.get(k).auctionBet);
+
     }
 }

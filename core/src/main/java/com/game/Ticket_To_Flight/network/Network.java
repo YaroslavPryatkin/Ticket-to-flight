@@ -2,6 +2,7 @@ package com.game.Ticket_To_Flight.network;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.EndPoint;
+import com.game.Ticket_To_Flight.backend.gameLogicEntities.Player;
 import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
 
 import java.lang.reflect.Field;
@@ -154,9 +155,10 @@ public class Network {
      * Sending null means pass
      */
     public static class PlayerAuctionChoiceResponse extends GameMessage {
-        public PlayerAuctionChoiceResponse(){}
         public Integer betAmount = null;
-        public PlayerAuctionChoiceResponse(Integer betAmount) {this.betAmount = betAmount;}
+        public Boolean isPass = false;
+        public PlayerAuctionChoiceResponse(int betAmount) {this.betAmount = betAmount; this.isPass = false;}
+        public PlayerAuctionChoiceResponse() {this.betAmount = null; this.isPass = true;}
     }
 
     public static class PlayerAbilityChoiceResponse extends GameMessage{
@@ -213,7 +215,9 @@ public class Network {
     }
 
     public static class ErrorMessage extends GameMessage {
-        public final static ErrorMessage NOT_YOUR_TURN = new ErrorMessage("NYT");
+        public final static ErrorMessage NOT_YOUR_TURN = new ErrorMessage("Not your turn");
+        public final static ErrorMessage ALREADY_PASSED = new ErrorMessage("Already passed");
+        public final static ErrorMessage ALREADY_ANSWERED = new ErrorMessage("Already answered");
         public ErrorMessage(){}
         private String message = "";
         public ErrorMessage(String message) {this.message = message;}

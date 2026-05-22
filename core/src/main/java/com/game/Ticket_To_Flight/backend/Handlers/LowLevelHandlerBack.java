@@ -22,19 +22,21 @@ public class LowLevelHandlerBack extends LowLevelHandler {
             NO_PLAYER_STAGE,
             WAITING_FOR_RESPONSE,
             ANSWERED,
+            GOOD_RESPONSE,
+            PASSED,
             BAD_RESPONSE
         }
         public volatile CurrentPlayerState currentPlayerState = CurrentPlayerState.NO_PLAYER_STAGE;
     }
 
-    public LowLevelHandlerBack.Flags flags = new LowLevelHandlerBack.Flags();
+    private LowLevelHandlerBack.Flags flags = new LowLevelHandlerBack.Flags();
 
     private final Map<Integer, Connection> int2con = new HashMap<>();
     private final Map<Connection, Integer> con2int = new HashMap<>();
 
     public final DataChangesCreator dataChangesCreator = new DataChangesCreator(gameData);
     private final GameStarter gameStarter = new GameStarter();
-
+    private final StateIterator stateIterator = new StateIterator(gameData, dataChangesCreator, flags);
 
     public LowLevelHandlerBack(GameData data,  MainLoopBack logic){super(data); this.logic = logic;}
 
@@ -50,7 +52,7 @@ public class LowLevelHandlerBack extends LowLevelHandler {
     protected void handleIncomingMessage(Connection con, Network.GameMessage message){
         if(message instanceof Network.JoinGameRequest) {
             Network.JoinGameRequest req = (Network.JoinGameRequest) message;
-            gameStarter.handleJoinGameRequest(con, req.playerName);
+            addMessage(con ,  gameStarter.handleJoinGameRequest(con, req.playerName));
         }
         else if(message instanceof Network.ReloadGameDataRequest){
             if(con2int.containsKey(con)){
@@ -58,21 +60,14 @@ public class LowLevelHandlerBack extends LowLevelHandler {
                 addMessage(con, new Network.ReloadGameDataResponse(reloadDC));
             }
         }
-        else if(message instanceof Network.PlayerInvestmentChoiceResponse){
-            if(playerTurnCheck(con)) {
-                flags.currentPlayerState = Flags.CurrentPlayerState.ANSWERED;
-                Network.PlayerInvestmentChoiceResponse resp = (Network.PlayerInvestmentChoiceResponse) message;
-                logic.handleInvestmentResponse(resp.amountOfShares);
-            }
-        }
-        else if(message instanceof Network.PlayerAuctionChoiceResponse){
+        else{
             if(playerTurnCheck(con)){
                 flags.currentPlayerState = Flags.CurrentPlayerState.ANSWERED;
-                Network.PlayerAuctionChoiceResponse resp = (Network.PlayerAuctionChoiceResponse) message;
-                logic.handleAuctionResponse(resp.betAmount);
+                logic.handlePlayerResponse(message);
             }
         }
-        else throw new IllegalArgumentException("Unknown message");
+
+
     }
 
     private boolean sendToAllPlayers(Network.GameMessage message) {
@@ -87,12 +82,25 @@ public class LowLevelHandlerBack extends LowLevelHandler {
         return res;
     }
 
+    /**
+     * Sends error "NOT YOUR TURN" if wrong turn
+     * @param con connection to check
+     * @return true if it is current player
+     */
     private boolean playerTurnCheck(Connection con){
         Integer player = con2int.get(con);
         if(player == null) return false;
-        if(player == gameData.currentPlayer) return true;
-        addMessage(con, Network.ErrorMessage.NOT_YOUR_TURN);
-        return false;
+        if(!player.equals(gameData.currentPlayer)){
+            addMessage(con, Network.ErrorMessage.NOT_YOUR_TURN);
+            return false;
+        }
+        if(flags.currentPlayerState != Flags.CurrentPlayerState.WAITING_FOR_RESPONSE &&
+            flags.currentPlayerState != Flags.CurrentPlayerState.BAD_RESPONSE){
+            addMessage(con, Network.ErrorMessage.ALREADY_ANSWERED);
+            return false;
+        }
+
+        return true;
     }
     //------------------------------------- messages part
 
@@ -127,6 +135,12 @@ public class LowLevelHandlerBack extends LowLevelHandler {
         }
     }
 
+    public void finishTurnSuccessfully(Boolean hasPassed){
+        if(!stateIterator.nextState(hasPassed))
+            System.out.println("Game finished");
+        applyAndSendDataChanges();
+    }
+
     public void applyAndSendDataChanges(){
         GameData.DataChanges dataChanges = dataChangesCreator.takeDataChanges();
         gameData.applyChangesUnsafe(dataChanges);
@@ -142,7 +156,6 @@ public class LowLevelHandlerBack extends LowLevelHandler {
         sendToAllPlayers(new Network.DataChangesMessage(dataChanges));
     }
 
-
     public void sendError(String error){
         flags.currentPlayerState = Flags.CurrentPlayerState.BAD_RESPONSE;
         Connection con = int2con.get(gameData.currentPlayer);
@@ -151,5 +164,24 @@ public class LowLevelHandlerBack extends LowLevelHandler {
         }
     }
 
+    public Flags.GamePreparationsState getGamePreparationState(){
+        return flags.gamePreparationsState;
+    }
+
+    public Flags.CurrentPlayerState getCurrentPlayerState(){
+        return flags.currentPlayerState;
+    }
+
+    public void setGoodResponseFlag(){
+        flags.currentPlayerState = Flags.CurrentPlayerState.GOOD_RESPONSE;
+    }
+
+    public void setPassFlag(){
+        flags.currentPlayerState = Flags.CurrentPlayerState.PASSED;
+    }
+
+    public void setWaitingForResponseFlag(){
+        flags.currentPlayerState = Flags.CurrentPlayerState.WAITING_FOR_RESPONSE;
+    }
     //------------------------------------- for use in main logic
 }

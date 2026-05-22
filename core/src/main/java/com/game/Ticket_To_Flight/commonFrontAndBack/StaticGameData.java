@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
-public class StatisGameData {
+public class StaticGameData {
     public static SetHolder<AirportType> airportTypes = new SetHolder<AirportType>();
     public static SetHolder<AirlineType> airlineTypes = new SetHolder<AirlineType>();
     public static SetHolder<PlaneType> planeTypes = new SetHolder<PlaneType>();
@@ -21,7 +21,8 @@ public class StatisGameData {
     public static SetHolder<AbilityType> abilityTypes = new SetHolder<AbilityType>();
     public static Integer maxActionsPerTurn = 5;
     public static Integer maxAmountOfShares = 20;
-
+    public static Integer amountOfRounds = 10;
+    public static Double minimalAuctionBet = 30.0;
 
     private static boolean jsonDownloaded = false;
     private static String jsonFolder = "assets/StaticData";

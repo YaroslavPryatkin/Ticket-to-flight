@@ -21,6 +21,10 @@
   },
   {
     "id": 5,
-    "description": "Buy 3 new gates at the airport"
+    "description": "Buy up to 3 new gates at the airport"
+  },
+  {
+    "id": 6,
+    "description": "A 1.2 multiplier to the income gain from flights. "
   }
 ]
