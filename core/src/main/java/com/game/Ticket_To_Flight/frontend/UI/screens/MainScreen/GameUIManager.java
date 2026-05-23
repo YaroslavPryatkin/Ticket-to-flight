@@ -9,10 +9,7 @@ import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
 import com.game.Ticket_To_Flight.frontend.LowLevelHandlerFront;
 import com.game.Ticket_To_Flight.frontend.MainClient;
 import com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.GameUIManagerDirectory.*;
-import com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.GameUIManagerDirectory.GameStageWindows.AuctionWindow;
-import com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.GameUIManagerDirectory.GameStageWindows.InvestWindow;
-import com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.GameUIManagerDirectory.GameStageWindows.PlaneWindow;
-import com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.GameUIManagerDirectory.GameStageWindows.SuccessWindow;
+import com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.GameUIManagerDirectory.GameStageWindows.*;
 
 public class GameUIManager {
     private final Stage uiStage;
@@ -114,9 +111,9 @@ public class GameUIManager {
         }
     }
 
-    public void showAuctionWindow() {
+    public boolean showAuctionWindow() {
         if (blueWindowPrinted)
-            return;
+            return false;
         if (window != null) {
             window.remove();
         }
@@ -126,11 +123,12 @@ public class GameUIManager {
 
         setPositionForWindow(window);
         blueWindowPrinted = true;
+        return true;
     }
 
-    public void showInvestWindow() {
+    public boolean showInvestWindow() {
         if (blueWindowPrinted)
-            return;
+            return false;
         if (window != null) {
             window.remove();
         }
@@ -140,6 +138,7 @@ public class GameUIManager {
 
         setPositionForWindow(window);
         blueWindowPrinted = true;
+        return true;
     }
 
     public void showSuccessWindow(String message) {
@@ -153,12 +152,24 @@ public class GameUIManager {
         this.setPositionForWindow(window);
     }
 
-    public void showAbilitiesWindow() {
-        uiStage.addActor(new AbilitiesWindow(skin_invest_window, this, llh));
+    public boolean showAbilitiesWindow() {
+        if (blueWindowPrinted)
+            return false;
+        if (window != null) {
+            window.remove();
+        }
+
+        window = new AbilitiesWindow(skin_invest_window, this, llh, gameData);
+        uiStage.addActor(window);
+
+        setPositionForWindow(window);
+        blueWindowPrinted = true;
+        return true;
     }
 
-    public void showPlaneWindow() {
+    public boolean showPlaneWindow() {
         uiStage.addActor(new PlaneWindow(skin_invest_window, this));
+        return true;
     }
 
     public void setBlueWindowPrinted(boolean blueWindowPrinted) {

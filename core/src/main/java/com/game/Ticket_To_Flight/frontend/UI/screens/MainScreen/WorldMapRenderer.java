@@ -140,20 +140,20 @@ public class WorldMapRenderer extends ScreenAdapter {
         }
     }
 
-    public void drawInvestmentWindow() {
-        uiManager.showInvestWindow();
+    public boolean drawInvestmentWindow() {
+        return uiManager.showInvestWindow();
     }
 
-    public void drawAuctionWindow() {
-        uiManager.showAuctionWindow();
+    public boolean drawAuctionWindow() {
+        return uiManager.showAuctionWindow();
     }
 
-    public void drawPlaneWindow() {
-        uiManager.showPlaneWindow();
+    public boolean drawPlaneWindow() {
+        return uiManager.showPlaneWindow();
     }
 
-    public void drawAbilitiesWindow() {
-        uiManager.showAbilitiesWindow();
+    public boolean drawAbilitiesWindow() {
+        return uiManager.showAbilitiesWindow();
     }
 
     public void setMapCurrentStrategy(MapInteractionStrategy currentStrategy) {

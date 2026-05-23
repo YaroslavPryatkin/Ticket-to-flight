@@ -186,7 +186,7 @@ public class Network {
 
     public static class PlayerAbilityChoiceResponse extends GameMessage{
         public PlayerAbilityChoiceResponse(){}
-        public int ability = 1;
+        public Integer ability = null;
         public PlayerAbilityChoiceResponse(int ability){this.ability = ability;}
     }
 

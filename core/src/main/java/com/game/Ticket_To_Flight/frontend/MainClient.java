@@ -38,19 +38,22 @@ public class MainClient {
                 this.myGame.setScreen(this.worldMapRenderer);
             } else if (gameData.currentState == GameData.State.INVESTMENTS && llh.getMyId() == gameData.currentPlayer) {
                 if (llh.flags.currentStateState == Flags.CurrentStateState.PLAYER_STAGE) {
-                    worldMapRenderer.drawInvestmentWindow();
-                    llh.flags.currentStateState = LowLevelHandlerFront.Flags.CurrentStateState.WAITING_FOR_PLAYER_CHOICE;
+                    if (worldMapRenderer.drawInvestmentWindow()) {
+                        llh.flags.currentStateState = LowLevelHandlerFront.Flags.CurrentStateState.WAITING_FOR_PLAYER_CHOICE;
+                    }
                 }
             } else if (gameData.currentState == GameData.State.AUCTION && llh.getMyId() == gameData.currentPlayer) {
                 if (llh.flags.currentStateState == Flags.CurrentStateState.PLAYER_STAGE) {
-                    worldMapRenderer.drawAuctionWindow();
-                    llh.flags.currentStateState = Flags.CurrentStateState.WAITING_FOR_PLAYER_CHOICE;
+                    if (worldMapRenderer.drawAuctionWindow()) {
+                        llh.flags.currentStateState = LowLevelHandlerFront.Flags.CurrentStateState.WAITING_FOR_PLAYER_CHOICE;
+                    }
                 }
                 worldMapRenderer.drawAuctionWindow();
             } else if (gameData.currentState == GameData.State.ABILITIES && llh.getMyId() == gameData.currentPlayer) {
                 if (llh.flags.currentStateState == Flags.CurrentStateState.PLAYER_STAGE) {
-                    worldMapRenderer.drawAbilitiesWindow();
-                    llh.flags.currentStateState = Flags.CurrentStateState.WAITING_FOR_PLAYER_CHOICE;
+                    if (worldMapRenderer.drawAbilitiesWindow()) {
+                        llh.flags.currentStateState = LowLevelHandlerFront.Flags.CurrentStateState.WAITING_FOR_PLAYER_CHOICE;
+                    }
                 }
             } else if (gameData.currentState == GameData.State.PLANES && llh.getMyId() == gameData.currentPlayer) {
                 if (llh.flags.currentStateState == Flags.CurrentStateState.PLAYER_STAGE) {
