@@ -55,6 +55,7 @@ public class Network {
         JoinGameResponse.class,
         GameData.State.class,
         ErrorMessage.class,
+        PlayerAuctionChoiceResponse.class,
         Arrays.asList().getClass(),
         Collections.emptyList().getClass(),
         Collections.emptyMap().getClass(),

@@ -52,7 +52,7 @@ public class GameData {
     public State currentState = State.NO_STATE;
     public Integer currentPlayer = -1; // id of current player. -1 if it is no player turn
     public List<Player> turnOrder = null;
-    public Integer currentBet = null;
+    public int currentBet = 0;
 
     public SetHolder<WorldEventType> worldEvents = new SetHolder<>();
     public SetHolder<Airport> airports = new SetHolder<>();
@@ -543,7 +543,7 @@ public class GameData {
         currentState = State.NO_STATE;
         currentPlayer = null;
         turnOrder = null;
-        currentBet = null;
+        currentBet = 0;
         worldEvents.clear();
         airports.clear();
         airlines.clear();

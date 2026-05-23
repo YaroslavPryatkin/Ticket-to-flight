@@ -1,5 +1,6 @@
 package com.game.Ticket_To_Flight.backend.Handlers;
 
+import com.game.Ticket_To_Flight.backend.gameLogicEntities.Player;
 import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
 
 public class TurnOrderIterator {
@@ -31,8 +32,9 @@ public class TurnOrderIterator {
         int size = gameData.turnOrder.size();
         for (int i = 0; i < size; ++i) {
             int cur = next();
-            if (!gameData.turnOrder.get(cur).hasPassed) {
-                return cur;
+            Player curPlayer = gameData.turnOrder.get(cur);
+            if (!curPlayer.hasPassed) {
+                return curPlayer.getId();
             }
         }
         return null;
