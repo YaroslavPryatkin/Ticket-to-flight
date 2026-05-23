@@ -12,7 +12,7 @@ public class PlaneType extends Identifiable {
     public final int capacity;
     public final ClosedInterval<Integer> gateRange;
     public final ClosedInterval<Double> distRange;
-    public final double price;
+    public final int price;
     public final String description;
 
 
@@ -27,7 +27,7 @@ public class PlaneType extends Identifiable {
         @JsonProperty("maxGate") Integer maxGate,
         @JsonProperty("minDist") Double minDist,
         @JsonProperty("maxDist") Double maxDist,
-        @JsonProperty("price") double price,
+        @JsonProperty("price") int price,
         @JsonProperty("description") String description
     ) {
         super(id);

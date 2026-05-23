@@ -760,6 +760,7 @@ public class MapHolder<K extends Identifiable, V> implements Map<Integer, V> {
             return storage.get(((Identifiable) key) .getId());
         return null;
     }
+
     public V put(K key, V value) { return storage.put(key.getId(), value); }
     @Override public V put(Integer key, V value) {
         if(!keyHolder.contains(key)) throw new IllegalArgumentException("Now original object exist.");
@@ -804,5 +805,11 @@ public class MapHolder<K extends Identifiable, V> implements Map<Integer, V> {
         for(Entry<Integer, V> e : storage.entrySet()){
             System.out.println(e.getKey() + " -> " + e.getValue().toString());
         }
+    }
+    @Override
+    public V getOrDefault(Object key, V df){
+        V res = get(key);
+        if(res == null) return df;
+        return res;
     }
 }

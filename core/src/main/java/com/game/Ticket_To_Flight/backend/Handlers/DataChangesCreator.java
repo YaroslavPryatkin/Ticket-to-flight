@@ -58,7 +58,7 @@ public class DataChangesCreator {
         dataChanges.availableAirlinesToAdd.add(newLine.getId());
     }
 
-    public boolean sellAirlineToThePlayer(Integer line, Integer player){
+    public boolean sellAirline(Integer line){
         if(gameData.availableAirlines.contains(line)){
             if(dataChanges.availableAirlinesToRemove == null){
                 dataChanges.availableAirlinesToRemove = new HashSet<>();
@@ -67,8 +67,8 @@ public class DataChangesCreator {
             if(dataChanges.playerAirlinesToAdd == null){
                 dataChanges.playerAirlinesToAdd = new HashMap<>();
             }
-            dataChanges.playerAirlinesToAdd.computeIfAbsent(player, k -> new HashSet<>());
-            return dataChanges.playerAirlinesToAdd.get(player).add(line);
+            dataChanges.playerAirlinesToAdd.computeIfAbsent(gameData.currentPlayer, k -> new HashSet<>());
+            return dataChanges.playerAirlinesToAdd.get(gameData.currentPlayer).add(line);
         }
         return false;
     }
@@ -98,6 +98,17 @@ public class DataChangesCreator {
         dataChanges.availablePlanesToAdd.compute(type, (k,v) -> (v==null) ? amount : v + amount );
     }
 
+    public boolean sellPlane(Integer plane){
+        if(gameData.availablePlanes.containsKey(plane)) {
+            if (dataChanges.availablePlanesToRemove == null) dataChanges.availablePlanesToRemove = new HashMap<>();
+            if (dataChanges.playerPlanesToAdd == null) dataChanges.playerPlanesToAdd = new HashMap<>();
+            dataChanges.playerPlanesToAdd.computeIfAbsent(gameData.currentPlayer, k -> new HashMap<>());
+            dataChanges.playerPlanesToAdd.get(gameData.currentPlayer)
+                .compute(plane, (k,v)->(v==null) ? 1 : v + 1);
+            return true;
+        }
+        return false;
+    }
 
     public void addAmountOfShares (Integer amountOfShares){
         if(dataChanges.playerAmountOfSharesChange == null)
@@ -208,5 +219,31 @@ public class DataChangesCreator {
                     dataChanges.availableAbilitiesToAdd.add(type.getId());
             }
         }
+    }
+
+    public void takeActionPoint(){
+        if(dataChanges.playerActionPointsChange == null) dataChanges.playerActionPointsChange = new HashMap<>();
+        dataChanges.playerActionPointsChange.compute(gameData.currentPlayer,
+            (k,v) -> (v==null) ? -1 : v-1);
+    }
+
+    public void resetActionPoints(){
+        if(dataChanges.playerActionPointsChange == null) dataChanges.playerActionPointsChange = new HashMap<>();
+        for(Player pl : gameData.players){
+            dataChanges.playerActionPointsChange.compute(pl.getId(),
+                (k,v) -> StaticGameData.maxActionsPerTurn - pl.actionPoints );
+        }
+    }
+
+    public void moneyChange(int moneyChange){
+        if(dataChanges.playerMoneyChange == null) dataChanges.playerMoneyChange=new HashMap<>();
+        dataChanges.playerMoneyChange.compute(gameData.currentPlayer, (k,v) -> (v==null) ?
+            moneyChange : v + moneyChange);
+    }
+
+    public void incomeChange(int incomeChange){
+        if(dataChanges.playerIncomeChange == null) dataChanges.playerIncomeChange=new HashMap<>();
+        dataChanges.playerIncomeChange.compute(gameData.currentPlayer, (k,v) -> (v==null) ?
+            incomeChange : v + incomeChange);
     }
 }

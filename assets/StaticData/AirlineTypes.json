@@ -8,7 +8,7 @@
     "maxLuxury": 1.2,
     "minCapacity": null,
     "maxCapacity": 80,
-    "price": 150.0,
+    "price": 150,
     "description": "Basic short commuter route for small turboprops. Low margins but cheap to set up."
   },
   {
@@ -20,7 +20,7 @@
     "maxLuxury": null,
     "minCapacity": null,
     "maxCapacity": 15,
-    "price": 250.0,
+    "price": 250,
     "description": "Exclusive air taxi service. High yield, low gate usage, requires luxury business jets."
   },
   {
@@ -32,7 +32,7 @@
     "maxLuxury": 1.2,
     "minCapacity": 50,
     "maxCapacity": 150,
-    "price": 200.0,
+    "price": 200,
     "description": "Standard regional shuttle. The backbone of short-haul domestic travel."
   },
   {
@@ -44,7 +44,7 @@
     "maxLuxury": 0.85,
     "minCapacity": 100,
     "maxCapacity": null,
-    "price": 120.0,
+    "price": 120,
     "description": "Ultra low-cost short hop. Cram as many passengers as possible into budget planes."
   },
   {
@@ -56,7 +56,7 @@
     "maxLuxury": 1.0,
     "minCapacity": 120,
     "maxCapacity": 200,
-    "price": 300.0,
+    "price": 300,
     "description": "High-density commuter line connecting two closely located major cities."
   },
   {
@@ -68,7 +68,7 @@
     "maxLuxury": null,
     "minCapacity": null,
     "maxCapacity": 50,
-    "price": 180.0,
+    "price": 180,
     "description": "Island hopper or remote region link. Versatile with no strict luxury constraints."
   },
   {
@@ -80,7 +80,7 @@
     "maxLuxury": null,
     "minCapacity": null,
     "maxCapacity": 10,
-    "price": 400.0,
+    "price": 400,
     "description": "VIP helicopter or light jet link between city centers or exclusive hubs."
   },
   {
@@ -92,7 +92,7 @@
     "maxLuxury": 1.0,
     "minCapacity": 20,
     "maxCapacity": 80,
-    "price": 100.0,
+    "price": 100,
     "description": "State-subsidized rural link. Very cheap to buy, modest returns."
   },
   {
@@ -104,7 +104,7 @@
     "maxLuxury": 1.5,
     "minCapacity": 80,
     "maxCapacity": null,
-    "price": 350.0,
+    "price": 350,
     "description": "Hub-feeder route. Uses more gates at the main hub than at the regional destination."
   },
   {
@@ -116,7 +116,7 @@
     "maxLuxury": 2.0,
     "minCapacity": 10,
     "maxCapacity": 50,
-    "price": 220.0,
+    "price": 220,
     "description": "Scenic short tourist route. Requires comfortable, smaller planes for sightseeing."
   },
   {
@@ -128,7 +128,7 @@
     "maxLuxury": 1.2,
     "minCapacity": 80,
     "maxCapacity": 180,
-    "price": 350.0,
+    "price": 350,
     "description": "Standard short-mid haul. Reliable workhorse route for medium distances."
   },
   {
@@ -140,7 +140,7 @@
     "maxLuxury": 0.85,
     "minCapacity": 150,
     "maxCapacity": null,
-    "price": 280.0,
+    "price": 280,
     "description": "Low-cost regional expansion. Needs high capacity and low comfort to turn a profit."
   },
   {
@@ -152,7 +152,7 @@
     "maxLuxury": null,
     "minCapacity": 30,
     "maxCapacity": 80,
-    "price": 450.0,
+    "price": 450,
     "description": "Business express route. Fast, comfortable flights between corporate centers."
   },
   {
@@ -164,7 +164,7 @@
     "maxLuxury": null,
     "minCapacity": 150,
     "maxCapacity": 300,
-    "price": 500.0,
+    "price": 500,
     "description": "Major hub-to-hub connector. High gate usage, moves massive amounts of transit passengers."
   },
   {
@@ -176,7 +176,7 @@
     "maxLuxury": 1.1,
     "minCapacity": 120,
     "maxCapacity": 220,
-    "price": 320.0,
+    "price": 320,
     "description": "Mid-distance tourist charter. Often seasonal, bringing crowds to sunny destinations."
   },
   {
@@ -188,7 +188,7 @@
     "maxLuxury": 2.0,
     "minCapacity": 80,
     "maxCapacity": 150,
-    "price": 400.0,
+    "price": 400,
     "description": "Premium leisure route. Targeted at upper-middle-class vacationers demanding comfort."
   },
   {
@@ -200,7 +200,7 @@
     "maxLuxury": 1.0,
     "minCapacity": 50,
     "maxCapacity": 120,
-    "price": 200.0,
+    "price": 200,
     "description": "Essential mid-distance link connecting underdeveloped areas."
   },
   {
@@ -212,7 +212,7 @@
     "maxLuxury": 1.0,
     "minCapacity": 50,
     "maxCapacity": 100,
-    "price": 380.0,
+    "price": 380,
     "description": "Combi route (passenger and cargo focus). Requires smaller planes with good payload."
   },
   {
@@ -224,7 +224,7 @@
     "maxLuxury": 1.2,
     "minCapacity": 180,
     "maxCapacity": 300,
-    "price": 480.0,
+    "price": 480,
     "description": "Dense domestic mainline. High capacity requirement for moving large domestic populations."
   },
   {
@@ -236,7 +236,7 @@
     "maxLuxury": null,
     "minCapacity": 20,
     "maxCapacity": 60,
-    "price": 600.0,
+    "price": 600,
     "description": "Exclusive resort link. Very high yield, catering to the wealthy elite."
   },
   {
@@ -248,7 +248,7 @@
     "maxLuxury": 1.3,
     "minCapacity": 120,
     "maxCapacity": 250,
-    "price": 400.0,
+    "price": 400,
     "description": "Standard transcontinental route. The classic mid-haul workhorse."
   },
   {
@@ -260,7 +260,7 @@
     "maxLuxury": 0.9,
     "minCapacity": 200,
     "maxCapacity": null,
-    "price": 350.0,
+    "price": 350,
     "description": "High-density cross-country. Cheap tickets, packed planes, high volume."
   },
   {
@@ -272,7 +272,7 @@
     "maxLuxury": null,
     "minCapacity": 50,
     "maxCapacity": 120,
-    "price": 550.0,
+    "price": 550,
     "description": "Premium coast-to-coast. Exclusively for business travelers willing to pay top dollar."
   },
   {
@@ -284,7 +284,7 @@
     "maxLuxury": null,
     "minCapacity": 200,
     "maxCapacity": 400,
-    "price": 600.0,
+    "price": 600,
     "description": "Major hub connector mid-haul. Demands widebody jets and significant gate infrastructure."
   },
   {
@@ -296,7 +296,7 @@
     "maxLuxury": 1.0,
     "minCapacity": 150,
     "maxCapacity": 250,
-    "price": 380.0,
+    "price": 380,
     "description": "Vacation charter mid-haul. Perfect for ferrying large groups to distant beaches."
   },
   {
@@ -308,7 +308,7 @@
     "maxLuxury": 2.5,
     "minCapacity": 80,
     "maxCapacity": 150,
-    "price": 500.0,
+    "price": 500,
     "description": "Mid-haul luxury link. Features lie-flat seats and premium service for discerning passengers."
   },
   {
@@ -320,7 +320,7 @@
     "maxLuxury": 1.2,
     "minCapacity": 100,
     "maxCapacity": 180,
-    "price": 420.0,
+    "price": 420,
     "description": "Regional expansion long route. Connecting secondary cities without stopping at major hubs."
   },
   {
@@ -332,7 +332,7 @@
     "maxLuxury": 0.8,
     "minCapacity": 180,
     "maxCapacity": 250,
-    "price": 300.0,
+    "price": 300,
     "description": "Medium-haul low cost. Uncomfortable but incredibly cheap for the distance."
   },
   {
@@ -344,7 +344,7 @@
     "maxLuxury": null,
     "minCapacity": null,
     "maxCapacity": 20,
-    "price": 700.0,
+    "price": 700,
     "description": "VIP charter mid-haul. Private jets flying international distances."
   },
   {
@@ -356,7 +356,7 @@
     "maxLuxury": 1.5,
     "minCapacity": 150,
     "maxCapacity": 300,
-    "price": 550.0,
+    "price": 550,
     "description": "Flagship domestic route. The pride of national airlines, demanding good capacity and service."
   },
   {
@@ -368,7 +368,7 @@
     "maxLuxury": 1.5,
     "minCapacity": 200,
     "maxCapacity": 350,
-    "price": 800.0,
+    "price": 800,
     "description": "Standard intercontinental route. Connects major global cities across oceans."
   },
   {
@@ -380,7 +380,7 @@
     "maxLuxury": 0.85,
     "minCapacity": 300,
     "maxCapacity": null,
-    "price": 650.0,
+    "price": 650,
     "description": "Budget long-haul. High capacity widebodies with minimal legroom for cheap long-distance travel."
   },
   {
@@ -392,7 +392,7 @@
     "maxLuxury": null,
     "minCapacity": 150,
     "maxCapacity": 250,
-    "price": 1000.0,
+    "price": 1000,
     "description": "Premium transoceanic. High emphasis on business and first-class cabins."
   },
   {
@@ -404,7 +404,7 @@
     "maxLuxury": 1.8,
     "minCapacity": 300,
     "maxCapacity": 500,
-    "price": 1200.0,
+    "price": 1200,
     "description": "Heavy hub-to-hub long haul. Uses massive gate blocks to process thousands of transit passengers."
   },
   {
@@ -416,7 +416,7 @@
     "maxLuxury": 1.1,
     "minCapacity": 250,
     "maxCapacity": 400,
-    "price": 750.0,
+    "price": 750,
     "description": "Long-haul leisure. Taking tourists to distant tropical or exotic resort continents."
   },
   {
@@ -428,7 +428,7 @@
     "maxLuxury": null,
     "minCapacity": 100,
     "maxCapacity": 200,
-    "price": 1100.0,
+    "price": 1100,
     "description": "Direct business link. Bypasses hubs to connect financial capitals with smaller luxury jets."
   },
   {
@@ -440,7 +440,7 @@
     "maxLuxury": 1.0,
     "minCapacity": 250,
     "maxCapacity": 400,
-    "price": 700.0,
+    "price": 700,
     "description": "Diaspora connection. High demand, VFR (Visiting Friends and Relatives) route with basic comfort."
   },
   {
@@ -452,7 +452,7 @@
     "maxLuxury": null,
     "minCapacity": null,
     "maxCapacity": 30,
-    "price": 1500.0,
+    "price": 1500,
     "description": "Long-haul VIP. Government officials and billionaires flying across continents."
   },
   {
@@ -464,7 +464,7 @@
     "maxLuxury": 1.3,
     "minCapacity": 180,
     "maxCapacity": 280,
-    "price": 850.0,
+    "price": 850,
     "description": "Secondary intercontinental. Connecting non-capital cities across oceans using efficient mid-size jets."
   },
   {
@@ -476,7 +476,7 @@
     "maxLuxury": null,
     "minCapacity": 350,
     "maxCapacity": null,
-    "price": 1400.0,
+    "price": 1400,
     "description": "Jumbo-jet exclusive route. Requires massive capacity, serving the busiest global corridors."
   },
   {
@@ -488,7 +488,7 @@
     "maxLuxury": null,
     "minCapacity": 250,
     "maxCapacity": 400,
-    "price": 1500.0,
+    "price": 1500,
     "description": "Ultra-long flagship route. The pinnacle of an airline's network, flying 14+ hours."
   },
   {
@@ -500,7 +500,7 @@
     "maxLuxury": 1.8,
     "minCapacity": 350,
     "maxCapacity": 600,
-    "price": 2000.0,
+    "price": 2000,
     "description": "Global mega-hub connector. Moving the maximum number of people halfway across the globe."
   },
   {
@@ -512,7 +512,7 @@
     "maxLuxury": null,
     "minCapacity": 100,
     "maxCapacity": 200,
-    "price": 2500.0,
+    "price": 2500,
     "description": "Ultra-long business direct. All-business class configurations flying extreme distances."
   },
   {
@@ -524,7 +524,7 @@
     "maxLuxury": 0.9,
     "minCapacity": 300,
     "maxCapacity": null,
-    "price": 1200.0,
+    "price": 1200,
     "description": "Extreme range low-cost. An endurance test for passengers paying rock-bottom prices."
   },
   {
@@ -536,7 +536,7 @@
     "maxLuxury": null,
     "minCapacity": null,
     "maxCapacity": 20,
-    "price": 3500.0,
+    "price": 3500,
     "description": "Presidential/VIP world link. State-of-the-art private jets with limitless luxury."
   },
   {
@@ -548,7 +548,7 @@
     "maxLuxury": 2.5,
     "minCapacity": 200,
     "maxCapacity": 300,
-    "price": 1800.0,
+    "price": 1800,
     "description": "Specialized ultra-long haul. High-yield route requiring specially modified long-range aircraft."
   },
   {
@@ -560,7 +560,7 @@
     "maxLuxury": 1.2,
     "minCapacity": 300,
     "maxCapacity": 450,
-    "price": 1400.0,
+    "price": 1400,
     "description": "Inter-hemisphere tourist route. Connecting winter in one hemisphere to summer in the other."
   },
   {
@@ -572,7 +572,7 @@
     "maxLuxury": 1.5,
     "minCapacity": 250,
     "maxCapacity": 350,
-    "price": 1600.0,
+    "price": 1600,
     "description": "Strategic global route. Essential long-distance link maintaining global commerce."
   },
   {
@@ -584,7 +584,7 @@
     "maxLuxury": null,
     "minCapacity": 30,
     "maxCapacity": 80,
-    "price": 3000.0,
+    "price": 3000,
     "description": "Ultra-luxury global express. Small, hyper-luxurious airliners for elite global transit."
   },
   {
@@ -596,7 +596,7 @@
     "maxLuxury": 1.1,
     "minCapacity": 400,
     "maxCapacity": null,
-    "price": 2200.0,
+    "price": 2200,
     "description": "Maximum capacity world tour. Giant double-decker aircraft connecting massive population centers."
   }
 ]

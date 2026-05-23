@@ -29,6 +29,7 @@ public class StateIterator {
              flags.currentPlayerState = LowLevelHandlerBack.Flags.CurrentPlayerState.NO_PLAYER_STAGE;
              if(round == 1){
                  dataChangesCreator.resetAllAbilities();
+                 dataChangesCreator.resetActionPoints();
                  dataChangesCreator.setDefaultTurnOrder();
              }
         }
@@ -63,6 +64,7 @@ public class StateIterator {
             nonPlayerStateToNonPlayerState(State.WORLD_UPDATE);
             ++round;
             dataChangesCreator.resetAllAbilities();
+            dataChangesCreator.resetActionPoints();
             dataChangesCreator.setCurrentRound(round);
             return round <= StaticGameData.amountOfRounds;
         }

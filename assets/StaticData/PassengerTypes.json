@@ -1,7 +1,7 @@
 [
   {
     "id": 1,
-    "solvency": 1.5,
+    "solvency": 200,
     "size": 5,
     "minLuxury": 1.5,
     "maxLuxury": null,
@@ -16,7 +16,7 @@
   },
   {
     "id": 2,
-    "solvency": 1,
+    "solvency": 100,
     "size": 100,
     "minLuxury": null,
     "maxLuxury": 1.2,

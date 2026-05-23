@@ -43,7 +43,8 @@ public class AirlineTooltipWindow extends Window {
                 public void clicked(InputEvent event, float x, float y) {
                     if (buyButton.isDisabled() || playerMoney < airline.getPrice()) return;
                     System.out.println("Buying route!");
-                    llh.sendBuyAirlineResponse(airline);
+                    if(airline == null) llh.sendAirlinePass();
+                    else llh.sendAirlineResponse(airline, false);
                     uiManager.removeTooltip();
                     uiManager.showSuccessWindow("Airline was bought successfully!");
                 }

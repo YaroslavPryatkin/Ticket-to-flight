@@ -136,14 +136,36 @@ public class Network {
         public GameMessage(){}
     }
 
+    public static enum FinishStatus{
+        NOT_FINISHED,
+        FINISHED,
+        PASS
+    }
+
     public static class PlayerAirlineChoiceResponse extends GameMessage{
-        public PlayerAirlineChoiceResponse(){}
-        public Set<Integer> airlines =null;
+        public int line = 0;
+        public FinishStatus finishStatus;
+        public PlayerAirlineChoiceResponse(int line, boolean isFinish){
+            this.line = line;
+            if(isFinish)
+                finishStatus = FinishStatus.FINISHED;
+            else
+                finishStatus = FinishStatus.NOT_FINISHED;
+        }
+        public PlayerAirlineChoiceResponse(){finishStatus = FinishStatus.PASS;}
     }
 
     public static class PlayerPlaneChoiceResponse extends GameMessage{
-        public PlayerPlaneChoiceResponse(){}
-        public Set<Integer> planes;
+        public int plane;
+        public FinishStatus finishStatus;
+        public PlayerPlaneChoiceResponse(int plane, boolean isFinish){
+            this.plane = plane;
+            if(isFinish)
+                finishStatus = FinishStatus.FINISHED;
+            else
+                finishStatus = FinishStatus.NOT_FINISHED;
+        }
+        public PlayerPlaneChoiceResponse(){finishStatus = FinishStatus.PASS;}
     }
 
     public static class PlayerInvestmentChoiceResponse extends GameMessage{
@@ -156,15 +178,16 @@ public class Network {
      * Sending null means pass
      */
     public static class PlayerAuctionChoiceResponse extends GameMessage {
-        public int betAmount;
+        public int betAmount = 0;
         public boolean isPass;
         public PlayerAuctionChoiceResponse(int betAmount) {this.betAmount = betAmount; this.isPass = false;}
-        public PlayerAuctionChoiceResponse() {this.betAmount = 0; this.isPass = true;}
+        public PlayerAuctionChoiceResponse() {this.isPass = true;}
     }
 
     public static class PlayerAbilityChoiceResponse extends GameMessage{
         public PlayerAbilityChoiceResponse(){}
         public Integer ability =null;
+        public PlayerAbilityChoiceResponse(Integer ability){this.ability = ability;}
     }
 
     public static class PlayerWorldEventChoiceResponse extends GameMessage{

@@ -21,6 +21,8 @@ import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
 import com.game.Ticket_To_Flight.frontend.MainClient;
 import com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.MapStrategies.MapInteractionStrategy;
 
+import java.util.concurrent.ConcurrentLinkedDeque;
+
 public class WorldMapRenderer extends ScreenAdapter {
     private final SpriteBatch batch;
     private final Texture mapTexture;
@@ -38,6 +40,7 @@ public class WorldMapRenderer extends ScreenAdapter {
 
     private final MainClient client;
     private final GameData gameData;
+
 
     public WorldMapRenderer(MainClient client) {
         this.client = client;

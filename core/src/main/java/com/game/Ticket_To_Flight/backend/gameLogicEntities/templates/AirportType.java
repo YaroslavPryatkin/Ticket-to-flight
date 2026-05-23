@@ -6,23 +6,15 @@ import com.game.Ticket_To_Flight.Utilities.Identifiable;
 import com.game.Ticket_To_Flight.commonFrontAndBack.StaticGameData;
 
 public class AirportType extends Identifiable {
-    public final double cost;
+    public final int cost;
     public final int gateAmount;
     public final CityType cityType;
     public final String description;
 
-    public AirportType(int id, double cost, int gateAmount, CityType cityType, String description) {
-        super(id);
-        this.cost = cost;
-        this.gateAmount = gateAmount;
-        this.cityType = cityType;
-        this.description = description;
-    }
-
     @JsonCreator
     public AirportType(
         @JsonProperty("id") int id,
-        @JsonProperty("cost") double cost,
+        @JsonProperty("cost") int cost,
         @JsonProperty("gateAmount") int gateAmount,
         @JsonProperty("cityType") int cityType,
         @JsonProperty("description") String description

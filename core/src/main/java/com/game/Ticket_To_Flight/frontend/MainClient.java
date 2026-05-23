@@ -9,12 +9,15 @@ import com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.WorldMapRenderer
 import com.game.Ticket_To_Flight.network.Network;
 import com.game.Ticket_To_Flight.frontend.LowLevelHandlerFront.Flags;
 
+import java.util.concurrent.ConcurrentLinkedDeque;
+
 public class MainClient {
     private final Game myGame;
     private final GameData gameData = new GameData();
     private final LowLevelHandlerFront llh = new LowLevelHandlerFront(gameData, this);
     private WorldMapRenderer worldMapRenderer;
     private ConnectionRenderer connectionRenderer;
+
 
     public MainClient(Game gm){
         this.myGame = gm;

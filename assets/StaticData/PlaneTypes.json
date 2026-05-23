@@ -9,7 +9,7 @@
     "maxGate": 4,
     "minDist": 500.0,
     "maxDist": 3500.0,
-    "price": 300.0,
+    "price": 300,
     "description": "cool plane"
   },
   {
@@ -22,7 +22,7 @@
     "maxGate": 4,
     "minDist": 500.0,
     "maxDist": 100000.0,
-    "price": 400000.0,
+    "price": 400000,
     "description": "big plane"
   }
 ]

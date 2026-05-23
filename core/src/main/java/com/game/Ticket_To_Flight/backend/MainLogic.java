@@ -11,6 +11,8 @@ import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
 import com.game.Ticket_To_Flight.commonFrontAndBack.StaticGameData;
 import com.game.Ticket_To_Flight.network.Network;
 
+import static com.game.Ticket_To_Flight.network.Network.FinishStatus.*;
+
 public class MainLogic extends MainLoopBack {
     private static MainLogic instance;
 
@@ -118,7 +120,7 @@ public class MainLogic extends MainLoopBack {
                 llh.sendWrongStateError();
             else {
                 Network.PlayerAbilityChoiceResponse resp = (Network.PlayerAbilityChoiceResponse) message;
-                if (StaticGameData.abilityTypes.contains(resp.ability)) {
+                if (resp.ability == null || StaticGameData.abilityTypes.contains(resp.ability)) {
                     if (resp.ability != 0 && gameData.availableAbilities.contains(resp.ability)) {
                         llh.dataChangesCreator.giveAbility(resp.ability);
                         llh.setFinishedStateFlag();
@@ -133,6 +135,34 @@ public class MainLogic extends MainLoopBack {
                 llh.sendWrongStateError();
             else {
                 Network.PlayerPlaneChoiceResponse resp = (Network.PlayerPlaneChoiceResponse) message;
+                if(resp.finishStatus == PASS){
+                    llh.setFinishedStateFlag();
+                }
+                else {
+                    Player pl = gameData.players.get(gameData.currentPlayer);
+                    if (pl.actionPoints > 0) {
+                        if (gameData.availablePlanes.getOrDefault(resp.plane, 0) > 0) {
+                            Integer price = StaticGameData.planeTypes.get(resp.plane).price;
+                            if(pl.money >= price) {
+                                llh.dataChangesCreator.moneyChange(price);
+                                llh.dataChangesCreator.takeActionPoint();
+                                llh.dataChangesCreator.sellPlane(resp.plane);
+                                if (resp.finishStatus == FINISHED) {
+                                    llh.setFinishedStateFlag();
+                                } else {
+                                    llh.setNotFinishedStateFlag();
+                                }
+                            }
+                            else{
+                                llh.sendError("Doesn't have enough money.");
+                            }
+                        } else {
+                            llh.sendError("This plane is unavailable.");
+                        }
+                    } else {
+                        llh.sendError("Not enough action points.");
+                    }
+                }
             }
         }
         else if(message instanceof Network.PlayerAirlineChoiceResponse){
@@ -140,6 +170,26 @@ public class MainLogic extends MainLoopBack {
                 llh.sendWrongStateError();
             else {
                 Network.PlayerAirlineChoiceResponse resp = (Network.PlayerAirlineChoiceResponse) message;
+                if(resp.finishStatus == PASS){
+                    llh.setFinishedStateFlag();
+                }
+                else {
+                    if (gameData.players.get(gameData.currentPlayer).actionPoints > 0) {
+                        if (gameData.availableAirlines.contains(resp.line)) {
+                            llh.dataChangesCreator.takeActionPoint();
+                            llh.dataChangesCreator.sellAirline(resp.line);
+                            if (resp.finishStatus == FINISHED) {
+                                llh.setFinishedStateFlag();
+                            } else {
+                                llh.setNotFinishedStateFlag();
+                            }
+                        } else {
+                            llh.sendError("This airline is unavailable");
+                        }
+                    } else {
+                        llh.sendError("Not enough action points.");
+                    }
+                }
             }
         }
         else if(message instanceof Network.PlayerRouteChoiceResponse){

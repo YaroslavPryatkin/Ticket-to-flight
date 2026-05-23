@@ -2,6 +2,7 @@ package com.game.Ticket_To_Flight.frontend;
 
 import com.esotericsoftware.kryonet.Connection;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airline;
+import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.PlaneType;
 import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
 import com.game.Ticket_To_Flight.commonFrontAndBack.LowLevelHandler;
 import com.game.Ticket_To_Flight.network.Network;
@@ -107,8 +108,8 @@ public class LowLevelHandlerFront extends LowLevelHandler {
         isValidationRunning.set(true);
 
         currentValidationTask = validationExecutor.submit(() -> {
-            boolean isValid = false;
-            GameData.DataChanges change = null;
+            boolean isValid;
+            GameData.DataChanges change;
 
             try {
                 gameData.acquireReadLock();
@@ -276,9 +277,29 @@ public class LowLevelHandlerFront extends LowLevelHandler {
         flags.currentStateState = Flags.CurrentStateState.WAITING_FOR_SERVER_RESPONSE;
     }
 
-
-    public void sendBuyAirlineResponse(Airline airline) {
+    public void sendAirlineResponse(Airline airline,  boolean isFinished){
+        if(airline == null) throw new NullPointerException("Airline should bot be null. To pass call sendAirlinePass()");
+        sendAirlineResponse(airline.getId(), isFinished);
+    }
+    public void sendAirlineResponse(int airline, boolean isFinished) {
+        sendMessageToServer(new Network.PlayerAirlineChoiceResponse(airline, isFinished));
+        flags.currentStateState = Flags.CurrentStateState.WAITING_FOR_SERVER_RESPONSE;
+    }
+    public void sendAirlinePass(){
         sendMessageToServer(new Network.PlayerAirlineChoiceResponse());
+        flags.currentStateState = Flags.CurrentStateState.WAITING_FOR_SERVER_RESPONSE;
+    }
+
+    public void sendPlaneResponse(PlaneType plane, boolean isFinished){
+        if(plane == null) throw new NullPointerException("Plane should bot be null. To pass call sendPlanePass()");
+        sendPlaneResponse(plane.getId(), isFinished);
+    }
+    public void sendPlaneResponse(int plane,  boolean isFinished) {
+        sendMessageToServer(new Network.PlayerPlaneChoiceResponse(plane, isFinished));
+        flags.currentStateState = Flags.CurrentStateState.WAITING_FOR_SERVER_RESPONSE;
+    }
+    public void sendPlanePass(){
+        sendMessageToServer(new Network.PlayerPlaneChoiceResponse());
         flags.currentStateState = Flags.CurrentStateState.WAITING_FOR_SERVER_RESPONSE;
     }
 
