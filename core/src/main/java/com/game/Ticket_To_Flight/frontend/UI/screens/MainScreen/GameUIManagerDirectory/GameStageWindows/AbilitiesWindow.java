@@ -34,34 +34,22 @@ public class AbilitiesWindow extends BaseGameWindow {
         abilityBtnStyle.checkedFontColor = Color.CYAN;
         abilityBtnStyle.disabledFontColor = Color.GRAY;
 
-        List<AbilityType> sortedAbilities = new ArrayList<>();
-        for (AbilityType ability : StaticGameData.abilityTypes) {
-            sortedAbilities.add(ability);
-        }
-
-        sortedAbilities.sort(new Comparator<AbilityType>() {
-            @Override
-            public int compare(AbilityType a1, AbilityType a2) {
-                return Integer.compare(a1.getId(), a2.getId());
-            }
-        });
-
         buttonGroup = new ButtonGroup<>();
         buttonGroup.setMaxCheckCount(1);
         buttonGroup.setMinCheckCount(0);
 
         Table innerTable = new Table();
 
-        int i = 1;
-        for (AbilityType ability : sortedAbilities) {
-            String buttonText = i + ". " + ability.description;
+        for (AbilityType ability : gameData.availableAbilities) {
+            if (ability.getId() == 0)
+                continue;
+            String buttonText = ability.description;
             TextButton abilityBtn = new TextButton(buttonText, abilityBtnStyle);
 
             abilityBtn.setUserObject(ability.getId());
 
             buttonGroup.add(abilityBtn);
             innerTable.add(abilityBtn).width(1100).height(80).padBottom(20).row();
-            i++;
         }
 
         ScrollPane scrollPane = new ScrollPane(innerTable, skin);
@@ -77,8 +65,6 @@ public class AbilitiesWindow extends BaseGameWindow {
                 TextButton selected = buttonGroup.getChecked();
                 if (selected == null) return;
                 int selectedAbilityId = (int) selected.getUserObject();
-
-                System.out.println("Selected ability ID: " + selectedAbilityId);
 
                 llh.sendAbilityResponse(selectedAbilityId);
 

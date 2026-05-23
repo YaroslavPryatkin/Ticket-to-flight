@@ -5,12 +5,17 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.game.Ticket_To_Flight.Utilities.MapHolder;
+import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.PlaneType;
 import com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.GameUIManager;
+
+import java.util.Iterator;
 
 public class PlaneWindow extends Table {
     private final GameUIManager uiManager;
 
     public PlaneWindow(Skin skin, GameUIManager uiManager) {
+
         this.uiManager = uiManager;
 
         final Table overlayWindow = new Table();
