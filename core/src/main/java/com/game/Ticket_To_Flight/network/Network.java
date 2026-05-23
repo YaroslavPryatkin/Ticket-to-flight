@@ -11,8 +11,8 @@ import java.lang.reflect.Type;
 import java.util.*;
 
 public class Network {
-    public static final int TCP_PORT = 54555;
-    public static final int UDP_PORT = 54777;
+    public static final int TCP_PORT = 54678;
+    public static final int UDP_PORT = 54911;
     public static final int timeoutTime = 5000;
 
     //old register

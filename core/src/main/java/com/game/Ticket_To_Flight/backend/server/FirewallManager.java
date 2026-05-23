@@ -1,6 +1,9 @@
-package com.game.Ticket_To_Flight;
+package com.game.Ticket_To_Flight.backend.server;
+
+import com.sun.tools.javac.Main;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
@@ -30,20 +33,28 @@ public class FirewallManager {
         return false;
     }
 
-    private static void createFirewallRule(int tcpPort, int udpPort) {
+    public static void createFirewallRule(int tcpPort, int udpPort) {
+        createRule(RULE_NAME + "_TCP", "TCP", tcpPort);
+        createRule(RULE_NAME + "_UDP", "UDP", udpPort);
+    }
+
+    private static void createRule(String ruleName, String protocol, int port) {
         try {
             String command = String.format(
-                "netsh advfirewall firewall add rule name=\"%s\" dir=in action=allow protocol=ANY localport=%d,%d",
-                RULE_NAME, tcpPort, udpPort
+                "netsh advfirewall firewall add rule name=\"%s\" dir=in action=allow protocol=%s localport=%d",
+                ruleName, protocol, port
             );
 
-            Process p = Runtime.getRuntime().exec(command);
-            p.waitFor();
+            ProcessBuilder pb = new ProcessBuilder("cmd", "/c", command);
+            pb.redirectErrorStream(true);
+            Process p = pb.start();
+            p.getInputStream().transferTo(System.out);
+            int exitCode = p.waitFor();
 
-            if (p.exitValue() == 0) {
-                System.out.println("Правило успешно создано!");
+            if (exitCode == 0) {
+                System.out.println("Rule " + ruleName + " successfully created.");
             } else {
-                System.err.println("Ошибка при создании правила. Запустите программу от имени Администратора.");
+                System.out.println("No admin rights, rule " + ruleName + " was not created. Continuing anyway...");
             }
         } catch (Exception e) {
             e.printStackTrace();

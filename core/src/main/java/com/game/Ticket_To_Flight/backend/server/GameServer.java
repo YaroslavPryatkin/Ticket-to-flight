@@ -13,7 +13,7 @@ public class GameServer {
     private final LowLevelHandler llh;
 
     public GameServer(LowLevelHandler llh) {
-
+        FirewallManager.ensureFirewallRule(Network.TCP_PORT, Network.UDP_PORT);
         this.llh = llh;
         server = new Server();
 
