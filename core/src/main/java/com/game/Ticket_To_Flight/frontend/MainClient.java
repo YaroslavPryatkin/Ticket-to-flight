@@ -2,7 +2,7 @@ package com.game.Ticket_To_Flight.frontend;
 
 import com.badlogic.gdx.Game;
 import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
-import com.game.Ticket_To_Flight.frontend.UI.screens.MainMenu.MainMenuRenderer;
+import com.game.Ticket_To_Flight.MainMenu.MainMenuRenderer;
 import com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.WorldMapRenderer;
 import com.game.Ticket_To_Flight.network.Network;
 import com.game.Ticket_To_Flight.frontend.LowLevelHandlerFront.Flags;
@@ -17,7 +17,7 @@ public class MainClient {
     public MainClient(Game gm){
         this.myGame = gm;
         // this.worldMapRenderer = new WorldMapRenderer(this);
-        this.mainMenuRenderer = new MainMenuRenderer(this);
+        //this.mainMenuRenderer = new MainMenuRenderer(this);
         //this.myGame.setScreen(this.worldMapRenderer);
         this.myGame.setScreen(this.mainMenuRenderer);
         mainCycleWithUpdate(0.0166666f);
