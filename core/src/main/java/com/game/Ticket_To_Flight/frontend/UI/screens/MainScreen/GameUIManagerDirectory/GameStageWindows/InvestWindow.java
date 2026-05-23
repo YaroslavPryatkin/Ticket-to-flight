@@ -1,30 +1,19 @@
-package com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.GameUIManagerDirectory;
+package com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.GameUIManagerDirectory.GameStageWindows;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.Align; // <-- Обязательный импорт для выравнивания
 import com.game.Ticket_To_Flight.frontend.LowLevelHandlerFront;
 import com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.GameUIManager;
+import com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.GameUIManagerDirectory.BaseGameWindow;
 
-public class InvestWindow extends Window {
+public class InvestWindow extends BaseGameWindow {
 
     public InvestWindow(Skin skin, final GameUIManager uiManager, final LowLevelHandlerFront llh) {
-        super("Investing", skin);
-
-        this.setSize(450, 350);
-
-        this.getColor().a = 0.8f;
-
-        this.setMovable(false);
-
-        this.getTitleLabel().setAlignment(Align.center);
-        this.padTop(50);
+        super("Investing", skin, 450, 350);
 
         Label subtitleLabel = new Label("invest your incomes to money", skin);
-
         final Slider slider = new Slider(1, 10, 1, false, skin);
         final Label amountLabel = new Label("1", skin);
 
@@ -44,10 +33,7 @@ public class InvestWindow extends Window {
                 llh.sendInvestmentResponse(investedAmount);
 
                 remove();
-
-                uiManager.setOverlayActive(false);
-
-                uiManager.showSuccessWindow("Income was invested successfully!");
+                uiManager.showSuccessWindow("Your request was sent to server");
             }
         });
 

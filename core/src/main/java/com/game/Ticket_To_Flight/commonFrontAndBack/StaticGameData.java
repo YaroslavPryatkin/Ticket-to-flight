@@ -22,7 +22,7 @@ public class StaticGameData {
     public static Integer maxActionsPerTurn = 5;
     public static Integer maxAmountOfShares = 20;
     public static Integer amountOfRounds = 10;
-    public static Double minimalAuctionBetIncrease = 40.0;
+    public static Integer minimalAuctionBetIncrease = 40;
     public static Integer plusMoneyPerShare = 300;
     public static Integer minusIncomePerShare = 100;
 

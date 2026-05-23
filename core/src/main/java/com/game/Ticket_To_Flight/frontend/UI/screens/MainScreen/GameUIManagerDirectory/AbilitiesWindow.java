@@ -17,7 +17,6 @@ public class AbilitiesWindow extends Table {
     private final ButtonGroup<TextButton> buttonGroup;
 
     public AbilitiesWindow(Skin skin, final GameUIManager uiManager, final LowLevelHandlerFront llh) {
-        uiManager.setOverlayActive(true);
 
         this.setFillParent(true);
         this.setBackground(skin.getDrawable("blue-bg"));
@@ -73,7 +72,6 @@ public class AbilitiesWindow extends Table {
                 System.out.println("Selected ability index: " + selectedIndex);
 
                 remove();
-                uiManager.setOverlayActive(false);
                 uiManager.showSuccessWindow("Ability selected successfully!");
             }
         });

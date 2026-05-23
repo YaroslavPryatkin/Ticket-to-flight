@@ -1,26 +1,18 @@
 package com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.game.Ticket_To_Flight.Utilities.MapHolder;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airline;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airport;
-import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.PassengerType;
 import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
 import com.game.Ticket_To_Flight.frontend.LowLevelHandlerFront;
 import com.game.Ticket_To_Flight.frontend.MainClient;
 import com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.GameUIManagerDirectory.*;
-import com.game.Ticket_To_Flight.network.Network;
-
-import java.util.Iterator;
+import com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.GameUIManagerDirectory.GameStageWindows.AuctionWindow;
+import com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.GameUIManagerDirectory.GameStageWindows.InvestWindow;
+import com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.GameUIManagerDirectory.GameStageWindows.PlaneWindow;
+import com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.GameUIManagerDirectory.GameStageWindows.SuccessWindow;
 
 public class GameUIManager {
     private final Stage uiStage;
@@ -42,11 +34,9 @@ public class GameUIManager {
     private Airline selectedAirline;
     private HUDOverlay hudOverlay;
 
-    private boolean isBuyingPhase = false; // maybe delete
+    private Window window;
 
-    private boolean isOverlayActive = false;
-
-    private InvestWindow investWindow;
+    private boolean blueWindowPrinted = false;
 
     public GameUIManager(Stage uiStage, MainClient client) {
         this.uiStage = uiStage;
@@ -67,6 +57,13 @@ public class GameUIManager {
 
     private void createInvestWindow() {
         skin_invest_window = new StyleFactory().createInvestWindow();
+    }
+
+    private void setPositionForWindow(Window window) {
+        window.setPosition(
+            (uiStage.getWidth() - window.getWidth()) / 2f,
+            (uiStage.getHeight() - window.getHeight()) / 2f
+        );
     }
 
     public void updateHUDData() {
@@ -118,31 +115,42 @@ public class GameUIManager {
     }
 
     public void showAuctionWindow() {
-        uiStage.addActor(new AuctionWindow(skin_invest_window, this, llh));
+        if (blueWindowPrinted)
+            return;
+        if (window != null) {
+            window.remove();
+        }
+
+        window = new AuctionWindow(skin_invest_window, this, llh, gameData);
+        uiStage.addActor(window);
+
+        setPositionForWindow(window);
+        blueWindowPrinted = true;
     }
 
     public void showInvestWindow() {
-        if (investWindow != null) {
-            investWindow.remove();
+        if (blueWindowPrinted)
+            return;
+        if (window != null) {
+            window.remove();
         }
 
-        investWindow = new InvestWindow(skin_invest_window, this, llh);
-        uiStage.addActor(investWindow);
+        window = new InvestWindow(skin_invest_window, this, llh);
+        uiStage.addActor(window);
 
-        investWindow.setPosition(
-            (uiStage.getWidth() - investWindow.getWidth()) / 2f,
-            (uiStage.getHeight() - investWindow.getHeight()) / 2f
-        );
+        setPositionForWindow(window);
+        blueWindowPrinted = true;
     }
 
     public void showSuccessWindow(String message) {
-        SuccessWindow successWindow = new SuccessWindow(skin_default_window, this, "Success");
+        if (window != null) {
+            window.remove();
+        }
 
-        float centerX = (uiStage.getWidth() - successWindow.getWidth()) / 2f;
-        float centerY = (uiStage.getHeight() - successWindow.getHeight()) / 2f;
-        successWindow.setPosition(centerX, centerY);
+        window = new SuccessWindow(skin_default_window, this, message);
+        uiStage.addActor(window);
 
-        uiStage.addActor(successWindow);
+        this.setPositionForWindow(window);
     }
 
     public void showAbilitiesWindow() {
@@ -153,20 +161,13 @@ public class GameUIManager {
         uiStage.addActor(new PlaneWindow(skin_invest_window, this));
     }
 
-    public boolean isOverlayActive() {
-        return isOverlayActive;
-    }
-
-    public void setOverlayActive(boolean b) {
-        isOverlayActive = b;
+    public void setBlueWindowPrinted(boolean blueWindowPrinted) {
+        this.blueWindowPrinted = blueWindowPrinted;
     }
 
     public void resize(int width, int height) {
-        if (investWindow != null && investWindow.getStage() != null) {
-            investWindow.setPosition(
-                (width - investWindow.getWidth()) / 2f,
-                (height - investWindow.getHeight()) / 2f
-            );
+        if (window != null && window.getStage() != null) {
+            setPositionForWindow(window);
         }
     }
 }

@@ -1,4 +1,4 @@
-package com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.GameUIManagerDirectory;
+package com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.GameUIManagerDirectory.GameStageWindows;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -12,7 +12,6 @@ public class PlaneWindow extends Table {
 
     public PlaneWindow(Skin skin, GameUIManager uiManager) {
         this.uiManager = uiManager;
-        uiManager.setOverlayActive(true);
 
         final Table overlayWindow = new Table();
         overlayWindow.setFillParent(true);

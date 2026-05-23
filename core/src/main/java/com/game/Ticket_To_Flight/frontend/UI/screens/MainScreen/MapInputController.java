@@ -77,8 +77,6 @@ public class MapInputController extends InputAdapter {
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        if (uiManager.isOverlayActive()) return true;
-
         Vector3 worldClick = new Vector3(screenX, screenY, 0);
         camera.unproject(worldClick);
 
@@ -101,7 +99,6 @@ public class MapInputController extends InputAdapter {
 
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
-        if (uiManager.isOverlayActive()) return true;
 
         float deltaX = lastMousePos.x - screenX;
         float deltaY = screenY - lastMousePos.y;
@@ -115,7 +112,6 @@ public class MapInputController extends InputAdapter {
 
     @Override
     public boolean scrolled(float amountX, float amountY) {
-        if (uiManager.isOverlayActive()) return true;
         camera.zoom += amountY * 0.1f;
         return true;
     }
