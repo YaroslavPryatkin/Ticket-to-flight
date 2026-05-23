@@ -50,12 +50,7 @@ public class ConnectionUIManager extends Table {
 
                 if (!nickname.isEmpty()) {
                     System.out.println("Nickname submitted: " + nickname);
-
-                    // Раскомментируй, когда сеть будет готова
-                    // if (llh != null) llh.sendJoinRequest(nickname);
-
-                    // СРАЗУ ЖЕ вызываем метод загрузки внутри этого же класса!
-                    showLoadingScreen("Waiting for other players...");
+                    llh.sendJoinRequest(nickname);
                 }
             }
         });

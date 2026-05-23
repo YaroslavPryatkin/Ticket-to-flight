@@ -11,7 +11,7 @@ import com.game.Ticket_To_Flight.frontend.LowLevelHandlerFront.Flags;
 public class MainClient {
     private final Game myGame;
     private final GameData gameData = new GameData();
-    private final LowLevelHandlerFront llh = new LowLevelHandlerFront(gameData);
+    private final LowLevelHandlerFront llh = new LowLevelHandlerFront(gameData, this);
     private WorldMapRenderer worldMapRenderer;
     private ConnectionRenderer connectionRenderer;
 
@@ -81,29 +81,31 @@ public class MainClient {
         if(llh.flags.gamePreparationsState == Flags.GamePreparationsState.WAITING_FOR_CONNECT_CALL) {
             llh.connectToServer();
         }
-        else if(llh.flags.gamePreparationsState == Flags.GamePreparationsState.SEARCHING_FOR_SERVER){
+        else if(llh.flags.gamePreparationsState == Flags.GamePreparationsState.SEARCHING_FOR_SERVER) {
             connectionRenderer.showLoadingScreen("Searching for server");
         }
-        else if(llh.flags.gamePreparationsState == Flags.GamePreparationsState.READY_TO_JOIN_THE_GAME){
-            if(llh.flags.joinGameResponse == null) {
-
-                //ui спросить имя
-                llh.sendJoinRequest("test");
+        else if(llh.flags.gamePreparationsState == Flags.GamePreparationsState.READY_TO_JOIN_THE_GAME) {
+            if (llh.flags.joinGameResponse == null) {
+                connectionRenderer.showNicknameInput();
             }
             else if(llh.flags.joinGameResponse == Network.JoinGameResponse.Response.NAME_ALREADY_EXISTS){
-                //ui спросить игрока еще раз
-                llh.sendJoinRequest("other name");
+                connectionRenderer.setInputIsPrinted(false);
+                connectionRenderer.showNicknameInput();
             }
 
         }
         else if(llh.flags.gamePreparationsState == Flags.GamePreparationsState.WAITING_FOR_SERVER_RESPONSE){
-            //ui крутить колесико
+            connectionRenderer.showLoadingScreen("Waiting for server response");
         }
         else if(llh.flags.gamePreparationsState == Flags.GamePreparationsState.WAITING_FOR_OTHER_PLAYERS_TO_JOIN){
-            //ui ждем игроков
+            connectionRenderer.showLoadingScreen("Waiting for other players");
         }
     }
 
+    public void changeScreenToRunning(){
+        worldMapRenderer = new WorldMapRenderer(this);
+        this.myGame.setScreen(worldMapRenderer);
+    }
 
     public GameData getGameData(){return gameData;}
 

@@ -345,7 +345,8 @@ public class GameData {
             this.playerIncomeChange = MapHolder.merge(
                 this.playerIncomeChange, other.playerIncomeChange, v -> v, DataChanges::sumDoubleOrNull);
 
-            this.playerHasPassedSet.putAll(other.playerHasPassedSet);
+            this.playerHasPassedSet = MapHolder.merge(
+                this.playerHasPassedSet, other.playerHasPassedSet, (f)->f, (f,s)->s);
 
             this.playerActionPointsChange = MapHolder.merge(
                 this.playerActionPointsChange, other.playerActionPointsChange, v -> v, DataChanges::sumIntOrNull);

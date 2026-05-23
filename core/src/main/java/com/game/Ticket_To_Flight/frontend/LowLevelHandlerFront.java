@@ -14,9 +14,10 @@ import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class LowLevelHandlerFront extends LowLevelHandler {
-    private GameClient gameClient = new GameClient(this);
+    private final GameClient gameClient = new GameClient(this);
     private Connection serverCon = null;
     private Integer myId = null;
+    private final MainClient mainClient;
 
     public class Flags{
         public enum GamePreparationsState{
@@ -43,7 +44,8 @@ public class LowLevelHandlerFront extends LowLevelHandler {
 
     public Flags flags = new Flags();
 
-    public LowLevelHandlerFront(GameData data){super(data);}
+    public LowLevelHandlerFront(GameData data,  MainClient mainClient){
+        super(data); this.mainClient = mainClient;}
 
     //------------------------------------- data changes part
     private final ExecutorService validationExecutor = Executors.newSingleThreadExecutor(r -> {
@@ -199,6 +201,7 @@ public class LowLevelHandlerFront extends LowLevelHandler {
         }
         else if(message instanceof Network.StartGameMessage){
             myId = ((Network.StartGameMessage) message).myId;
+            mainClient.changeScreenToRunning();
             flags.gamePreparationsState = Flags.GamePreparationsState.RUNNING;
             System.out.println("game is running");
         }
