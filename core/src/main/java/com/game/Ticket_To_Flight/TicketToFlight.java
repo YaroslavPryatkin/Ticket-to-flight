@@ -7,10 +7,11 @@ import com.game.Ticket_To_Flight.frontend.MainClient;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class TicketToFlight extends Game {
+    private MainLogic logic;
     @Override
     public void create() {
         StaticGameData.loadAllJsons();
-        MainLogic logic = MainLogic.getInstance();
+        logic = MainLogic.getInstance();
         MainClient cl = new MainClient(this);
     }
 }

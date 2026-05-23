@@ -159,7 +159,6 @@ public class WorldMapRenderer extends ScreenAdapter {
     @Override
     public void render(float delta) {
         client.mainCycleWithUpdate(delta);
-        gameData.releaseReadLock();
     }
 
     public void renderNoLogic(float delta) {

@@ -23,58 +23,48 @@ public class MainClient {
         mainCycleWithUpdate(0.0166666f);
     }
 
+
     public void mainCycleWithUpdate(float delta) {
         llh.update();
         gameData.acquireReadLock();
         mainCycle(delta);
+        gameData.releaseReadLock();
     }
 
     private void mainCycle(float delta){
-        if(llh.flags.gamePreparationsState != Flags.GamePreparationsState.RUNNING){
-            GamePreparationStage();
-        }
-        else {
-            if(gameData.currentState == GameData.State.WORLD_UPDATE) {
+        if(llh.flags.gamePreparationsState == Flags.GamePreparationsState.RUNNING) {
+            if (gameData.currentState == GameData.State.WORLD_UPDATE) {
                 //this.myGame.setScreen(this.worldMapRenderer);
-            }
-            else if (gameData.currentState == GameData.State.INVESTMENTS && llh.getMyId() == gameData.currentPlayer) {
+            } else if (gameData.currentState == GameData.State.INVESTMENTS && llh.getMyId() == gameData.currentPlayer) {
                 if (llh.flags.currentStateState == Flags.CurrentStateState.PLAYER_STAGE) {
                     worldMapRenderer.drawInvestmentWindow();
                     llh.flags.currentStateState = LowLevelHandlerFront.Flags.CurrentStateState.WAITING_FOR_PLAYER_CHOICE;
                 }
-            }
-            else if (gameData.currentState == GameData.State.AUCTION && llh.getMyId() == gameData.currentPlayer) {
+            } else if (gameData.currentState == GameData.State.AUCTION && llh.getMyId() == gameData.currentPlayer) {
                 if (llh.flags.currentStateState == Flags.CurrentStateState.PLAYER_STAGE) {
                     worldMapRenderer.drawAuctionWindow();
                     llh.flags.currentStateState = Flags.CurrentStateState.WAITING_FOR_PLAYER_CHOICE;
                 }
                 worldMapRenderer.drawAuctionWindow();
-            }
-            else if (gameData.currentState == GameData.State.ABILITIES && llh.getMyId() == gameData.currentPlayer) {
-               if (llh.flags.currentStateState == Flags.CurrentStateState.PLAYER_STAGE) {
-                   worldMapRenderer.drawAbilitiesWindow();
-                   llh.flags.currentStateState = Flags.CurrentStateState.WAITING_FOR_PLAYER_CHOICE;
-               }
-            }
-            else if (gameData.currentState == GameData.State.PLANES && llh.getMyId() == gameData.currentPlayer) {
+            } else if (gameData.currentState == GameData.State.ABILITIES && llh.getMyId() == gameData.currentPlayer) {
+                if (llh.flags.currentStateState == Flags.CurrentStateState.PLAYER_STAGE) {
+                    worldMapRenderer.drawAbilitiesWindow();
+                    llh.flags.currentStateState = Flags.CurrentStateState.WAITING_FOR_PLAYER_CHOICE;
+                }
+            } else if (gameData.currentState == GameData.State.PLANES && llh.getMyId() == gameData.currentPlayer) {
                 if (llh.flags.currentStateState == Flags.CurrentStateState.PLAYER_STAGE) {
                     worldMapRenderer.drawPlaneWindow();
                     llh.flags.currentStateState = Flags.CurrentStateState.WAITING_FOR_PLAYER_CHOICE;
                 }
-            }
-            else if (gameData.currentState == GameData.State.AIRLINES && llh.getMyId() == gameData.currentPlayer) {
+            } else if (gameData.currentState == GameData.State.AIRLINES && llh.getMyId() == gameData.currentPlayer) {
                 // mainDrawer.reDrawAirlinesWindow();
-            }
-            else if (gameData.currentState == GameData.State.EVENT && llh.getMyId() == gameData.currentPlayer) {
+            } else if (gameData.currentState == GameData.State.EVENT && llh.getMyId() == gameData.currentPlayer) {
                 //mainDrawer.eventWindow();
-            }
-            else if (gameData.currentState == GameData.State.FLIGHTS && llh.getMyId() == gameData.currentPlayer) {
+            } else if (gameData.currentState == GameData.State.FLIGHTS && llh.getMyId() == gameData.currentPlayer) {
                 // smth
-            }
-            else if (gameData.currentState == GameData.State.INCOME && llh.getMyId() == gameData.currentPlayer) {
+            } else if (gameData.currentState == GameData.State.INCOME && llh.getMyId() == gameData.currentPlayer) {
                 // change Income
-            }
-            else if (gameData.currentState == GameData.State.TAXES && llh.getMyId() == gameData.currentPlayer) {
+            } else if (gameData.currentState == GameData.State.TAXES && llh.getMyId() == gameData.currentPlayer) {
                 // Taxes
             }
         }
@@ -82,8 +72,18 @@ public class MainClient {
     }
 
 
+    public void mainPreparationCycle(float delta) {
+        llh.update();
+        gameData.acquireReadLock();
+        GamePreparationStage();
+        gameData.releaseReadLock();
+    }
+
+
     private void GamePreparationStage(){
         if(llh.flags.gamePreparationsState == Flags.GamePreparationsState.WAITING_FOR_CONNECT_CALL){
+            //показать кнопку "найти сервер"
+            //когда нажали
             llh.connectToServer();
         }
         else if(llh.flags.gamePreparationsState == Flags.GamePreparationsState.SEARCHING_FOR_SERVER){

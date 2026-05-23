@@ -264,7 +264,13 @@ public class LowLevelHandlerFront extends LowLevelHandler {
     }
 
     public void sendAuctionResponse(Integer betAmount) {
+        if(betAmount == null)  throw new NullPointerException();
         sendMessageToServer(new Network.PlayerAuctionChoiceResponse(betAmount));
+        flags.currentStateState = Flags.CurrentStateState.WAITING_FOR_SERVER_RESPONSE;
+    }
+
+    public void sendAuctionResponse() {
+        sendMessageToServer(new Network.PlayerAuctionChoiceResponse());
         flags.currentStateState = Flags.CurrentStateState.WAITING_FOR_SERVER_RESPONSE;
     }
 
