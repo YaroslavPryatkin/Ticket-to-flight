@@ -8,19 +8,23 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.game.Ticket_To_Flight.frontend.LowLevelHandlerFront;
+import com.game.Ticket_To_Flight.frontend.MainClient;
 import com.game.Ticket_To_Flight.frontend.UI.screens.ConnectionScreen.ConnectionScreenRenderer.StyleFactoryConnection;
 
 public class ConnectionRenderer extends ScreenAdapter {
     private final Game game;
     private final LowLevelHandlerFront llh;
+    private final MainClient mainClient;
 
     private final Stage uiStage;
     private final Skin skin;
     private final ConnectionUIManager uiManager;
 
-    public ConnectionRenderer(Game game, LowLevelHandlerFront llh) {
+    public ConnectionRenderer(Game game, LowLevelHandlerFront llh, MainClient mainClient) {
         this.game = game;
         this.llh = llh;
+        this.mainClient = mainClient;
+
         this.uiStage = new Stage(new ScreenViewport());
         this.skin = new StyleFactoryConnection().createConnectionSkin();
         this.uiManager = new ConnectionUIManager(skin, llh);
@@ -45,6 +49,8 @@ public class ConnectionRenderer extends ScreenAdapter {
     public void render(float delta) {
         Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+        mainClient.mainPreparationCycle(delta);
 
         uiStage.act(delta);
         uiStage.draw();

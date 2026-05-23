@@ -19,7 +19,7 @@ public class ConnectionUIManager extends Table {
     }
 
     public void showLoadingScreen(String message) {
-        this.clearChildren(); // Очищаем себя от старых элементов (например, от поля ввода)
+        this.clearChildren();
 
         Image loadingIcon = new Image(skin.getDrawable("loading-icon"));
         loadingIcon.setOrigin(Align.center);
@@ -34,7 +34,7 @@ public class ConnectionUIManager extends Table {
     }
 
     public void showNicknameInputScreen() {
-        this.clearChildren(); // Очищаем себя от экрана загрузки
+        this.clearChildren();
 
         Label promptLabel = new Label("Enter your Nickname", skin);
         promptLabel.setFontScale(1.5f);

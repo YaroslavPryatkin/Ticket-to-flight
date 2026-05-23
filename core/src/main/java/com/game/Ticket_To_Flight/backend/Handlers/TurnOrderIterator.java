@@ -14,7 +14,7 @@ public class TurnOrderIterator {
 
     public void reset(Integer abilityId){
         currentPlayerInTurnOrder=-1;
-        playerWithAbility=1;
+        playerWithAbility=-1;
         if(abilityId != null && gameData.turnOrder!=null && !gameData.turnOrder.isEmpty()){
             for(int i=0;i<gameData.turnOrder.size();++i){
                 if(gameData.turnOrder.get(i).ability.getId() == abilityId) {

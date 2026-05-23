@@ -3,6 +3,7 @@ package com.game.Ticket_To_Flight.frontend;
 import com.badlogic.gdx.Game;
 import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
 import com.game.Ticket_To_Flight.MainMenu.MainMenuRenderer;
+import com.game.Ticket_To_Flight.frontend.UI.screens.ConnectionScreen.ConnectionRenderer;
 import com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.WorldMapRenderer;
 import com.game.Ticket_To_Flight.network.Network;
 import com.game.Ticket_To_Flight.frontend.LowLevelHandlerFront.Flags;
@@ -12,17 +13,13 @@ public class MainClient {
     private final GameData gameData = new GameData();
     private final LowLevelHandlerFront llh = new LowLevelHandlerFront(gameData);
     private WorldMapRenderer worldMapRenderer;
-    private MainMenuRenderer mainMenuRenderer;
+    private ConnectionRenderer connectionRenderer;
 
     public MainClient(Game gm){
         this.myGame = gm;
-        // this.worldMapRenderer = new WorldMapRenderer(this);
-        //this.mainMenuRenderer = new MainMenuRenderer(this);
-        //this.myGame.setScreen(this.worldMapRenderer);
-        this.myGame.setScreen(this.mainMenuRenderer);
-        mainCycleWithUpdate(0.0166666f);
+        this.connectionRenderer = new ConnectionRenderer(myGame, llh, this);
+        this.myGame.setScreen(this.connectionRenderer);
     }
-
 
     public void mainCycleWithUpdate(float delta) {
         llh.update();
@@ -80,14 +77,12 @@ public class MainClient {
     }
 
 
-    private void GamePreparationStage(){
-        if(llh.flags.gamePreparationsState == Flags.GamePreparationsState.WAITING_FOR_CONNECT_CALL){
-            //показать кнопку "найти сервер"
-            //когда нажали
+    private void GamePreparationStage() {
+        if(llh.flags.gamePreparationsState == Flags.GamePreparationsState.WAITING_FOR_CONNECT_CALL) {
             llh.connectToServer();
         }
         else if(llh.flags.gamePreparationsState == Flags.GamePreparationsState.SEARCHING_FOR_SERVER){
-            //ui крутить колесико
+            connectionRenderer.showLoadingScreen("Searching for server");
         }
         else if(llh.flags.gamePreparationsState == Flags.GamePreparationsState.READY_TO_JOIN_THE_GAME){
             if(llh.flags.joinGameResponse == null) {
