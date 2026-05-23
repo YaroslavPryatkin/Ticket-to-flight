@@ -76,6 +76,6 @@ public class Airport extends Identifiable {
 
     @Override
     public String toString(){
-        return "Airport " + airportName + " of type " + type.description;
+        return "Airport [" + airportName + "] of type [" + type.getId() + "]";
     }
 }

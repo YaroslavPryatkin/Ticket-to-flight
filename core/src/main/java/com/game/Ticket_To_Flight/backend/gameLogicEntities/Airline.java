@@ -56,6 +56,6 @@ public class Airline extends Identifiable {
 
     @Override
     public String toString(){
-        return "Airline of type [" + type.description + "] connecting airports A: " + portA.getId() + " and B: " + portB.getId();
+        return "Airline of type [" + type.getId() + "] connecting airports A=[" + portA.getId() + "] and B=[" + portB.getId() + "]";
     }
 }

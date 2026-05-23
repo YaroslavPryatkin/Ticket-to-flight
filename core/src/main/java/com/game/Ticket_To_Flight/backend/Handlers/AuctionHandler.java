@@ -52,7 +52,7 @@ public class AuctionHandler {
             dataChangesCreator.returnBetPercent(id, returnPercent(i));
             res.add(id);
         }
-        dataChangesCreator.setTurnOrderInt(res);
+        dataChangesCreator.setTurnOrder(res);
         dataChangesCreator.resetCurrentBet();
         exitList.clear();
     }

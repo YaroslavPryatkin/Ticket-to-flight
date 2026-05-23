@@ -102,13 +102,22 @@ public class DataChangesCreator {
     public void addAmountOfShares (Integer amountOfShares){
         if(dataChanges.playerAmountOfSharesChange == null)
             dataChanges.playerAmountOfSharesChange = new HashMap<>();
-        dataChanges.playerAmountOfSharesChange
-            .compute(gameData.currentPlayer, (k,v)->(v==null) ? amountOfShares : amountOfShares+v);
-    }
+        if(dataChanges.playerMoneyChange == null)
+            dataChanges.playerMoneyChange = new HashMap<>();
+        if(dataChanges.playerIncomeChange == null)
+            dataChanges.playerIncomeChange = new HashMap<>();
 
-    public void setCurrentPLayer(Player pl){
-        if(pl == null) setCurrentPLayer((Integer)null);
-        else setCurrentPLayer(pl.getId());
+        dataChanges.playerAmountOfSharesChange
+            .compute(gameData.currentPlayer, (k,v)->(v==null) ?
+                amountOfShares : amountOfShares+v);
+        dataChanges.playerIncomeChange
+            .compute(gameData.currentPlayer, (k,v)->(v==null) ?
+                -amountOfShares * StaticGameData.minusIncomePerShare :
+                v - amountOfShares * StaticGameData.minusIncomePerShare);
+        dataChanges.playerMoneyChange
+            .compute(gameData.currentPlayer, (k,v)->(v==null) ?
+                amountOfShares * StaticGameData.plusMoneyPerShare :
+                v + amountOfShares * StaticGameData.plusMoneyPerShare);
     }
 
     public void setCurrentPLayer(Integer pl){
@@ -123,15 +132,7 @@ public class DataChangesCreator {
         dataChanges.roundNumber = roundNumber;
     }
 
-    public void setTurnOrderPl(List<Player> newTurnOrder){
-        if(dataChanges.turnOrder == null) dataChanges.turnOrder = new ArrayList<>(gameData.players.size());
-        else dataChanges.turnOrder.clear();
-        for(Player pl : newTurnOrder){
-            dataChanges.turnOrder.add(pl.getId());
-        }
-    }
-
-    public void setTurnOrderInt(List<Integer> newTurnOrder){
+    public void setTurnOrder(List<Integer> newTurnOrder){
         if(dataChanges.turnOrder == null) dataChanges.turnOrder = new ArrayList<>(gameData.players.size());
         else dataChanges.turnOrder.clear();
         dataChanges.turnOrder.addAll(newTurnOrder);
