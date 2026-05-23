@@ -1,6 +1,7 @@
 package com.game.Ticket_To_Flight.frontend;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
 import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
 import com.game.Ticket_To_Flight.MainMenu.MainMenuRenderer;
 import com.game.Ticket_To_Flight.frontend.UI.screens.ConnectionScreen.ConnectionRenderer;
@@ -65,7 +66,7 @@ public class MainClient {
                 // Taxes
             }
         }
-        //worldMapRenderer.renderNoLogic(delta);
+        worldMapRenderer.renderNoLogic(delta);
     }
 
 
@@ -103,8 +104,13 @@ public class MainClient {
     }
 
     public void changeScreenToRunning(){
-        worldMapRenderer = new WorldMapRenderer(this);
-        this.myGame.setScreen(worldMapRenderer);
+        Gdx.app.postRunnable(new Runnable() {
+            @Override
+            public void run() {
+                worldMapRenderer = new WorldMapRenderer(MainClient.this);
+                myGame.setScreen(worldMapRenderer);
+            }
+        });
     }
 
     public GameData getGameData(){return gameData;}

@@ -1,6 +1,8 @@
 package com.game.Ticket_To_Flight.frontend.UI.screens.ConnectionScreen;
 
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -15,7 +17,7 @@ public class ConnectionUIManager extends Table {
     public ConnectionUIManager(Skin skin, LowLevelHandlerFront llh) {
         this.skin = skin;
         this.llh = llh;
-        this.setFillParent(true); // Растягиваем на весь экран
+        this.setFillParent(true);
     }
 
     public void showLoadingScreen(String message) {
@@ -52,6 +54,22 @@ public class ConnectionUIManager extends Table {
                     System.out.println("Nickname submitted: " + nickname);
                     llh.sendJoinRequest(nickname);
                 }
+            }
+        });
+
+        nicknameField.addListener(new InputListener() {
+            @Override
+            public boolean keyDown(InputEvent event, int keycode) {
+                if (keycode == Input.Keys.ENTER || keycode == Input.Keys.NUMPAD_ENTER) {
+                    String nickname = nicknameField.getText().trim();
+
+                    if (!nickname.isEmpty()) {
+                        System.out.println("Nickname submitted via Enter: " + nickname);
+                        llh.sendJoinRequest(nickname);
+                    }
+                    return true;
+                }
+                return false;
             }
         });
 
