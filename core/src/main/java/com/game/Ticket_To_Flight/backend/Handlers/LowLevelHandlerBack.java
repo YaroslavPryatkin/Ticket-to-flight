@@ -22,8 +22,8 @@ public class LowLevelHandlerBack extends LowLevelHandler {
             NO_PLAYER_STAGE,
             WAITING_FOR_RESPONSE,
             ANSWERED,
-            GOOD_RESPONSE,
-            PASSED,
+            NOT_FINISHED_STATE,
+            FINISHED_STATE,
             BAD_RESPONSE
         }
         public volatile CurrentPlayerState currentPlayerState = CurrentPlayerState.NO_PLAYER_STAGE;
@@ -163,6 +163,13 @@ public class LowLevelHandlerBack extends LowLevelHandler {
             addMessage(con, new Network.ErrorMessage(error));
         }
     }
+    public void sendWrongStateError(){
+        flags.currentPlayerState = Flags.CurrentPlayerState.BAD_RESPONSE;
+        Connection con = int2con.get(gameData.currentPlayer);
+        if(con!=null){
+            addMessage(con, Network.ErrorMessage.WRONG_STATE);
+        }
+    }
 
     public Flags.GamePreparationsState getGamePreparationState(){
         return flags.gamePreparationsState;
@@ -172,12 +179,12 @@ public class LowLevelHandlerBack extends LowLevelHandler {
         return flags.currentPlayerState;
     }
 
-    public void setGoodResponseFlag(){
-        flags.currentPlayerState = Flags.CurrentPlayerState.GOOD_RESPONSE;
+    public void setNotFinishedStateFlag(){
+        flags.currentPlayerState = Flags.CurrentPlayerState.NOT_FINISHED_STATE;
     }
 
-    public void setPassFlag(){
-        flags.currentPlayerState = Flags.CurrentPlayerState.PASSED;
+    public void setFinishedStateFlag(){
+        flags.currentPlayerState = Flags.CurrentPlayerState.FINISHED_STATE;
     }
 
     public void setWaitingForResponseFlag(){

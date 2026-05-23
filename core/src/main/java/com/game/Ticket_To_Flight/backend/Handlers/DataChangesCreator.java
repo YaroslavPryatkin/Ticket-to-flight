@@ -3,9 +3,11 @@ package com.game.Ticket_To_Flight.backend.Handlers;
 import com.badlogic.gdx.math.Vector2;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airport;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Player;
+import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.AbilityType;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.AirlineType;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.AirportType;
 import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
+import com.game.Ticket_To_Flight.commonFrontAndBack.StaticGameData;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -177,5 +179,26 @@ public class DataChangesCreator {
         dataChanges.playerAuctionBetChanges.compute(player,
             (k, v) ->  -gameData.players.get(k).auctionBet);
 
+    }
+
+    public void giveAbility(Integer ability){
+        if(dataChanges.availableAbilitiesToRemove == null) dataChanges.availableAbilitiesToRemove = new HashSet<>();
+        if(dataChanges.playerAbilityChoice == null) dataChanges.playerAbilityChoice = new HashMap<>();
+        dataChanges.availableAbilitiesToRemove.add(ability);
+        dataChanges.playerAbilityChoice.put(gameData.currentPlayer, ability);
+    }
+
+    public void resetAllAbilities(){
+        if(dataChanges.availableAbilitiesToAdd == null) dataChanges.availableAbilitiesToAdd = new HashSet<>();
+        if(dataChanges.playerAbilityChoice == null) dataChanges.playerAbilityChoice = new HashMap<>();
+        for(Player pl : gameData.players){
+            dataChanges.playerAbilityChoice.put(pl.getId(), 0);
+        }
+        for(AbilityType type : StaticGameData.abilityTypes){
+            if(type.getId() != 0){
+                if(!gameData.availableAbilities.contains(type))
+                    dataChanges.availableAbilitiesToAdd.add(type.getId());
+            }
+        }
     }
 }

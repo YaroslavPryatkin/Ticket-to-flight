@@ -216,7 +216,7 @@ public class Network {
 
     public static class ErrorMessage extends GameMessage {
         public final static ErrorMessage NOT_YOUR_TURN = new ErrorMessage("Not your turn");
-        public final static ErrorMessage ALREADY_PASSED = new ErrorMessage("Already passed");
+        public final static ErrorMessage WRONG_STATE = new ErrorMessage("Wrong response for current state");
         public final static ErrorMessage ALREADY_ANSWERED = new ErrorMessage("Already answered");
         public ErrorMessage(){}
         private String message = "";

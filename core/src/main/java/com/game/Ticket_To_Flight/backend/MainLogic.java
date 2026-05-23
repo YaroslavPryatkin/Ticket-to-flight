@@ -20,6 +20,11 @@ public class MainLogic extends MainLoopBack {
         return instance;
     }
 
+    public static synchronized void stopServer(){
+        instance.stop();
+        instance = null;
+    }
+
     private MainLogic(){
         super();
     }
@@ -52,10 +57,10 @@ public class MainLogic extends MainLoopBack {
                    //something went wrong
                     llh.setWaitingForResponseFlag();
                 }
-                else if(llh.getCurrentPlayerState() == Flags.CurrentPlayerState.GOOD_RESPONSE){
+                else if(llh.getCurrentPlayerState() == Flags.CurrentPlayerState.NOT_FINISHED_STATE){
                     llh.finishTurnSuccessfully(false);
                 }
-                else if(llh.getCurrentPlayerState() == Flags.CurrentPlayerState.PASSED){
+                else if(llh.getCurrentPlayerState() == Flags.CurrentPlayerState.FINISHED_STATE){
                     llh.finishTurnSuccessfully(true);
                 }
             }
@@ -65,58 +70,88 @@ public class MainLogic extends MainLoopBack {
     @Override
     public void handlePlayerResponse(Network.GameMessage message){
         if(message instanceof Network.PlayerInvestmentChoiceResponse){
-            Network.PlayerInvestmentChoiceResponse resp = (Network.PlayerInvestmentChoiceResponse) message;
-            Integer addedAmountOfShares = resp.amountOfShares;
-            if(addedAmountOfShares == null) {
-                llh.sendError("Could not parse");
-                return;
-            }
-            if(addedAmountOfShares <= 0) {
-                llh.sendError("Amount of shares should be > 0");
-                return;
-            }
-            Player pl = gameData.players.get(gameData.currentPlayer);
-            if(pl.amountOfShares + addedAmountOfShares <= StaticGameData.maxAmountOfShares){
-                llh.dataChangesCreator.addAmountOfShares(addedAmountOfShares);
-                llh.setPassFlag();
-            }
-            else{
-                llh.sendError("Amount of shares should be < maximum amount of shares");
+            if(gameData.currentState != GameData.State.INVESTMENTS)
+                llh.sendWrongStateError();
+            else {
+                Network.PlayerInvestmentChoiceResponse resp = (Network.PlayerInvestmentChoiceResponse) message;
+                Integer addedAmountOfShares = resp.amountOfShares;
+                if (addedAmountOfShares == null) {
+                    llh.sendError("Could not parse");
+                    return;
+                }
+                if (addedAmountOfShares <= 0) {
+                    llh.sendError("Amount of shares should be > 0");
+                    return;
+                }
+                Player pl = gameData.players.get(gameData.currentPlayer);
+                if (pl.amountOfShares + addedAmountOfShares <= StaticGameData.maxAmountOfShares) {
+                    llh.dataChangesCreator.addAmountOfShares(addedAmountOfShares);
+                    llh.setFinishedStateFlag();
+                } else {
+                    llh.sendError("Amount of shares should be < maximum amount of shares");
+                }
             }
         }
         else if(message instanceof Network.PlayerAuctionChoiceResponse){
-            Network.PlayerAuctionChoiceResponse resp = (Network.PlayerAuctionChoiceResponse) message;
-            if(resp.isPass){
-                if(!auctionHandler.pass())
-                    llh.sendError("Already passed");
-                else {
-                    if(auctionHandler.areAllPlayersReady())
-                        auctionHandler.finishAuction();
-                    llh.setPassFlag();
-                }
-            }
+            if(gameData.currentState != GameData.State.AUCTION)
+                llh.sendWrongStateError();
             else {
-                Integer betAmount = resp.betAmount;
-                String betRepl = auctionHandler.canBet(betAmount);
-                if (betRepl == null) {
-                    auctionHandler.bet(betAmount);
-                    llh.setGoodResponseFlag();
+                Network.PlayerAuctionChoiceResponse resp = (Network.PlayerAuctionChoiceResponse) message;
+                if (resp.isPass) {
+                    if (auctionHandler.pass()) {
+                        if (auctionHandler.areAllPlayersReady())
+                            auctionHandler.finishAndResetAuction();
+                        llh.setFinishedStateFlag();
+                    } else {
+                        llh.sendError("Already passed");
+                    }
                 } else {
-                    llh.sendError(betRepl);
+                    Integer betAmount = resp.betAmount;
+                    String betRepl = auctionHandler.canBet(betAmount);
+                    if (betRepl == null) {
+                        auctionHandler.bet(betAmount);
+                        llh.setNotFinishedStateFlag();
+                    } else {
+                        llh.sendError(betRepl);
+                    }
                 }
             }
         }
         else if(message instanceof Network.PlayerAbilityChoiceResponse){
-            Network.PlayerAbilityChoiceResponse resp = (Network.PlayerAbilityChoiceResponse) message;
+            if(gameData.currentState != GameData.State.ABILITIES)
+                llh.sendWrongStateError();
+            else {
+                Network.PlayerAbilityChoiceResponse resp = (Network.PlayerAbilityChoiceResponse) message;
+                if (StaticGameData.abilityTypes.contains(resp.ability)) {
+                    if (resp.ability != 0 && gameData.availableAbilities.contains(resp.ability)) {
+                        llh.dataChangesCreator.giveAbility(resp.ability);
+                        llh.setFinishedStateFlag();
+                    } else
+                        llh.sendError("The chosen ability is unavailable");
+                } else
+                    llh.sendError("Unknown ability id");
+            }
         }
         else if(message instanceof Network.PlayerPlaneChoiceResponse){
-            Network.PlayerPlaneChoiceResponse resp = (Network.PlayerPlaneChoiceResponse) message;
+            if(gameData.currentState != GameData.State.PLANES)
+                llh.sendWrongStateError();
+            else {
+                Network.PlayerPlaneChoiceResponse resp = (Network.PlayerPlaneChoiceResponse) message;
+            }
         }
         else if(message instanceof Network.PlayerAirlineChoiceResponse){
-            Network.PlayerAirlineChoiceResponse resp = (Network.PlayerAirlineChoiceResponse) message;
+            if(gameData.currentState != GameData.State.AIRLINES)
+                llh.sendWrongStateError();
+            else {
+                Network.PlayerAirlineChoiceResponse resp = (Network.PlayerAirlineChoiceResponse) message;
+            }
         }
         else if(message instanceof Network.PlayerRouteChoiceResponse){
-            Network.PlayerRouteChoiceResponse resp = (Network.PlayerRouteChoiceResponse) message;
+            if(gameData.currentState != GameData.State.FLIGHTS)
+                llh.sendWrongStateError();
+            else {
+                Network.PlayerRouteChoiceResponse resp = (Network.PlayerRouteChoiceResponse) message;
+            }
         }
         else throw new IllegalArgumentException("Unknown message");
     }

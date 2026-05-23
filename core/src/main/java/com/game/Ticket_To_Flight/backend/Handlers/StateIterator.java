@@ -27,7 +27,8 @@ public class StateIterator {
             nonPlayerStateToNonPlayerState(State.WORLD_UPDATE);
              dataChangesCreator.setCurrentRound(round);
              flags.currentPlayerState = LowLevelHandlerBack.Flags.CurrentPlayerState.NO_PLAYER_STAGE;
-             if(round == 0){
+             if(round == 1){
+                 dataChangesCreator.resetAllAbilities();
                  dataChangesCreator.setDefaultTurnOrder();
              }
         }
@@ -61,6 +62,7 @@ public class StateIterator {
         else if (gameData.currentState == GameData.State.TAXES) {
             nonPlayerStateToNonPlayerState(State.WORLD_UPDATE);
             ++round;
+            dataChangesCreator.resetAllAbilities();
             dataChangesCreator.setCurrentRound(round);
             return round <= StaticGameData.amountOfRounds;
         }
@@ -74,7 +76,7 @@ public class StateIterator {
      * if not everybody had passed, sets next player. Else moves to the next state.
      * @param nextState state for transfer to
      * @param ability ability to be the first
-     * @param hasPassed костыль
+     * @param hasPassed crutch
      */
     private void playerStateToPlayerState(State nextState, Integer ability, boolean hasPassed){
         if(hasPassed)

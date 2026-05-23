@@ -42,7 +42,7 @@ public class AuctionHandler {
         dataChangesCreator.playerMakeBet(gameData.currentPlayer, amountOfBet);
     }
 
-    public void finishAuction(){
+    public void finishAndResetAuction(){
         List<Integer> res = new ArrayList<>();
         for(int i=exitList.size()-1; i>=0;--i){
             int id = exitList.get(i);

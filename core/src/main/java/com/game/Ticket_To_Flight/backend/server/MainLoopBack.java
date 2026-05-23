@@ -52,7 +52,7 @@ public abstract class MainLoopBack {
         }
     }
 
-    public synchronized void stop() {
+    protected synchronized void stop() {
         if (!isRunning) return;
 
         isRunning = false;
@@ -61,11 +61,8 @@ public abstract class MainLoopBack {
         }
 
         llh.clearAllMessages();
-        afterStop();
     }
 
-
-    protected void afterStop(){};
 
     protected abstract void mainCycle();
 
