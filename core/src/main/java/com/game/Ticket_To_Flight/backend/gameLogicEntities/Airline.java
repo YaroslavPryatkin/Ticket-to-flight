@@ -38,7 +38,7 @@ public class Airline extends Identifiable {
         return player;
     }
 
-    public double getPrice() {
+    public int getPrice() {
         return type.getPrice();
     }
 

@@ -4,6 +4,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.game.Ticket_To_Flight.PresetPaths;
 import com.game.Ticket_To_Flight.backend.Handlers.AuctionHandler;
 import com.game.Ticket_To_Flight.backend.Handlers.WorldMapUpdater;
+import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airline;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Player;
 import com.game.Ticket_To_Flight.backend.server.MainLoopBack;
 import com.game.Ticket_To_Flight.backend.Handlers.LowLevelHandlerBack.Flags;
@@ -120,7 +121,7 @@ public class MainLogic extends MainLoopBack {
                 llh.sendWrongStateError();
             else {
                 Network.PlayerAbilityChoiceResponse resp = (Network.PlayerAbilityChoiceResponse) message;
-                if (resp.ability == null || StaticGameData.abilityTypes.contains(resp.ability)) {
+                if (StaticGameData.abilityTypes.contains(resp.ability)) {
                     if (resp.ability != 0 && gameData.availableAbilities.contains(resp.ability)) {
                         llh.dataChangesCreator.giveAbility(resp.ability);
                         llh.setFinishedStateFlag();
@@ -144,7 +145,7 @@ public class MainLogic extends MainLoopBack {
                         if (gameData.availablePlanes.getOrDefault(resp.plane, 0) > 0) {
                             Integer price = StaticGameData.planeTypes.get(resp.plane).price;
                             if(pl.money >= price) {
-                                llh.dataChangesCreator.moneyChange(price);
+                                llh.dataChangesCreator.moneyChange(-price);
                                 llh.dataChangesCreator.takeActionPoint();
                                 llh.dataChangesCreator.sellPlane(resp.plane);
                                 if (resp.finishStatus == FINISHED) {
@@ -174,14 +175,22 @@ public class MainLogic extends MainLoopBack {
                     llh.setFinishedStateFlag();
                 }
                 else {
-                    if (gameData.players.get(gameData.currentPlayer).actionPoints > 0) {
-                        if (gameData.availableAirlines.contains(resp.line)) {
-                            llh.dataChangesCreator.takeActionPoint();
-                            llh.dataChangesCreator.sellAirline(resp.line);
-                            if (resp.finishStatus == FINISHED) {
-                                llh.setFinishedStateFlag();
-                            } else {
-                                llh.setNotFinishedStateFlag();
+                    Player pl = gameData.players.get(gameData.currentPlayer);
+                    if (pl.actionPoints > 0) {
+                        Airline line = gameData.availableAirlines.get(resp.line);
+                        if (line == null) {
+                            if(pl.money >= line.getPrice()) {
+                                llh.dataChangesCreator.moneyChange(-line.getPrice());
+                                llh.dataChangesCreator.takeActionPoint();
+                                llh.dataChangesCreator.sellAirline(resp.line);
+                                if (resp.finishStatus == FINISHED) {
+                                    llh.setFinishedStateFlag();
+                                } else {
+                                    llh.setNotFinishedStateFlag();
+                                }
+                            }
+                            else{
+                                llh.sendError("Doesn't have enough money.");
                             }
                         } else {
                             llh.sendError("This airline is unavailable");
