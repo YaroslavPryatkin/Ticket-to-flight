@@ -11,6 +11,9 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * static class
+ */
 public class StaticGameData {
     public static SetHolder<AirportType> airportTypes = new SetHolder<AirportType>();
     public static SetHolder<AirlineType> airlineTypes = new SetHolder<AirlineType>();
@@ -25,6 +28,8 @@ public class StaticGameData {
     public static Integer minimalAuctionBetIncrease = 40;
     public static Integer plusMoneyPerShare = 300;
     public static Integer minusIncomePerShare = 100;
+
+    private StaticGameData(){}
 
     private static boolean jsonDownloaded = false;
     private static String jsonFolder = "assets/StaticData";

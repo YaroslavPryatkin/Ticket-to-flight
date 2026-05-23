@@ -4,6 +4,6 @@ import java.util.Map;
 
 public class PresetPaths {
     public static Map<Integer, String> presetPaths = Map.of(
-        1, "Presets/Preset1/"
+        1, "presets/preset1/"
     );
 }

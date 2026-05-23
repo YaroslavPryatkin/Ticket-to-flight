@@ -34,22 +34,19 @@ public class DataChangesCreator {
         return dto.getId();
     }
 
-    public boolean addAirport(int id, AirportType type, Vector2 position, String airportName){
-        return addAirport(id, type.getId(), position, airportName);
+    public void addAirport(int id, Integer type, Integer x, Integer y, String airportName){
+        addAirport(id, type, new Vector2(x,y), airportName);
     }
 
-    public boolean addAirport(int id, Integer type, Vector2 position, String airportName){
+    public void addAirport(int id, Integer type, Vector2 position, String airportName){
         if(dataChanges.airportsToAdd == null){
             dataChanges.airportsToAdd = new HashSet<>();
         }
-        return dataChanges.airportsToAdd.add(new GameData.AirportDTO(id, type, position, airportName));
+        dataChanges.airportsToAdd.add(new GameData.AirportDTO(id, type, position, airportName));
     }
 
-    public boolean addAirline(AirlineType type, Airport portA, Airport portB){
-        return addAirline(type.getId(), portA.getId(), portB.getId());
-    }
 
-    public boolean addAirline(Integer type, Integer portA, Integer portB){
+    public void addAirline(Integer type, Integer portA, Integer portB){
         if(dataChanges.airlinesToAdd == null){
             dataChanges.airlinesToAdd = new HashSet<>();
         }
@@ -57,11 +54,8 @@ public class DataChangesCreator {
             dataChanges.availableAirlinesToAdd = new HashSet<>();
         }
         GameData.AirlineDTO newLine = new GameData.AirlineDTO( type,  portA,  portB);
-        if(dataChanges.airlinesToAdd.add(newLine)){
-            dataChanges.availableAirlinesToAdd.add(newLine.getId());
-            return true;
-        }
-        return false;
+        dataChanges.airlinesToAdd.add(newLine);
+        dataChanges.availableAirlinesToAdd.add(newLine.getId());
     }
 
     public boolean sellAirlineToThePlayer(Integer line, Integer player){
@@ -79,13 +73,13 @@ public class DataChangesCreator {
         return false;
     }
 
-    public void addPassengers (Integer airport, Integer type, Integer amount){
+    public void addPassengers (Integer airport, Integer type){
         if(dataChanges.airportPassengersToAdd == null){
             dataChanges.airportPassengersToAdd = new HashMap<>();
         }
         dataChanges.airportPassengersToAdd.computeIfAbsent(airport, k -> new HashMap<>());
         dataChanges.airportPassengersToAdd.get(airport)
-            .compute(type, (k,v)-> v == null ? amount : v + amount);
+            .compute(type, (k,v)-> v == null ? 1 : v + 1);
 
     }
 
@@ -98,6 +92,12 @@ public class DataChangesCreator {
             .compute(type, (k,v)-> v == null ? amount : v + amount);
 
     }
+
+    public void addAvailablePlanes(Integer type, Integer amount){
+        if(dataChanges.availablePlanesToAdd == null) dataChanges.availablePlanesToAdd = new HashMap<>();
+        dataChanges.availablePlanesToAdd.compute(type, (k,v) -> (v==null) ? amount : v + amount );
+    }
+
 
     public void addAmountOfShares (Integer amountOfShares){
         if(dataChanges.playerAmountOfSharesChange == null)

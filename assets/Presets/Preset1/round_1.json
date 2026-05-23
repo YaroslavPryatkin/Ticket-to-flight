@@ -1,0 +1,51 @@
+{
+  "amountOfAirportsToAddPassengers": 7,
+
+  "airports": [
+    {
+      "id": 1,
+      "type": 101,
+      "x": 100,
+      "y": 100,
+      "name": "Test port 1"
+    },
+    {
+      "id": 2,
+      "type": 102,
+      "x": 200,
+      "y": 200,
+      "name": "Test port 2"
+    },
+    {
+      "id": 3,
+      "type": 103,
+      "x": 100,
+      "y": 200,
+      "name": "Test port 3"
+    }
+  ],
+
+  "airlines": [
+    {
+      "type": 201,
+      "portA": 1,
+      "portB": 2
+    },
+    {
+      "type": 202,
+      "portA": 2,
+      "portB": 3
+    }
+  ],
+
+  "planes": [
+    {
+      "type": 1,
+      "amount": 3
+    },
+    {
+      "type": 2,
+      "amount": 2
+    }
+  ]
+}

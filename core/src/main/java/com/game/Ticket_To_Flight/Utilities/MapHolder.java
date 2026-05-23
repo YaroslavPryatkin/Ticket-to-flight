@@ -800,4 +800,9 @@ public class MapHolder<K extends Identifiable, V> implements Map<Integer, V> {
     }
     @Override public Collection<V> values() { return storage.values(); }
     @Override public Set<Entry<Integer, V>> entrySet() {return storage.entrySet(); }
+    public void printToConsole(){
+        for(Entry<Integer, V> e : storage.entrySet()){
+            System.out.println(e.getKey() + " -> " + e.getValue().toString());
+        }
+    }
 }

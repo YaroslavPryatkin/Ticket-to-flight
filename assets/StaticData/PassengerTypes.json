@@ -1,17 +1,32 @@
 [
   {
-    "id": 201,
+    "id": 1,
     "solvency": 1.5,
-    "size": 2,
-    "minLuxury": 0.5,
-    "maxLuxury": 1.0,
-    "minYield": 10.0,
-    "maxYield": 25.5,
-    "minCapacity": 50,
-    "maxCapacity": 150,
-    "minStations": 1,
-    "maxStations": 3,
-    "typeTo": 1,
-    "description": "Бизнес-класс"
+    "size": 5,
+    "minLuxury": 1.5,
+    "maxLuxury": null,
+    "minYield": 1.0,
+    "maxYield": null,
+    "minCapacity": null,
+    "maxCapacity": 20,
+    "minStations": null,
+    "maxStations": 1,
+    "typeTo": 5,
+    "description": "Business men"
+  },
+  {
+    "id": 2,
+    "solvency": 1,
+    "size": 100,
+    "minLuxury": null,
+    "maxLuxury": 1.2,
+    "minYield": null,
+    "maxYield": null,
+    "minCapacity": null,
+    "maxCapacity": null,
+    "minStations": null,
+    "maxStations": null,
+    "typeTo": 4,
+    "description": "Common people"
   }
 ]

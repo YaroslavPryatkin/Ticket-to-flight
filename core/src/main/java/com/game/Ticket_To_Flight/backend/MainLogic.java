@@ -1,7 +1,9 @@
 package com.game.Ticket_To_Flight.backend;
 
 import com.badlogic.gdx.math.Vector2;
+import com.game.Ticket_To_Flight.PresetPaths;
 import com.game.Ticket_To_Flight.backend.Handlers.AuctionHandler;
+import com.game.Ticket_To_Flight.backend.Handlers.WorldMapUpdater;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Player;
 import com.game.Ticket_To_Flight.backend.server.MainLoopBack;
 import com.game.Ticket_To_Flight.backend.Handlers.LowLevelHandlerBack.Flags;
@@ -30,9 +32,10 @@ public class MainLogic extends MainLoopBack {
     }
 
     private final AuctionHandler auctionHandler = new AuctionHandler(gameData, llh.dataChangesCreator);
+    private final WorldMapUpdater worldMapUpdater = new WorldMapUpdater(
+        PresetPaths.presetPaths.get(1), gameData, llh.dataChangesCreator);
 
 
-    private boolean sentChanges =false;
     @Override
     protected void mainCycle(){
         if(llh.getGamePreparationState() == Flags.GamePreparationsState.WAITING_FOR_PLAYERS){
@@ -41,14 +44,7 @@ public class MainLogic extends MainLoopBack {
         else{
             if(llh.getCurrentPlayerState() == Flags.CurrentPlayerState.NO_PLAYER_STAGE) {
                 if (gameData.currentState == GameData.State.WORLD_UPDATE) {
-                    if (!sentChanges) {
-                        llh.dataChangesCreator.addAirport(1, 101, new Vector2(100, 100), "Test port 1");
-                        llh.dataChangesCreator.addAirport(2, 102, new Vector2(200, 200), "Test port 2");
-                        llh.dataChangesCreator.addAirport(3, 103, new Vector2(100, 200), "Test port 3");
-                        llh.dataChangesCreator.addAirline(201, 1, 2);
-                        llh.dataChangesCreator.addAirline(202, 2, 3);
-                        sentChanges = true;
-                    }
+                    worldMapUpdater.loadRound();
                 }
                 llh.finishTurnSuccessfully(null);
             }

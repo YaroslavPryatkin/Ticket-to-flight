@@ -1,7 +1,7 @@
 [
   {
     "id": 1,
-    "fuel": 4.2,
+    "fuel": 100000,
     "stations": 0,
     "luxury": 1,
     "capacity": 180,
@@ -10,6 +10,19 @@
     "minDist": 500.0,
     "maxDist": 3500.0,
     "price": 300.0,
-    "description": ""
+    "description": "cool plane"
+  },
+  {
+    "id": 2,
+    "fuel": 50000,
+    "stations": 10,
+    "luxury": 1,
+    "capacity": 180,
+    "minGate": 4,
+    "maxGate": 4,
+    "minDist": 500.0,
+    "maxDist": 100000.0,
+    "price": 400000.0,
+    "description": "big plane"
   }
 ]

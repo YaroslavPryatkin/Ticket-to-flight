@@ -153,6 +153,8 @@ public class LowLevelHandlerBack extends LowLevelHandler {
         gameData.airports.printAllToConsole();
         System.out.println("Airlines:");
         gameData.airlines.printAllToConsole();
+        System.out.println("Available Planes");
+        gameData.availablePlanes.printToConsole();
         sendToAllPlayers(new Network.DataChangesMessage(dataChanges));
     }
 
