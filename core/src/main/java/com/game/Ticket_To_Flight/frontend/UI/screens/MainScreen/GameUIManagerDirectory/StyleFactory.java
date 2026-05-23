@@ -10,7 +10,11 @@ public class StyleFactory {
 
     public Skin createBasicWindow() {
         Skin skin = new Skin();
-        skin.add("default-font", new BitmapFont());
+
+        BitmapFont font = new BitmapFont();
+        font.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+        font.getData().setScale(3.5f);
+        skin.add("default-font", font);
 
         Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
         pixmap.setColor(new Color(0.2f, 0.2f, 0.2f, 0.8f));
@@ -47,12 +51,18 @@ public class StyleFactory {
         btnStyle.up = skin.getDrawable("btn-up");
         btnStyle.disabled = skin.getDrawable("btn-disabled");
         skin.add("default", btnStyle);
+
         return skin;
     }
 
     public Skin createInvestWindow() {
         Skin skin = new Skin();
-        skin.add("default-font", new BitmapFont());
+
+        BitmapFont font = new BitmapFont();
+        // Применяем то же сглаживание и масштабирование для синего окна
+        font.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+        font.getData().setScale(3.5f);
+        skin.add("default-font", font);
 
         Pixmap bluePix = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
         bluePix.setColor(new Color(0.1f, 0.2f, 0.5f, 0.85f));

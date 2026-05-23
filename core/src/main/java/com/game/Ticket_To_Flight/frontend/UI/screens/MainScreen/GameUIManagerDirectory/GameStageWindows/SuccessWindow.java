@@ -12,8 +12,9 @@ public class SuccessWindow extends BaseGameWindow {
 
         this.setModal(true);
 
-        this.pad(30);
-        this.padTop(50);
+        this.pad(60);
+
+        this.padTop(120);
 
         Label messageLabel = new Label(message, skin);
 
@@ -26,8 +27,9 @@ public class SuccessWindow extends BaseGameWindow {
             }
         });
 
-        this.add(messageLabel).padBottom(30).row();
-        this.add(closeBtn).width(120).height(40);
+        this.add(messageLabel).padBottom(60).row();
+
+        this.add(closeBtn).width(250).height(80);
 
         this.pack();
     }

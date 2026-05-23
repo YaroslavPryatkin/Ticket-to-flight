@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.game.Ticket_To_Flight.PresetPaths;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airline;
@@ -65,7 +66,7 @@ public class WorldMapRenderer extends ScreenAdapter {
 
         this.camera = new OrthographicCamera();
         this.viewport = new ExtendViewport(WORLD_WIDTH, WORLD_HEIGHT, camera);
-        this.uiStage = new Stage(new ExtendViewport(WORLD_WIDTH, WORLD_HEIGHT));
+        uiStage = new Stage(new FitViewport(1920, 1080));
 
         this.uiManager = new GameUIManager(uiStage, client);
         this.inputCtrl = new MapInputController(camera, gameData, uiManager);
@@ -167,7 +168,9 @@ public class WorldMapRenderer extends ScreenAdapter {
 
         clampCamera();
         camera.update();
-        batch.setProjectionMatrix(camera.combined);
+
+        viewport.apply();
+        batch.setProjectionMatrix(viewport.getCamera().combined);
 
         batch.begin();
         batch.draw(mapTexture, 0, 0, WORLD_WIDTH, WORLD_HEIGHT);
@@ -175,6 +178,8 @@ public class WorldMapRenderer extends ScreenAdapter {
         addAirportsOnTheMap();
         batch.setColor(Color.WHITE);
         batch.end();
+
+        uiStage.getViewport().apply();
 
         uiStage.act(delta);
         uiStage.draw();

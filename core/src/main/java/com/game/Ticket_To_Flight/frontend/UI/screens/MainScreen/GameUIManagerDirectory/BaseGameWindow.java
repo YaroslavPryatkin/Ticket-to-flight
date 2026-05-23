@@ -21,6 +21,7 @@ public abstract class BaseGameWindow extends Window {
         this.getColor().a = 0.8f;
         this.setMovable(false);
         this.getTitleLabel().setAlignment(Align.center);
-        this.padTop(50);
+
+        this.padTop(90);
     }
 }

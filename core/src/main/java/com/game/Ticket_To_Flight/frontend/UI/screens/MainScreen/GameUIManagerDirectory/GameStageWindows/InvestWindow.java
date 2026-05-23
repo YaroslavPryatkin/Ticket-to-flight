@@ -11,7 +11,7 @@ import com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.GameUIManagerDir
 public class InvestWindow extends BaseGameWindow {
 
     public InvestWindow(Skin skin, final GameUIManager uiManager, final LowLevelHandlerFront llh) {
-        super("Investing", skin, 450, 350);
+        super("Investing", skin, 800, 600);
 
         Label subtitleLabel = new Label("invest your incomes to money", skin);
         final Slider slider = new Slider(1, 10, 1, false, skin);
@@ -37,9 +37,9 @@ public class InvestWindow extends BaseGameWindow {
             }
         });
 
-        this.add(subtitleLabel).padBottom(40).row();
-        this.add(slider).width(300).padBottom(10).row();
-        this.add(amountLabel).padBottom(40).row();
-        this.add(submitBtn).width(150).height(50);
+        this.add(subtitleLabel).padBottom(60).row();
+        this.add(slider).width(500).padBottom(20).row();
+        this.add(amountLabel).padBottom(60).row();
+        this.add(submitBtn).width(300).height(80);
     }
 }
