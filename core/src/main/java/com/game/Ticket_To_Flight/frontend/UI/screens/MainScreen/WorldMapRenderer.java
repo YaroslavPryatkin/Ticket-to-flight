@@ -47,7 +47,7 @@ public class WorldMapRenderer extends ScreenAdapter {
 
         this.batch = new SpriteBatch();
 
-        this.mapTexture = new Texture(Gdx.files.internal(PresetPaths.presetPaths.get(1)));
+        this.mapTexture = new Texture(Gdx.files.internal(PresetPaths.presetPaths.get(1)+"map.png"));
 
         int baseRadius = 32;
         Pixmap pixmap = new Pixmap(baseRadius * 2, baseRadius * 2, Pixmap.Format.RGBA8888);
@@ -184,6 +184,7 @@ public class WorldMapRenderer extends ScreenAdapter {
     public void resize(int width, int height) {
         viewport.update(width, height, true);
         uiStage.getViewport().update(width, height, true);
+        uiManager.resize(width, height);
     }
 
     @Override

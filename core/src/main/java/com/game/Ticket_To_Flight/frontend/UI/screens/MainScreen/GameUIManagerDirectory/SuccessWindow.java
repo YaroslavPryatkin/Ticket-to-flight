@@ -23,7 +23,7 @@ public class SuccessWindow extends Window {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 remove();
-                uiManager.setOverlayActive(false);
+                //uiManager.setOverlayActive(false);
             }
         });
 

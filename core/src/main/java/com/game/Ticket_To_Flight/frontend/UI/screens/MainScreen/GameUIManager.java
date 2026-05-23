@@ -46,6 +46,8 @@ public class GameUIManager {
 
     private boolean isOverlayActive = false;
 
+    private InvestWindow investWindow;
+
     public GameUIManager(Stage uiStage, MainClient client) {
         this.uiStage = uiStage;
         this.llh = client.getLlh();
@@ -120,12 +122,20 @@ public class GameUIManager {
     }
 
     public void showInvestWindow() {
-        uiStage.addActor(new InvestWindow(skin_invest_window, this, llh));
+        if (investWindow != null) {
+            investWindow.remove();
+        }
+
+        investWindow = new InvestWindow(skin_invest_window, this, llh);
+        uiStage.addActor(investWindow);
+
+        investWindow.setPosition(
+            (uiStage.getWidth() - investWindow.getWidth()) / 2f,
+            (uiStage.getHeight() - investWindow.getHeight()) / 2f
+        );
     }
 
     public void showSuccessWindow(String message) {
-        isOverlayActive = true;
-
         SuccessWindow successWindow = new SuccessWindow(skin_default_window, this, "Success");
 
         float centerX = (uiStage.getWidth() - successWindow.getWidth()) / 2f;
@@ -149,5 +159,14 @@ public class GameUIManager {
 
     public void setOverlayActive(boolean b) {
         isOverlayActive = b;
+    }
+
+    public void resize(int width, int height) {
+        if (investWindow != null && investWindow.getStage() != null) {
+            investWindow.setPosition(
+                (width - investWindow.getWidth()) / 2f,
+                (height - investWindow.getHeight()) / 2f
+            );
+        }
     }
 }

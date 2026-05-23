@@ -91,11 +91,11 @@ public class StyleFactory {
         TextButton.TextButtonStyle btnStyle = new TextButton.TextButtonStyle();
         btnStyle.font = skin.getFont("default-font");
         btnStyle.fontColor = Color.WHITE;
-        btnStyle.up = skin.getDrawable("dark-bg"); // Будет темная кнопка
+        btnStyle.up = skin.getDrawable("dark-bg");
         skin.add("default", btnStyle);
 
         Pixmap redPix = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
-        redPix.setColor(new Color(0.8f, 0.2f, 0.2f, 0.9f)); // Красный цвет
+        redPix.setColor(new Color(0.8f, 0.2f, 0.2f, 0.9f));
         redPix.fill();
         skin.add("red-bg", new Texture(redPix));
         redPix.dispose();
@@ -104,6 +104,7 @@ public class StyleFactory {
         btnStyleRed.font = skin.getFont("default-font");
         btnStyleRed.fontColor = Color.WHITE;
         btnStyleRed.up = skin.getDrawable("red-bg");
+        skin.add("red", btnStyleRed);
 
         Pixmap btnDisabledPixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
         btnDisabledPixmap.setColor(new Color(0.1f, 0.1f, 0.1f, 0.9f));
@@ -118,17 +119,22 @@ public class StyleFactory {
         scrollKnobPix.dispose();
 
         Pixmap scrollTrackPix = new Pixmap(10, 10, Pixmap.Format.RGBA8888);
-        scrollTrackPix.setColor(new Color(0.1f, 0.1f, 0.1f, 0.5f)); // Полупрозрачный темный фон
+        scrollTrackPix.setColor(new Color(0.1f, 0.1f, 0.1f, 0.5f));
         scrollTrackPix.fill();
         skin.add("scroll-track", new Texture(scrollTrackPix));
         scrollTrackPix.dispose();
 
         ScrollPane.ScrollPaneStyle scrollStyle = new ScrollPane.ScrollPaneStyle();
-        scrollStyle.vScrollKnob = skin.getDrawable("scroll-knob"); // Вертикальный ползунок
-        scrollStyle.vScroll = skin.getDrawable("scroll-track");    // Вертикальная дорожка
+        scrollStyle.vScrollKnob = skin.getDrawable("scroll-knob");
+        scrollStyle.vScroll = skin.getDrawable("scroll-track");
         skin.add("default", scrollStyle);
 
-        skin.add("red", btnStyleRed);
+        Window.WindowStyle windowStyle = new Window.WindowStyle();
+        windowStyle.titleFont = skin.getFont("default-font");
+        windowStyle.titleFontColor = Color.WHITE;
+        windowStyle.background = skin.getDrawable("blue-bg");
+        skin.add("default", windowStyle);
+
         return skin;
     }
 }
