@@ -179,7 +179,7 @@ public class GameData {
         private PlayerDTO(){
             super(0); name = null; money = 0; income = 0; amountOfShares=0;
             actionPoints=0; planes = null; airlines = null; ability = null; color = null;
-            hasPassed = false; auctionBet=null;}
+            hasPassed = false; auctionBet=0;}
         private static final AtomicInteger idGenerator = new AtomicInteger(0);
 
         private final String name;
@@ -187,8 +187,8 @@ public class GameData {
         private final int income;
         private final int amountOfShares;
         private final int actionPoints;
-        private final  boolean hasPassed;
-        private final Integer auctionBet;
+        private final boolean hasPassed;
+        private final int auctionBet;
         private final Map<Integer, Integer> planes;
         private final Set<Integer> airlines;
         private final Integer ability;
@@ -232,7 +232,7 @@ public class GameData {
             ability = null;
             this.color = color;
             this.hasPassed = false;
-            this.auctionBet = null;
+            this.auctionBet = 0;
         }
 
         public Player restore(SetHolder<Airline> lookUpAirlines){
@@ -456,8 +456,8 @@ public class GameData {
         players.changeAsStruct((pl) -> pl.planes,
             Arrays.asList(changes.playerPlanesToAdd, changes.playerPlanesToRemove),
             (f, s)-> f.merge(s,
-                (params)-> {Integer res = params.get(0) - params.get(1); return res == 0 ? null : res;},
-                (old, params)->{Integer res = old+params.get(0) - params.get(1); return res == 0 ? null : res;},
+                (params)-> {int res = params.get(0) - params.get(1); return res == 0 ? null : res;},
+                (old, params)->{int res = old+params.get(0) - params.get(1); return res == 0 ? null : res;},
                 (i)->0
             )
         );
@@ -465,8 +465,8 @@ public class GameData {
         airports.changeAsStruct((pl) -> pl.passengers,
             Arrays.asList(changes.airportPassengersToAdd, changes.airportPassengersToRemove),
             (f, s)-> f.merge(s,
-                (params)-> {Integer res = params.get(0) - params.get(1); return res == 0 ? null : res;},
-                (old, params)->{Integer res = old+params.get(0) - params.get(1); return res == 0 ? null : res;},
+                (params)-> {int res = params.get(0) - params.get(1); return res == 0 ? null : res;},
+                (old, params)->{int res = old+params.get(0) - params.get(1); return res == 0 ? null : res;},
                 (i)->0
             )
         );

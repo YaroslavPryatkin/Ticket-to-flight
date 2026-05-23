@@ -16,7 +16,7 @@ public class Player extends Identifiable {
     public int amountOfShares = 0;
     public int actionPoints = 0;
     public boolean hasPassed = false;
-    public Integer auctionBet = null;
+    public int auctionBet = 0;
     public MapHolder<PlaneType, Integer> planes = new MapHolder<>();
     public SetHolder<Airline> airlines = new SetHolder<>();
     public String name;
