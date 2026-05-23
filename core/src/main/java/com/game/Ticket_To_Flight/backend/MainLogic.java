@@ -106,10 +106,10 @@ public class MainLogic extends MainLoopBack {
                         llh.sendError("Already passed");
                     }
                 } else {
-                    Integer betAmount = resp.betAmount;
-                    String betRepl = auctionHandler.canBet(betAmount);
+                    Integer newPlayerBet = resp.betAmount;
+                    String betRepl = auctionHandler.canBet(newPlayerBet);
                     if (betRepl == null) {
-                        auctionHandler.bet(betAmount);
+                        auctionHandler.bet(newPlayerBet);
                         llh.setNotFinishedStateFlag();
                     } else {
                         llh.sendError(betRepl);
@@ -153,7 +153,9 @@ public class MainLogic extends MainLoopBack {
                 Network.PlayerRouteChoiceResponse resp = (Network.PlayerRouteChoiceResponse) message;
             }
         }
-        else throw new IllegalArgumentException("Unknown message");
+        else{
+            llh.sendUnknownMessageError();
+        }
     }
 
 

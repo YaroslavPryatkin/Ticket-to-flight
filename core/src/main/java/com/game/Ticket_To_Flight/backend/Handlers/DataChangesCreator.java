@@ -157,28 +157,35 @@ public class DataChangesCreator {
         }
     }
 
-    public void playerMakeBet(Integer player, Integer amountOfMoney){
+    public void playerMakeBet(Integer player, Integer playerBetChange){
         if(dataChanges.playerAuctionBetChanges == null) dataChanges.playerAuctionBetChanges = new HashMap<>();
         if(dataChanges.playerMoneyChange == null) dataChanges.playerMoneyChange = new HashMap<>();
         dataChanges.playerMoneyChange.compute(player,
-            (k, v) -> (v==null) ? -amountOfMoney : v-amountOfMoney);
+            (k, v) -> (v==null) ? -playerBetChange : v - playerBetChange);
         dataChanges.playerAuctionBetChanges.compute(player,
-            (k, v) -> (v==null) ? amountOfMoney : v +amountOfMoney);
+            (k, v) -> (v==null) ? playerBetChange : v + playerBetChange);
 
     }
 
-    public void playerReturnBet(Integer player, Double percentage){
+    public void returnBetPercent(Integer player, Double percentage){
         if(dataChanges.playerAuctionBetChanges == null) dataChanges.playerAuctionBetChanges = new HashMap<>();
         if(dataChanges.playerMoneyChange == null) dataChanges.playerMoneyChange = new HashMap<>();
 
         dataChanges.playerMoneyChange.compute(player,
             (k, v) ->  {
-            double amountOfMoney = gameData.players.get(k).auctionBet * percentage;
+            Integer amountOfMoney = (int) Math.floor(gameData.players.get(k).auctionBet * percentage);
             return (v==null) ? amountOfMoney : v + amountOfMoney;
             });
         dataChanges.playerAuctionBetChanges.compute(player,
             (k, v) ->  -gameData.players.get(k).auctionBet);
+    }
 
+    public void setCurrentBet(Integer newCurrentBet){
+        dataChanges.currentBet = newCurrentBet;
+    }
+
+    public void resetCurrentBet(){
+        dataChanges.currentBet = 0;
     }
 
     public void giveAbility(Integer ability){

@@ -170,6 +170,13 @@ public class LowLevelHandlerBack extends LowLevelHandler {
             addMessage(con, Network.ErrorMessage.WRONG_STATE);
         }
     }
+    public void sendUnknownMessageError(){
+        flags.currentPlayerState = Flags.CurrentPlayerState.BAD_RESPONSE;
+        Connection con = int2con.get(gameData.currentPlayer);
+        if(con!=null){
+            addMessage(con, Network.ErrorMessage.UNKNOWN_MESSAGE);
+        }
+    }
 
     public Flags.GamePreparationsState getGamePreparationState(){
         return flags.gamePreparationsState;

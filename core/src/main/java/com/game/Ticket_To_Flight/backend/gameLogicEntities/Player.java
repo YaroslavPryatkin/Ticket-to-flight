@@ -11,8 +11,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class Player extends Identifiable {
     private static final AtomicInteger idGenerator = new AtomicInteger(0);
 
-    public double money = 0;
-    public double income = 0;
+    public int money = 0;
+    public int income = 0;
     public int amountOfShares = 0;
     public int actionPoints = 0;
     public boolean hasPassed = false;
@@ -25,7 +25,7 @@ public class Player extends Identifiable {
 
     //for client
     public Player(
-        int id, double money, double income, int amountOfShares, int actionPoints,
+        int id, int money, int income, int amountOfShares, int actionPoints,
         MapHolder<PlaneType, Integer> planes, SetHolder<Airline> airlines,
         String name, AbilityType ability,  Color color,  boolean hasPassed, Integer auctionBet){
         super(id);
@@ -42,10 +42,10 @@ public class Player extends Identifiable {
         this.auctionBet = auctionBet;
     }
 
-    public Double getIncome() {return income;}
-    public void setIncome(Double val){income = val;}
-    public Double getMoney() {return money;}
-    public void setMoney(Double val) {money = val;}
+    public Integer getIncome() {return income;}
+    public void setIncome(Integer val){income = val;}
+    public Integer getMoney() {return money;}
+    public void setMoney(Integer val) {money = val;}
     public Integer getAmountOfShares() {return amountOfShares;}
     public void setAmountOfShares(Integer val) {amountOfShares = val;}
     public Integer getActionPoints() {return actionPoints;}

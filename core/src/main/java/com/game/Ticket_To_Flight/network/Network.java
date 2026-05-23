@@ -147,18 +147,18 @@ public class Network {
 
     public static class PlayerInvestmentChoiceResponse extends GameMessage{
         public PlayerInvestmentChoiceResponse(){}
-        public Integer amountOfShares = null;
-        public PlayerInvestmentChoiceResponse(Integer shares ){this.amountOfShares = shares;}
+        public int amountOfShares=0;
+        public PlayerInvestmentChoiceResponse(int shares ){this.amountOfShares = shares;}
     }
 
     /**
      * Sending null means pass
      */
     public static class PlayerAuctionChoiceResponse extends GameMessage {
-        public Integer betAmount = null;
-        public Boolean isPass = false;
+        public int betAmount;
+        public boolean isPass;
         public PlayerAuctionChoiceResponse(int betAmount) {this.betAmount = betAmount; this.isPass = false;}
-        public PlayerAuctionChoiceResponse() {this.betAmount = null; this.isPass = true;}
+        public PlayerAuctionChoiceResponse() {this.betAmount = 0; this.isPass = true;}
     }
 
     public static class PlayerAbilityChoiceResponse extends GameMessage{
@@ -218,6 +218,7 @@ public class Network {
         public final static ErrorMessage NOT_YOUR_TURN = new ErrorMessage("Not your turn");
         public final static ErrorMessage WRONG_STATE = new ErrorMessage("Wrong response for current state");
         public final static ErrorMessage ALREADY_ANSWERED = new ErrorMessage("Already answered");
+        public final static ErrorMessage UNKNOWN_MESSAGE = new ErrorMessage("Server received an unknown message");
         public ErrorMessage(){}
         private String message = "";
         public ErrorMessage(String message) {this.message = message;}

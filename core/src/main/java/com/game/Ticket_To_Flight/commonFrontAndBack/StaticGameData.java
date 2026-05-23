@@ -22,7 +22,7 @@ public class StaticGameData {
     public static Integer maxActionsPerTurn = 5;
     public static Integer maxAmountOfShares = 20;
     public static Integer amountOfRounds = 10;
-    public static Double minimalAuctionBet = 30.0;
+    public static Double minimalAuctionBetIncrease = 30.0;
 
     private static boolean jsonDownloaded = false;
     private static String jsonFolder = "assets/StaticData";

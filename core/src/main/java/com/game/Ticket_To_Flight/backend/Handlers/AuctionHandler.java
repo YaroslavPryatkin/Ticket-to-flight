@@ -30,26 +30,30 @@ public class AuctionHandler {
     /**
      * @return null if ok, else error message
      */
-    public String canBet(Integer amountOfBet){
-        if(amountOfBet == null) return "Could not parse";
-        if(amountOfBet < StaticGameData.minimalAuctionBet) return "The bet is less then minimal bet";
+    public String canBet(Integer newPlayerBet){
+        if(newPlayerBet == null) return "Could not parse";
+        if(newPlayerBet < gameData.currentBet + StaticGameData.minimalAuctionBetIncrease)
+            return "The bet increase is less then minimal bet increase";
         Player pl = gameData.players.get(gameData.currentPlayer);
-        if(pl.money < amountOfBet) return "Not enough money";
+        if(pl.money + pl.auctionBet < newPlayerBet) return "Not enough money";
         return null;
     }
 
-    public void bet(Integer amountOfBet){
-        dataChangesCreator.playerMakeBet(gameData.currentPlayer, amountOfBet);
+    public void bet(Integer newPlayerBet){
+        Integer betChange = newPlayerBet - gameData.players.get(gameData.currentPlayer).auctionBet;
+        dataChangesCreator.playerMakeBet(gameData.currentPlayer, betChange);
+        dataChangesCreator.setCurrentBet(newPlayerBet);
     }
 
     public void finishAndResetAuction(){
         List<Integer> res = new ArrayList<>();
         for(int i=exitList.size()-1; i>=0;--i){
             int id = exitList.get(i);
-            dataChangesCreator.playerReturnBet(id, returnPercent(i));
+            dataChangesCreator.returnBetPercent(id, returnPercent(i));
             res.add(id);
         }
         dataChangesCreator.setTurnOrderInt(res);
+        dataChangesCreator.resetCurrentBet();
         exitList.clear();
     }
 
