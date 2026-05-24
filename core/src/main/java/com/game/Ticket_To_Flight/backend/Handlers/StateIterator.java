@@ -9,20 +9,24 @@ public class StateIterator {
     private final DataChangesCreator dataChangesCreator;
     private final TurnOrderIterator turnOrderIterator;
     private final LowLevelHandlerBack.Flags flags;
+    private final LowLevelHandlerBack llh;
     private int round = 1;
 
     public StateIterator(
         GameData gameData,
         DataChangesCreator dataChangesCreator,
-        LowLevelHandlerBack.Flags flags
+        LowLevelHandlerBack.Flags flags,
+        LowLevelHandlerBack llh
     ){
         this.gameData= gameData;
         turnOrderIterator = new TurnOrderIterator(gameData);
         this.dataChangesCreator = dataChangesCreator;
         this.flags = flags;
+        this.llh = llh;
     }
 
-    public boolean nextState(Boolean hasPassed){
+    public boolean nextState(){
+        llh.applyAndSendDataChanges(); // sending changes from main logic
         if(gameData.currentState == GameData.State.NO_STATE){
             nonPlayerStateToNonPlayerState(State.WORLD_UPDATE);
              dataChangesCreator.setCurrentRound(round);
@@ -37,25 +41,27 @@ public class StateIterator {
             nonPlayerStateToPlayerState(State.INVESTMENTS, null);
         }
         else if (gameData.currentState == GameData.State.INVESTMENTS) {
-            playerStateToPlayerState(State.AUCTION, null, hasPassed);
+            playerStateToPlayerState(State.AUCTION, null);
         }
         else if (gameData.currentState == GameData.State.AUCTION) {
-            playerStateToPlayerState(State.ABILITIES, null, hasPassed);
+            // finished auction, which changes turn order, will not brake it since that means all
+            // players have passed and nextPlayer() will return null anyway
+            playerStateToPlayerState(State.ABILITIES, null);
         }
         else if (gameData.currentState == GameData.State.ABILITIES) {
-            playerStateToPlayerState(State.PLANES, 1, hasPassed);
+            playerStateToPlayerState(State.PLANES, 1);
         }
         else if (gameData.currentState == GameData.State.PLANES) {
-             playerStateToPlayerState(State.AIRLINES, 2, hasPassed);
+             playerStateToPlayerState(State.AIRLINES, 2);
         }
         else if (gameData.currentState == GameData.State.AIRLINES) {
-            playerStateToNonPlayerState(State.EVENT, hasPassed);
+            playerStateToNonPlayerState(State.EVENT);
         }
         else if (gameData.currentState == GameData.State.EVENT) {
              nonPlayerStateToPlayerState(State.FLIGHTS, 3);
         }
         else if (gameData.currentState == GameData.State.FLIGHTS) {
-            playerStateToNonPlayerState(State.INCOME, hasPassed);
+            playerStateToNonPlayerState(State.INCOME);
         }
         else if (gameData.currentState == GameData.State.INCOME) {
             nonPlayerStateToNonPlayerState(State.TAXES);
@@ -66,44 +72,37 @@ public class StateIterator {
             dataChangesCreator.resetAllAbilities();
             dataChangesCreator.resetActionPoints();
             dataChangesCreator.setCurrentRound(round);
-            return round <= StaticGameData.amountOfRounds;
         }
         else {
              throw new IllegalArgumentException("Unknown game state");
         }
-        return true;
+        llh.applyAndSendDataChanges(); // sending changes in current player and game state
+        return round <= StaticGameData.amountOfRounds;
     }
 
     /**
      * if not everybody had passed, sets next player. Else moves to the next state.
      * @param nextState state for transfer to
      * @param ability ability to be the first
-     * @param hasPassed crutch
      */
-    private void playerStateToPlayerState(State nextState, Integer ability, boolean hasPassed){
-        if(hasPassed)
-            dataChangesCreator.addHasPassed();
-
+    private void playerStateToPlayerState(State nextState, Integer ability){
         Integer nextPlayer = turnOrderIterator.getNextPlayer();
-        if(nextPlayer != null && !(hasPassed && gameData.currentPlayer.equals(nextPlayer))){
+        if(nextPlayer != null){ // at least one not passed player
             dataChangesCreator.setCurrentPLayer(nextPlayer);
-            flags.currentPlayerState = LowLevelHandlerBack.Flags.CurrentPlayerState.WAITING_FOR_RESPONSE;
+
         }
-        else {
+        else { // everybody passed
             dataChangesCreator.removeAllPassed();
             dataChangesCreator.setCurrentState(nextState);
             turnOrderIterator.reset(ability);
             dataChangesCreator.setCurrentPLayer(turnOrderIterator.getNextPlayer());
-            flags.currentPlayerState = LowLevelHandlerBack.Flags.CurrentPlayerState.WAITING_FOR_RESPONSE;
         }
+        flags.currentPlayerState = LowLevelHandlerBack.Flags.CurrentPlayerState.WAITING_FOR_RESPONSE;
     }
 
-    private void playerStateToNonPlayerState(State nextState, boolean hasPassed){
-        if(hasPassed)
-            dataChangesCreator.addHasPassed();
-
+    private void playerStateToNonPlayerState(State nextState){
         Integer nextPlayer = turnOrderIterator.getNextPlayer();
-        if(nextPlayer != null && !(hasPassed && gameData.currentPlayer.equals(nextPlayer))){
+        if(nextPlayer != null){
             dataChangesCreator.setCurrentPLayer(nextPlayer);
             flags.currentPlayerState = LowLevelHandlerBack.Flags.CurrentPlayerState.WAITING_FOR_RESPONSE;
         }
@@ -126,5 +125,7 @@ public class StateIterator {
         dataChangesCreator.setCurrentState(nextState);
         dataChangesCreator.setCurrentPLayer(-1);
     }
+
+
 
 }

@@ -12,7 +12,7 @@ import java.util.*;
 public class LowLevelHandlerBack extends LowLevelHandler {
     private final GameServer gameClient = new GameServer(this);
     private final MainLoopBack logic;
-    public class Flags {
+    public static class Flags {
         public enum GamePreparationsState {
             WAITING_FOR_PLAYERS,
             RUNNING
@@ -22,21 +22,20 @@ public class LowLevelHandlerBack extends LowLevelHandler {
             NO_PLAYER_STAGE,
             WAITING_FOR_RESPONSE,
             ANSWERED,
-            NOT_FINISHED_STATE,
-            FINISHED_STATE,
+            GOOD_RESPONSE,
             BAD_RESPONSE
         }
         public volatile CurrentPlayerState currentPlayerState = CurrentPlayerState.NO_PLAYER_STAGE;
     }
 
-    private LowLevelHandlerBack.Flags flags = new LowLevelHandlerBack.Flags();
+    private final LowLevelHandlerBack.Flags flags = new LowLevelHandlerBack.Flags();
 
     private final Map<Integer, Connection> int2con = new HashMap<>();
     private final Map<Connection, Integer> con2int = new HashMap<>();
 
     public final DataChangesCreator dataChangesCreator = new DataChangesCreator(gameData);
     private final GameStarter gameStarter = new GameStarter();
-    private final StateIterator stateIterator = new StateIterator(gameData, dataChangesCreator, flags);
+    private final StateIterator stateIterator = new StateIterator(gameData, dataChangesCreator, flags, this);
 
     public LowLevelHandlerBack(GameData data,  MainLoopBack logic){super(data); this.logic = logic;}
 
@@ -70,7 +69,7 @@ public class LowLevelHandlerBack extends LowLevelHandler {
 
     }
 
-    private boolean sendToAllPlayers(Network.GameMessage message) {
+   private boolean sendToAllPlayers(Network.GameMessage message) {
         boolean res = true;
         for (Connection con : int2con.values()) {
             if (con != null && con.isConnected()) {
@@ -102,6 +101,26 @@ public class LowLevelHandlerBack extends LowLevelHandler {
 
         return true;
     }
+
+
+
+    void applyAndSendDataChanges(){
+        GameData.DataChanges dataChanges = dataChangesCreator.takeDataChanges();
+        gameData.applyChangesUnsafe(dataChanges);
+        System.out.println("Changes were applied, current game data:");
+        System.out.println("Current state = " + gameData.currentState);
+        System.out.println("Current player = " + gameData.currentPlayer);
+        System.out.println("Players:");
+        gameData.players.printAllToConsole();
+        System.out.println("Airports:");
+        gameData.airports.printAllToConsole();
+        System.out.println("Airlines:");
+        gameData.airlines.printAllToConsole();
+        System.out.println("Available Planes");
+        gameData.availablePlanes.printToConsole();
+        sendToAllPlayers(new Network.DataChangesMessage(dataChanges));
+    }
+
     //------------------------------------- messages part
 
     //------------------------------------- update part
@@ -135,27 +154,9 @@ public class LowLevelHandlerBack extends LowLevelHandler {
         }
     }
 
-    public void finishTurnSuccessfully(Boolean hasPassed){
-        if(!stateIterator.nextState(hasPassed))
+    public void finishTurnSuccessfully(){
+        if(!stateIterator.nextState())
             System.out.println("Game finished");
-        applyAndSendDataChanges();
-    }
-
-    public void applyAndSendDataChanges(){
-        GameData.DataChanges dataChanges = dataChangesCreator.takeDataChanges();
-        gameData.applyChangesUnsafe(dataChanges);
-        System.out.println("Changes were applied, current game data:");
-        System.out.println("Current state = " + gameData.currentState);
-        System.out.println("Current player = " + gameData.currentPlayer);
-        System.out.println("Players:");
-        gameData.players.printAllToConsole();
-        System.out.println("Airports:");
-        gameData.airports.printAllToConsole();
-        System.out.println("Airlines:");
-        gameData.airlines.printAllToConsole();
-        System.out.println("Available Planes");
-        gameData.availablePlanes.printToConsole();
-        sendToAllPlayers(new Network.DataChangesMessage(dataChanges));
     }
 
     public void sendError(String error){
@@ -188,16 +189,18 @@ public class LowLevelHandlerBack extends LowLevelHandler {
         return flags.currentPlayerState;
     }
 
-    public void setNotFinishedStateFlag(){
-        flags.currentPlayerState = Flags.CurrentPlayerState.NOT_FINISHED_STATE;
+    public void playerFinished(){
+        dataChangesCreator.addHasPassed();
+        flags.currentPlayerState = Flags.CurrentPlayerState.GOOD_RESPONSE;
+    }
+    public void playerNotFinished(){
+        flags.currentPlayerState = Flags.CurrentPlayerState.GOOD_RESPONSE;
     }
 
-    public void setFinishedStateFlag(){
-        flags.currentPlayerState = Flags.CurrentPlayerState.FINISHED_STATE;
-    }
-
+    //temporary. When route handling is added, should be deleted
     public void setWaitingForResponseFlag(){
         flags.currentPlayerState = Flags.CurrentPlayerState.WAITING_FOR_RESPONSE;
     }
+
     //------------------------------------- for use in main logic
 }

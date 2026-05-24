@@ -10,12 +10,11 @@ import java.io.IOException;
 
 public class GameServer {
     private final Server server;
-    private final LowLevelHandler llh;
+
 
     public GameServer(LowLevelHandler llh) {
         FirewallManager.ensureFirewallRule(Network.TCP_PORT, Network.UDP_PORT);
-        this.llh = llh;
-        server = new Server();
+        server = new Server(Network.writeBufferSize, Network.objectBufferSize);
 
         Network.register(server);
 

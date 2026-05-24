@@ -13,11 +13,9 @@ import java.net.UnknownHostException;
 
 public class GameClient {
     private final Client client;
-    private final LowLevelHandler llh;
 
     public GameClient(LowLevelHandler llh) {
-        this.llh = llh;
-        client = new Client();
+        client = new Client(Network.writeBufferSize, Network.objectBufferSize);
         Network.register(client);
 
         client.addListener(new Listener() {

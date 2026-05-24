@@ -72,16 +72,16 @@ public class SetHolder<T extends Identifiable> implements Set<T> {
      * @param function function to apply
      * @return this
      */
-    public <V> SetHolder<T> changeAsStruct(
-        Function<T, V> getField,
+    public <C, V> SetHolder<T> changeAsStruct(
+        Function<T, C> getField,
         Map<Integer, V> other,
-        BiConsumer<V, V> function
+        BiConsumer<C, V> function
     ) {
         if(getField == null || other == null || function == null) return this;
         for (Map.Entry<Integer, V> entry : other.entrySet()) {
             T realItem = this.get(entry.getKey());
             if (realItem != null) {
-                V currentValue = getField.apply(realItem);
+                C currentValue = getField.apply(realItem);
 
                 // Mutate the inner structure of the field
                 function.accept(currentValue, entry.getValue());
@@ -152,10 +152,10 @@ public class SetHolder<T extends Identifiable> implements Set<T> {
      * or if the checkFunction fails for any object.
      * Note: no checking is done to ensure this[key].getField() != null
      */
-    public <V> boolean checkChangeAsStruct(
-        Function<T, V> getField,
+    public <C, V> boolean checkChangeAsStruct(
+        Function<T, C> getField,
         Map<Integer, V> other,
-        BiPredicate<V, V> checkFunction
+        BiPredicate<C, V> checkFunction
     ) {
         if(other == null) return true;
         if(checkFunction == null || getField == null) return false;
@@ -166,7 +166,7 @@ public class SetHolder<T extends Identifiable> implements Set<T> {
                 return false;
             }
 
-            V currentValue = getField.apply(realItem);
+            C currentValue = getField.apply(realItem);
             // 2. Validate the specific logic via the provided predicate
             if (!checkFunction.test(currentValue, entry.getValue())) {
                 return false;
@@ -176,32 +176,6 @@ public class SetHolder<T extends Identifiable> implements Set<T> {
         return true;
     }
 
-
-    /**
-     * Applies a modifying function to a specific field of the objects.
-     * Useful for mutable field objects (like internal collections or wrappers).
-     * @return this
-     */
-    public <V> SetHolder<T> changeAsStructType(
-        Function<T, V> getField,
-        List<Map<T, V>> params,
-        BiConsumer<V, List<V>> function
-    ) {
-        Set<T> allKeys = collectAllKeysType(params);
-
-        for (T key : allKeys) {
-            // Get the actual stored instance using the ID of the key
-            T realItem = this.get(key);
-            if (realItem != null) {
-                V currentValue = getField.apply(realItem);
-                List<V> paramValues = collectParamValuesType(key, params);
-
-                // Mutate the inner structure of the field
-                function.accept(currentValue, paramValues);
-            }
-        }
-        return this;
-    }
 
     /**
      * Applies a modifying function to a specific field of the objects.
@@ -967,35 +941,9 @@ public class SetHolder<T extends Identifiable> implements Set<T> {
      * @return result of the check. If false, then not all changes will be applied
      */
     public boolean checkChangeSetIILookUp(Set<Integer> toAdd, Set<Integer> toRemove, SetHolder<T> lookUp) {
-        return SetHolder.checkChangeSetIILookUp(this, toAdd, toRemove, lookUp);
-    }
-
-
-    // --- Static change set methods ---
-
-
-    /**
-     * All allowed combinations of an element containing in this, toAdd, toRemove are: <br>
-     * this, toAdd, toRemove -> toAdd ----- delete old one, add new one <br>
-     * this, toRemove -> null ------------- delete old one <br>
-     * toAdd, toRemove -> null ------------ add new one and immediately delete <br>
-     * this -> this ----------------------- nothing changed <br>
-     * toAdd -> toAdd --------------------- add new one <br>
-     * Not allowed combinations are: <br>
-     * this, toAdd -> this ---------------- trying to add a copy <br>
-     * toRemove -> null ------------------- removing non-existing <br>
-     * In case of adding, the id of added element must exist in lookUp
-     * @param current "this" set
-     * @param toAdd a set to add
-     * @param toRemove a set to remove
-     * @param lookUp a holder of actual objects from toAdd
-     * @return result of the check. If false, then not all changes will be applied
-     */
-    public static <T extends Identifiable> boolean checkChangeSetIILookUp(Set<T> current, Set<Integer> toAdd, Set<Integer> toRemove, SetHolder<T> lookUp) {
-        if(current == null) return false;
         if (toAdd != null && toRemove != null) {
             for (Integer id : toAdd) {
-                boolean inThis = current.contains(id);
+                boolean inThis = this.contains(id);
                 boolean inRem = toRemove.contains(id);
 
                 if (inThis && !inRem) return false;
@@ -1005,20 +953,21 @@ public class SetHolder<T extends Identifiable> implements Set<T> {
                 }
             }
             for (Integer id : toRemove) {
-                if (!current.contains(id) && !toAdd.contains(id)) return false;
+                if (!this.contains(id) && !toAdd.contains(id)) return false;
             }
         } else if (toAdd != null) {
             for (Integer id : toAdd) {
-                if (current.contains(id)) return false;
+                if (this.contains(id)) return false;
                 if (lookUp.get(id) == null) return false;
             }
         } else if (toRemove != null) {
             for (Integer id : toRemove) {
-                if (!current.contains(id)) return false;
+                if (!this.contains(id)) return false;
             }
         }
         return true;
     }
+
 
     public void printAllToConsole(){
         for(Map.Entry<Integer, T> e : storage.entrySet()){
