@@ -1,9 +1,12 @@
 package com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.GameUIManagerDirectory;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.NinePatch;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 
 public class StyleFactory {
@@ -11,32 +14,21 @@ public class StyleFactory {
     public Skin createBasicWindow() {
         Skin skin = new Skin();
 
-        BitmapFont font = new BitmapFont();
-        font.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
-        font.getData().setScale(3.5f);
-        skin.add("default-font", font);
+        skin.add("default-font", generateCustomFont(42));
 
-        Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
-        pixmap.setColor(new Color(0.2f, 0.2f, 0.2f, 0.8f));
-        pixmap.fill();
-        skin.add("background", new Texture(pixmap));
+        Color windowBgColor = new Color(0.18f, 0.18f, 0.20f, 0.95f);
+        Color buttonNormalColor = new Color(0.35f, 0.35f, 0.38f, 1f);
+        Color buttonDownColor = new Color(0.25f, 0.25f, 0.28f, 1f);
+        Color disabledColor = new Color(0.15f, 0.15f, 0.18f, 0.8f);
 
-        Pixmap btnPixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
-        btnPixmap.setColor(new Color(0.4f, 0.4f, 0.4f, 1f));
-        btnPixmap.fill();
-        skin.add("btn-up", new Texture(btnPixmap));
-
-        Pixmap btnDisabledPixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
-        btnDisabledPixmap.setColor(new Color(0.1f, 0.1f, 0.1f, 0.9f));
-        btnDisabledPixmap.fill();
-        skin.add("btn-disabled", new Texture(btnDisabledPixmap));
-
-        pixmap.dispose();
-        btnPixmap.dispose();
-        btnDisabledPixmap.dispose();
+        skin.add("background", createRoundedPatch(windowBgColor, 16));
+        skin.add("btn-up", createRoundedPatch(buttonNormalColor, 12));
+        skin.add("btn-down", createRoundedPatch(buttonDownColor, 12));
+        skin.add("btn-disabled", createRoundedPatch(disabledColor, 12));
 
         Window.WindowStyle windowStyle = new Window.WindowStyle();
         windowStyle.titleFont = skin.getFont("default-font");
+        windowStyle.titleFontColor = Color.WHITE;
         windowStyle.background = skin.getDrawable("background");
         skin.add("default", windowStyle);
 
@@ -48,50 +40,95 @@ public class StyleFactory {
         TextButton.TextButtonStyle btnStyle = new TextButton.TextButtonStyle();
         btnStyle.font = skin.getFont("default-font");
         btnStyle.fontColor = Color.WHITE;
+        btnStyle.downFontColor = Color.LIGHT_GRAY;
         btnStyle.up = skin.getDrawable("btn-up");
+        btnStyle.down = skin.getDrawable("btn-down");
+        btnStyle.checked = skin.getDrawable("btn-down");
         btnStyle.disabled = skin.getDrawable("btn-disabled");
         skin.add("default", btnStyle);
 
         return skin;
     }
 
+    private BitmapFont generateCustomFont(int size) {
+        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("ui/Rubik-Medium.ttf"));
+        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+        parameter.size = size;
+        parameter.color = Color.WHITE;
+        parameter.minFilter = Texture.TextureFilter.Linear;
+        parameter.magFilter = Texture.TextureFilter.Linear;
+        parameter.shadowColor = new Color(0, 0, 0, 0.5f);
+        parameter.shadowOffsetX = 2;
+        parameter.shadowOffsetY = 2;
+
+        BitmapFont font = generator.generateFont(parameter);
+        generator.dispose();
+        return font;
+    }
+
+    private NinePatch createRoundedPatch(Color color, int radius) {
+        int size = radius * 2 + 2;
+        Pixmap pixmap = new Pixmap(size, size, Pixmap.Format.RGBA8888);
+        pixmap.setBlending(Pixmap.Blending.None);
+        pixmap.setColor(color);
+
+        pixmap.fillCircle(radius, radius, radius);
+        pixmap.fillCircle(size - radius - 1, radius, radius);
+        pixmap.fillCircle(radius, size - radius - 1, radius);
+        pixmap.fillCircle(size - radius - 1, size - radius - 1, radius);
+
+        pixmap.fillRectangle(radius, 0, size - 2 * radius, size);
+        pixmap.fillRectangle(0, radius, size, size - 2 * radius);
+
+        Texture texture = new Texture(pixmap);
+        texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+        pixmap.dispose();
+
+        return new NinePatch(texture, radius, radius, radius, radius);
+    }
+
+    private Texture createCircleTexture(Color color, int radius) {
+        int size = radius * 2;
+        Pixmap pixmap = new Pixmap(size, size, Pixmap.Format.RGBA8888);
+        pixmap.setBlending(Pixmap.Blending.None);
+        pixmap.setColor(color);
+        pixmap.fillCircle(radius, radius, radius);
+
+        Texture texture = new Texture(pixmap);
+        texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+        pixmap.dispose();
+
+        return texture;
+    }
+
     public Skin createInvestWindow() {
         Skin skin = new Skin();
 
-        BitmapFont font = new BitmapFont();
-        // Применяем то же сглаживание и масштабирование для синего окна
-        font.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
-        font.getData().setScale(3.5f);
-        skin.add("default-font", font);
+        skin.add("default-font", generateCustomFont(42));
 
-        Pixmap bluePix = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
-        bluePix.setColor(new Color(0.1f, 0.2f, 0.5f, 0.85f));
-        bluePix.fill();
-        skin.add("blue-bg", new Texture(bluePix));
-        bluePix.dispose();
+        Color windowBgColor = new Color(0.15f, 0.20f, 0.28f, 0.95f);
+        Color buttonNormalColor = new Color(0.16f, 0.50f, 0.73f, 1f);
+        Color buttonCheckedColor = new Color(0.10f, 0.35f, 0.53f, 1f);
+        Color buttonRedColor = new Color(0.90f, 0.30f, 0.26f, 1f);
+        Color disabledColor = new Color(0.3f, 0.3f, 0.3f, 0.8f);
 
-        Pixmap sliderKnob = new Pixmap(20, 20, Pixmap.Format.RGBA8888);
-        sliderKnob.setColor(Color.CYAN);
-        sliderKnob.fillCircle(10, 10, 10);
-        skin.add("slider-knob", new Texture(sliderKnob));
-        sliderKnob.dispose();
+        skin.add("blue-bg", createRoundedPatch(windowBgColor, 16));
+        skin.add("dark-bg", createRoundedPatch(buttonNormalColor, 12));
+        skin.add("blue-bg-checked", createRoundedPatch(buttonCheckedColor, 12));
+        skin.add("red-bg", createRoundedPatch(buttonRedColor, 12));
+        skin.add("btn-disabled", createRoundedPatch(disabledColor, 12));
 
-        Pixmap darkPix = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
-        darkPix.setColor(new Color(0.1f, 0.1f, 0.1f, 0.9f));
-        darkPix.fill();
-        skin.add("dark-bg", new Texture(darkPix));
-        darkPix.dispose();
+        skin.add("slider-track", createRoundedPatch(new Color(0.1f, 0.1f, 0.1f, 1f), 6));
+        skin.add("slider-knob", createCircleTexture(Color.CYAN, 12));
 
-        Pixmap sliderTrackPix = new Pixmap(100, 10, Pixmap.Format.RGBA8888);
-        sliderTrackPix.setColor(new Color(0.2f, 0.2f, 0.2f, 1f));
-        sliderTrackPix.fill();
-        skin.add("slider-track", new Texture(sliderTrackPix));
-        sliderTrackPix.dispose();
+        skin.add("scroll-track", createRoundedPatch(new Color(0.05f, 0.05f, 0.05f, 0.5f), 5));
+        skin.add("scroll-knob", createRoundedPatch(Color.LIGHT_GRAY, 5));
 
-        Slider.SliderStyle sliderStyle = new Slider.SliderStyle();
-        sliderStyle.background = skin.getDrawable("slider-track");
-        sliderStyle.knob = skin.getDrawable("slider-knob");
-        skin.add("default-horizontal", sliderStyle);
+        Window.WindowStyle windowStyle = new Window.WindowStyle();
+        windowStyle.titleFont = skin.getFont("default-font");
+        windowStyle.titleFontColor = Color.WHITE;
+        windowStyle.background = skin.getDrawable("blue-bg");
+        skin.add("default", windowStyle);
 
         Label.LabelStyle labelStyle = new Label.LabelStyle();
         labelStyle.font = skin.getFont("default-font");
@@ -101,49 +138,33 @@ public class StyleFactory {
         TextButton.TextButtonStyle btnStyle = new TextButton.TextButtonStyle();
         btnStyle.font = skin.getFont("default-font");
         btnStyle.fontColor = Color.WHITE;
+        btnStyle.downFontColor = Color.LIGHT_GRAY;
         btnStyle.up = skin.getDrawable("dark-bg");
+        btnStyle.down = skin.getDrawable("blue-bg-checked");
+        btnStyle.checked = skin.getDrawable("blue-bg-checked");
+        btnStyle.disabled = skin.getDrawable("btn-disabled");
         skin.add("default", btnStyle);
-
-        Pixmap redPix = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
-        redPix.setColor(new Color(0.8f, 0.2f, 0.2f, 0.9f));
-        redPix.fill();
-        skin.add("red-bg", new Texture(redPix));
-        redPix.dispose();
 
         TextButton.TextButtonStyle btnStyleRed = new TextButton.TextButtonStyle();
         btnStyleRed.font = skin.getFont("default-font");
         btnStyleRed.fontColor = Color.WHITE;
+        btnStyleRed.downFontColor = Color.LIGHT_GRAY;
         btnStyleRed.up = skin.getDrawable("red-bg");
+        btnStyleRed.down = skin.getDrawable("blue-bg-checked");
+        btnStyleRed.disabled = skin.getDrawable("btn-disabled");
         skin.add("red", btnStyleRed);
 
-        Pixmap btnDisabledPixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
-        btnDisabledPixmap.setColor(new Color(0.1f, 0.1f, 0.1f, 0.9f));
-        btnDisabledPixmap.fill();
-        skin.add("btn-disabled", new Texture(btnDisabledPixmap));
-        btnDisabledPixmap.dispose();
-
-        Pixmap scrollKnobPix = new Pixmap(10, 10, Pixmap.Format.RGBA8888);
-        scrollKnobPix.setColor(Color.LIGHT_GRAY);
-        scrollKnobPix.fill();
-        skin.add("scroll-knob", new Texture(scrollKnobPix));
-        scrollKnobPix.dispose();
-
-        Pixmap scrollTrackPix = new Pixmap(10, 10, Pixmap.Format.RGBA8888);
-        scrollTrackPix.setColor(new Color(0.1f, 0.1f, 0.1f, 0.5f));
-        scrollTrackPix.fill();
-        skin.add("scroll-track", new Texture(scrollTrackPix));
-        scrollTrackPix.dispose();
+        Slider.SliderStyle sliderStyle = new Slider.SliderStyle();
+        sliderStyle.background = skin.getDrawable("slider-track");
+        sliderStyle.knob = skin.getDrawable("slider-knob");
+        skin.add("default-horizontal", sliderStyle);
 
         ScrollPane.ScrollPaneStyle scrollStyle = new ScrollPane.ScrollPaneStyle();
         scrollStyle.vScrollKnob = skin.getDrawable("scroll-knob");
         scrollStyle.vScroll = skin.getDrawable("scroll-track");
+        scrollStyle.hScrollKnob = skin.getDrawable("scroll-knob");
+        scrollStyle.hScroll = skin.getDrawable("scroll-track");
         skin.add("default", scrollStyle);
-
-        Window.WindowStyle windowStyle = new Window.WindowStyle();
-        windowStyle.titleFont = skin.getFont("default-font");
-        windowStyle.titleFontColor = Color.WHITE;
-        windowStyle.background = skin.getDrawable("blue-bg");
-        skin.add("default", windowStyle);
 
         return skin;
     }
