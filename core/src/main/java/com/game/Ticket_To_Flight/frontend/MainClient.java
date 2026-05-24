@@ -34,7 +34,10 @@ public class MainClient {
 
     private void mainCycle(float delta){
         if(llh.flags.gamePreparationsState == Flags.GamePreparationsState.RUNNING) {
-            if (gameData.currentState == GameData.State.WORLD_UPDATE) {
+            if(llh.flags.currentStateState == Flags.CurrentStateState.SERVER_DISCONNECTED){
+                //stop game and return to connecting screen
+            }
+            else if (gameData.currentState == GameData.State.WORLD_UPDATE) {
                 this.myGame.setScreen(this.worldMapRenderer);
             } else if (gameData.currentState == GameData.State.INVESTMENTS && llh.getMyId() == gameData.currentPlayer) {
                 if (llh.flags.currentStateState == Flags.CurrentStateState.PLAYER_STAGE) {

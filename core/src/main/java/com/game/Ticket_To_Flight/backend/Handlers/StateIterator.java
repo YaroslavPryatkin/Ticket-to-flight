@@ -1,5 +1,7 @@
 package com.game.Ticket_To_Flight.backend.Handlers;
 
+import com.esotericsoftware.kryonet.Connection;
+import com.game.Ticket_To_Flight.backend.gameLogicEntities.Player;
 import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
 import com.game.Ticket_To_Flight.commonFrontAndBack.GameData.State;
 import com.game.Ticket_To_Flight.commonFrontAndBack.StaticGameData;
@@ -126,6 +128,10 @@ public class StateIterator {
         dataChangesCreator.setCurrentPLayer(-1);
     }
 
+    private void removeAllDisconnectedPlayers(){
+        for(Player pl : gameData.players){
 
+        }
+    }
 
 }

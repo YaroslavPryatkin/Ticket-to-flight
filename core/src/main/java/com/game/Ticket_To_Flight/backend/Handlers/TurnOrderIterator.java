@@ -9,11 +9,11 @@ public class TurnOrderIterator {
     private int currentPlayerInTurnOrder = -1;
     private int playerWithAbility = -1;
 
-    public TurnOrderIterator(GameData gameData){
+    TurnOrderIterator(GameData gameData){
         this.gameData = gameData;
     }
 
-    public void reset(Integer abilityId){
+    void reset(Integer abilityId){
         currentPlayerInTurnOrder=-1;
         playerWithAbility=-1;
         if(abilityId != null && gameData.turnOrder!=null && !gameData.turnOrder.isEmpty()){
@@ -26,7 +26,7 @@ public class TurnOrderIterator {
         }
     }
 
-    public Integer getNextPlayer(){
+    Integer getNextPlayer(){
         if(gameData.turnOrder == null || gameData.turnOrder.isEmpty()) return null;
 
         int size = gameData.turnOrder.size();
@@ -52,5 +52,17 @@ public class TurnOrderIterator {
                 return currentPlayerInTurnOrder - 1;
             return currentPlayerInTurnOrder;
         }
+    }
+
+    void removePlayer(int indexToRemove){
+        if (playerWithAbility != -1) {
+            if (indexToRemove == playerWithAbility) {
+                playerWithAbility = -1;
+            } else if (indexToRemove < playerWithAbility) {
+                --playerWithAbility;
+            }
+        }
+        if(indexToRemove <= currentPlayerInTurnOrder)
+            --currentPlayerInTurnOrder;
     }
 }

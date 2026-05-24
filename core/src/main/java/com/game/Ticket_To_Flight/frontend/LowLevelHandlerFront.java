@@ -38,7 +38,8 @@ public class LowLevelHandlerFront extends LowLevelHandler {
             PLAYER_STAGE,
             WAITING_FOR_PLAYER_CHOICE,
             WAITING_FOR_SERVER_RESPONSE,
-            RECEIVED_ERROR_MESSAGE
+            RECEIVED_ERROR_MESSAGE,
+            SERVER_DISCONNECTED
         }
         public volatile CurrentStateState currentStateState = CurrentStateState.NOT_IN_GAME;
         public volatile String errorMessage = null;
@@ -74,8 +75,10 @@ public class LowLevelHandlerFront extends LowLevelHandler {
         try {
             checkedChanges = null;
             gameData.clearGameData();
-            gameData.applyChangesUnsafe(dataChanges);
-            changeFlagDependingOnNewState(dataChanges.currentState);
+            if(dataChanges != null) {
+                gameData.applyChangesUnsafe(dataChanges);
+                changeFlagDependingOnNewState(dataChanges.currentState);
+            }
         } catch (Exception e) {
             dataInconsistent();
         } finally {
@@ -85,6 +88,10 @@ public class LowLevelHandlerFront extends LowLevelHandler {
 
 
     public void updateChanges() {
+        if(!isConnected()){
+            resetGameData(null);
+            return;
+        }
         if (checkedChanges != null) {
             gameData.acquireWriteLock();
             try {
@@ -184,8 +191,17 @@ public class LowLevelHandlerFront extends LowLevelHandler {
     }
 
     @Override
+    public void handleDisconnection(Connection con){
+        if(con.equals(serverCon)){
+            serverCon = null;
+            flags.currentStateState = Flags.CurrentStateState.SERVER_DISCONNECTED;
+            flags.gamePreparationsState = Flags.GamePreparationsState.WAITING_FOR_CONNECT_CALL;
+        }
+    }
+
+    @Override
     protected void handleIncomingMessage(Connection con, Network.GameMessage message){
-        if(con!=serverCon) return;
+        if(!con.equals(serverCon)) return;
 
         if(message instanceof Network.DataChangesMessage){
             changesQueue.offer(((Network.DataChangesMessage) message).dc);
@@ -243,6 +259,7 @@ public class LowLevelHandlerFront extends LowLevelHandler {
         if(flags.gamePreparationsState != Flags.GamePreparationsState.WAITING_FOR_CONNECT_CALL) return false;
         //System.out.println("Looking for server");
         flags.gamePreparationsState = Flags.GamePreparationsState.SEARCHING_FOR_SERVER;
+        flags.currentStateState = Flags.CurrentStateState.NOT_IN_GAME;
         gameClient.connect();
 
         if(!isConnected()) {

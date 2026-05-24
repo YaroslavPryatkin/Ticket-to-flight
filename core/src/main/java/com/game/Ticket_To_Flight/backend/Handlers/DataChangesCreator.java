@@ -31,6 +31,10 @@ public class DataChangesCreator {
         return dto.getId();
     }
 
+    void removePlayer(Integer id){
+
+    }
+
     void addAirport(int id, Integer type, Integer x, Integer y, String airportName){
         addAirport(id, type, new Vector2(x,y), airportName);
     }
@@ -256,4 +260,5 @@ public class DataChangesCreator {
         dataChanges.playerIncomeChange.compute(gameData.currentPlayer, (k,v) -> (v==null) ?
             -incomeLoss : v - incomeLoss);
     }
+
 }

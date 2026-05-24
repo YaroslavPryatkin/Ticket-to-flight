@@ -42,6 +42,12 @@ public abstract class LowLevelHandler {
      */
     public abstract void handleNewConnection(Connection con);
 
+    /**
+     * called by network thread when connection is lost
+     */
+    public abstract void handleDisconnection(Connection con);
+
+
     public void clearWaitingMessages() {
         sendMessageQueue.clear();
     }

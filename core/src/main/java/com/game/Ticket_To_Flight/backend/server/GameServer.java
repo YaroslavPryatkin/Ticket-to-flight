@@ -28,6 +28,9 @@ public class GameServer {
             public void received(Connection connection, Object object) {
                 llh.receiveMessage(connection, object);
             }
+
+            @Override
+            public void disconnected(Connection connection) {llh.handleDisconnection(connection);}
         });
         start();
     }

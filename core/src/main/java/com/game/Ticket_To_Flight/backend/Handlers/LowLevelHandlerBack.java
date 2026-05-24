@@ -8,6 +8,7 @@ import com.game.Ticket_To_Flight.commonFrontAndBack.LowLevelHandler;
 import com.game.Ticket_To_Flight.network.Network;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class LowLevelHandlerBack extends LowLevelHandler {
     private final GameServer gameClient = new GameServer(this);
@@ -30,8 +31,8 @@ public class LowLevelHandlerBack extends LowLevelHandler {
 
     private final LowLevelHandlerBack.Flags flags = new LowLevelHandlerBack.Flags();
 
-    private final Map<Integer, Connection> int2con = new HashMap<>();
-    private final Map<Connection, Integer> con2int = new HashMap<>();
+    final Map<Integer, Connection> int2con = new ConcurrentHashMap<>();
+    final Map<Connection, Integer> con2int = new ConcurrentHashMap<>();
 
     public final DataChangesCreator dataChangesCreator = new DataChangesCreator(gameData);
     private final GameStarter gameStarter = new GameStarter();
@@ -48,6 +49,23 @@ public class LowLevelHandlerBack extends LowLevelHandler {
     }
 
     @Override
+    public void handleDisconnection(Connection con) {
+        Integer playerId = con2int.remove(con);
+        int2con.remove(con);
+
+        if (playerId == null) {
+            return;
+        }
+
+        if (gameData.currentPlayer != null && gameData.currentPlayer.equals(playerId)) {
+            flags.currentPlayerState = Flags.CurrentPlayerState.GOOD_RESPONSE;
+            dataChangesCreator.addHasPassed();
+        }
+
+        System.out.println("Player " + playerId + " disconnected");
+    }
+
+        @Override
     protected void handleIncomingMessage(Connection con, Network.GameMessage message){
         if(message instanceof Network.JoinGameRequest) {
             Network.JoinGameRequest req = (Network.JoinGameRequest) message;
