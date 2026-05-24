@@ -178,7 +178,7 @@ public class MainLogic extends MainLoopBack {
                     Player pl = gameData.players.get(gameData.currentPlayer);
                     if (pl.actionPoints > 0) {
                         Airline line = gameData.availableAirlines.get(resp.line);
-                        if (line == null) {
+                        if (line != null) {
                             if(pl.money >= line.getPrice()) {
                                 llh.dataChangesCreator.moneyChange(-line.getPrice());
                                 llh.dataChangesCreator.takeActionPoint();
