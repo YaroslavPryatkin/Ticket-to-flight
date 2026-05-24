@@ -63,7 +63,9 @@ public class MainClient {
                 }
             } else if (gameData.currentState == GameData.State.PLANES && llh.getMyId() == gameData.currentPlayer) {
                 if (llh.flags.currentStateState == Flags.CurrentStateState.PLAYER_STAGE) {
+                    System.out.println("Something");
                     if (worldMapRenderer.drawPlaneWindow()) {
+                        System.out.println("Changing to something");
                         llh.flags.currentStateState = LowLevelHandlerFront.Flags.CurrentStateState.WAITING_FOR_PLAYER_CHOICE;
                     }
                 }

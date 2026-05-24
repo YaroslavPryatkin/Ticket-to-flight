@@ -6,16 +6,16 @@ import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airline;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airport;
 import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
 import com.game.Ticket_To_Flight.frontend.MainClient;
+import com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.GameUIManagerDirectory.HUD.HUDOverlay;
 import com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.Managers.TooltipManager;
 import com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.Managers.WindowManager;
-import com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.Managers.HUDController;
 import com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.GameUIManagerDirectory.Skins.WorldMapStyleFactory;
 
 public class GameUIManager {
 
     private final WindowManager windowManager;
     private final TooltipManager tooltipManager;
-    private final HUDController hudController;
+    private final HUDOverlay hud;
 
     public GameUIManager(Stage uiStageWindow, Stage uiStageHUD, MainClient client) {
         WorldMapStyleFactory styleFactory = new WorldMapStyleFactory();
@@ -26,7 +26,7 @@ public class GameUIManager {
 
         this.windowManager = new WindowManager(uiStageWindow, skin_default_window, skin_invest_window, this, gameData, client.getLlh());
         this.tooltipManager = new TooltipManager(uiStageHUD, skin_default_window, this, gameData, client.getLlh());
-        this.hudController = new HUDController(uiStageHUD, skin_default_window, gameData, client.getLlh());
+        this.hud = new HUDOverlay(uiStageHUD, skin_default_window, gameData, client.getLlh());
     }
 
     public boolean showAuctionWindow() { return windowManager.showAuctionWindow(); }
@@ -43,11 +43,11 @@ public class GameUIManager {
     public void removeTooltip() { tooltipManager.removeTooltip(); }
 
     public void updateHUDData() {
-        hudController.updateData();
+        hud.updateHUD();
     }
 
     public void resize(int width, int height) {
         windowManager.centerCurrentWindow();
-        hudController.resize();
+        hud.resize();
     }
 }
