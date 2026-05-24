@@ -6,6 +6,7 @@ import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.game.Ticket_To_Flight.frontend.LowLevelHandlerFront;
 import com.game.Ticket_To_Flight.frontend.MainClient;
@@ -27,7 +28,7 @@ public class ConnectionRenderer extends ScreenAdapter {
         this.llh = llh;
         this.mainClient = mainClient;
 
-        this.uiStage = new Stage(new ScreenViewport());
+        this.uiStage = new Stage(new FitViewport(1920, 1080));
         this.skin = new StyleFactoryConnection().createConnectionSkin();
         this.uiManager = new ConnectionUIManager(skin, llh);
 

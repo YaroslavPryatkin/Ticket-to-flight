@@ -23,7 +23,7 @@ public class MainMenuUI {
     private void buildUI(Skin skin) {
         Label titleLabel = new Label("Ticket to Flight", skin);
         titleLabel.setFontScale(2.5f);
-        mainTable.add(titleLabel).padBottom(50).row();
+        mainTable.add(titleLabel).padBottom(150).row();
 
         TextButton createServerBtn = new TextButton("Create server", skin);
         TextButton connectServerBtn = new TextButton("Connect to server", skin);
@@ -48,8 +48,8 @@ public class MainMenuUI {
             }
         });
 
-        mainTable.add(createServerBtn).width(280).height(55).padBottom(20).row();
-        mainTable.add(connectServerBtn).width(280).height(55);
+        mainTable.add(createServerBtn).width(500).height(150).padBottom(20).row();
+        mainTable.add(connectServerBtn).width(500).height(150);
     }
 
     public Table getTable() {

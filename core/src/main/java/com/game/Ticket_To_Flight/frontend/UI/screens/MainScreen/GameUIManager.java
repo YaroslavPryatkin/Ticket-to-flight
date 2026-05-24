@@ -49,11 +49,11 @@ public class GameUIManager {
     }
 
     private void createBasicWindow() {
-        skin_default_window = new StyleFactory().createBasicWindow();
+        skin_default_window = new WorldMapStyleFactory().createBasicWindow();
     }
 
     private void createInvestWindow() {
-        skin_invest_window = new StyleFactory().createInvestWindow();
+        skin_invest_window = new WorldMapStyleFactory().createInvestWindow();
     }
 
     private void setPositionForWindow(Window window) {

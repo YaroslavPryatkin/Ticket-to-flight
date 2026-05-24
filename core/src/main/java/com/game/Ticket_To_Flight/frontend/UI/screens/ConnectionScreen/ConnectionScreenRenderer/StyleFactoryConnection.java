@@ -3,31 +3,28 @@ package com.game.Ticket_To_Flight.frontend.UI.screens.ConnectionScreen.Connectio
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
+import com.game.Ticket_To_Flight.skin.BaseSkinFactory;
 
-public class StyleFactoryConnection extends Skin {
-    public Skin createConnectionSkin() {
-        Skin s = new Skin();
-        s.add("default-font", new BitmapFont());
+public class StyleFactoryConnection extends BaseSkinFactory {
+    public static Skin createConnectionSkin() {
+        Skin skin = new Skin();
+        skin.add("default-font", generateCustomFont(42));
 
-        Pixmap darkPix = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
-        darkPix.setColor(new Color(0.2f, 0.2f, 0.2f, 1f));
-        darkPix.fill();
-        s.add("bg-dark", new Texture(darkPix));
+        Color bgDarkColor = new Color(0.15f, 0.20f, 0.28f, 0.95f);
+        Color selectionColor = new Color(0.3f, 0.5f, 0.8f, 0.8f);
+        Color buttonNormalColor = new Color(0.16f, 0.50f, 0.73f, 1f);
+        Color buttonDownColor = new Color(0.10f, 0.35f, 0.53f, 1f);
 
-        Pixmap cursorPix = new Pixmap(2, 20, Pixmap.Format.RGBA8888);
-        cursorPix.setColor(Color.WHITE);
-        cursorPix.fill();
-        s.add("cursor", new Texture(cursorPix));
+        skin.add("bg-dark", createRoundedPatch(bgDarkColor, 12));
+        skin.add("btn-up", createRoundedPatch(buttonNormalColor, 12));
+        skin.add("btn-down", createRoundedPatch(buttonDownColor, 12));
 
-        Pixmap selectionPix = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
-        selectionPix.setColor(new Color(0.3f, 0.5f, 0.8f, 0.8f));
-        selectionPix.fill();
-        s.add("selection", new Texture(selectionPix));
+        skin.add("cursor", createRectangleTexture(Color.WHITE, 3, 40));
+        skin.add("selection", createRectangleTexture(selectionColor, 1, 1));
 
         Pixmap loadPix = new Pixmap(32, 32, Pixmap.Format.RGBA8888);
         loadPix.setColor(Color.WHITE);
@@ -35,32 +32,30 @@ public class StyleFactoryConnection extends Skin {
         loadPix.setColor(Color.BLACK);
         loadPix.fillCircle(16, 16, 10);
         loadPix.fillRectangle(16, 0, 16, 16);
-        s.add("loading-icon", new Texture(loadPix));
-
-        Label.LabelStyle labelStyle = new Label.LabelStyle();
-        labelStyle.font = s.getFont("default-font");
-        labelStyle.fontColor = Color.WHITE;
-        s.add("default", labelStyle);
-
-        TextButton.TextButtonStyle btnStyle = new TextButton.TextButtonStyle();
-        btnStyle.font = s.getFont("default-font");
-        btnStyle.fontColor = Color.WHITE;
-        btnStyle.up = s.getDrawable("bg-dark");
-        s.add("default", btnStyle);
-
-        TextField.TextFieldStyle tfStyle = new TextField.TextFieldStyle();
-        tfStyle.font = s.getFont("default-font");
-        tfStyle.fontColor = Color.WHITE;
-        tfStyle.background = s.getDrawable("bg-dark");
-        tfStyle.cursor = s.getDrawable("cursor");
-        tfStyle.selection = s.getDrawable("selection");
-        s.add("default", tfStyle);
-
-        darkPix.dispose();
-        cursorPix.dispose();
-        selectionPix.dispose();
+        skin.add("loading-icon", new Texture(loadPix));
         loadPix.dispose();
 
-        return s;
+        Label.LabelStyle labelStyle = new Label.LabelStyle();
+        labelStyle.font = skin.getFont("default-font");
+        labelStyle.fontColor = Color.WHITE;
+        skin.add("default", labelStyle);
+
+        TextButton.TextButtonStyle btnStyle = new TextButton.TextButtonStyle();
+        btnStyle.font = skin.getFont("default-font");
+        btnStyle.fontColor = Color.WHITE;
+        btnStyle.downFontColor = Color.LIGHT_GRAY;
+        btnStyle.up = skin.getDrawable("btn-up");
+        btnStyle.down = skin.getDrawable("btn-down");
+        skin.add("default", btnStyle);
+
+        TextField.TextFieldStyle tfStyle = new TextField.TextFieldStyle();
+        tfStyle.font = skin.getFont("default-font");
+        tfStyle.fontColor = Color.WHITE;
+        tfStyle.background = skin.getDrawable("bg-dark");
+        tfStyle.cursor = skin.getDrawable("cursor");
+        tfStyle.selection = skin.getDrawable("selection");
+        skin.add("default", tfStyle);
+
+        return skin;
     }
 }

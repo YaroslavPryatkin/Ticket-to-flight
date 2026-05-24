@@ -74,7 +74,7 @@ public class ConnectionUIManager extends Table {
         });
 
         this.add(promptLabel).padBottom(30).row();
-        this.add(nicknameField).width(300).height(50).padBottom(20).row();
-        this.add(acceptBtn).width(150).height(50);
+        this.add(nicknameField).width(800).height(150).padBottom(50).row();
+        this.add(acceptBtn).width(500).height(150);
     }
 }

@@ -5,6 +5,7 @@ import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 public class MainMenuRenderer extends ScreenAdapter {
@@ -14,7 +15,7 @@ public class MainMenuRenderer extends ScreenAdapter {
 
     public MainMenuRenderer(MainMenuClient mainMenuClient) {
         this.mainMenuClient = mainMenuClient;
-        this.stage = new Stage(new ScreenViewport());
+        this.stage = new Stage(new FitViewport(1920, 1080));
         this.skin = MainMenuSkinFactory.createMenuSkin();
 
         Gdx.input.setInputProcessor(stage);
@@ -29,7 +30,7 @@ public class MainMenuRenderer extends ScreenAdapter {
     }
 
     private void renderNoLogic(float delta) {
-        Gdx.gl.glClearColor(0.1f, 0.2f, 0.5f, 1f);
+        Gdx.gl.glClearColor(0.1f, 0.15f, 0.25f, 1f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         stage.act(delta);
