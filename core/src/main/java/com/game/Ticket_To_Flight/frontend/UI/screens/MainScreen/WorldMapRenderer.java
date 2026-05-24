@@ -34,7 +34,9 @@ public class WorldMapRenderer extends ScreenAdapter {
     private final float WORLD_WIDTH;
     private final float WORLD_HEIGHT;
 
-    private final Stage uiStage;
+    private final Stage uiStageWindow;
+    private final Stage uiStageHUD;
+
     private final GameUIManager uiManager;
     private final MapInputController inputCtrl;
 
@@ -69,18 +71,16 @@ public class WorldMapRenderer extends ScreenAdapter {
 
         this.camera = new OrthographicCamera();
         this.viewport = new ExtendViewport(WORLD_WIDTH, WORLD_HEIGHT, camera);
-        uiStage = new Stage(new FitViewport(1920, 1080));
+        this.uiStageWindow = new Stage(new FitViewport(1920, 1080));
+        this.uiStageHUD = new Stage(new ExtendViewport(1920, 1080));
 
-        this.uiManager = new GameUIManager(uiStage, client);
+        this.uiManager = new GameUIManager(uiStageWindow, uiStageHUD, client);
         this.inputCtrl = new MapInputController(camera, gameData, uiManager);
 
         InputMultiplexer multiplexer = new InputMultiplexer();
-        multiplexer.addProcessor(uiStage);
+        multiplexer.addProcessor(uiStageWindow);
         multiplexer.addProcessor(inputCtrl);
         Gdx.input.setInputProcessor(multiplexer);
-        //uiManager.showAbilitiesWindow();
-        //uiManager.showAuctionWindow();
-        //uiManager.showInvestWindow();
     }
 
     private void clampCamera() {
@@ -143,18 +143,13 @@ public class WorldMapRenderer extends ScreenAdapter {
     public boolean drawInvestmentWindow() {
         return uiManager.showInvestWindow();
     }
-
     public boolean drawAuctionWindow() {
         return uiManager.showAuctionWindow();
     }
-
     public boolean drawPlaneWindow() {
         return uiManager.showPlaneWindow();
     }
-
-    public boolean drawAbilitiesWindow() {
-        return uiManager.showAbilitiesWindow();
-    }
+    public boolean drawAbilitiesWindow() { return uiManager.showAbilitiesWindow(); }
 
     public void setMapCurrentStrategy(MapInteractionStrategy currentStrategy) {
         inputCtrl.setCurrentStrategy(currentStrategy);
@@ -182,16 +177,22 @@ public class WorldMapRenderer extends ScreenAdapter {
         batch.setColor(Color.WHITE);
         batch.end();
 
-        uiStage.getViewport().apply();
+        uiManager.updateHUDData();
 
-        uiStage.act(delta);
-        uiStage.draw();
+        uiStageWindow.getViewport().apply();
+        uiStageWindow.act(delta);
+        uiStageWindow.draw();
+
+        uiStageHUD.getViewport().apply();
+        uiStageHUD.act(delta);
+        uiStageHUD.draw();
     }
 
     @Override
     public void resize(int width, int height) {
         viewport.update(width, height, true);
-        uiStage.getViewport().update(width, height, true);
+        uiStageWindow.getViewport().update(width, height, true);
+        uiStageHUD.getViewport().update(width, height, true);
         uiManager.resize(width, height);
     }
 
@@ -201,6 +202,7 @@ public class WorldMapRenderer extends ScreenAdapter {
         mapTexture.dispose();
         if (airportTexture != null) airportTexture.dispose();
         if (airlineTexture != null) airlineTexture.dispose();
-        uiStage.dispose();
+        uiStageWindow.dispose();
+        uiStageHUD.dispose();
     }
 }

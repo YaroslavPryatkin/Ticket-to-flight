@@ -1,4 +1,4 @@
-package com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.GameUIManagerDirectory;
+package com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.GameUIManagerDirectory.HUD;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -9,18 +9,20 @@ public class HUDOverlay extends Table {
     private final Label roundLabel;
     private final Label stageLabel;
     private final Label timeLabel;
+
     private final Label moneyLabel;
     private final Label incomeLabel;
+    private final Label currentBetLabel;
 
     public HUDOverlay(Skin skin) {
         this.setFillParent(true);
         this.top();
-        this.pad(15);
+        this.pad(20);
 
-        roundLabel = new Label("Round: 1", skin);
-        stageLabel = new Label("Stage: WAITING", skin);
+        roundLabel = new Label("Round: ", skin);
+        stageLabel = new Label("Stage: ", skin);
 
-        timeLabel = new Label("Time: 120s", skin);
+        timeLabel = new Label("Time: ", skin);
         timeLabel.setColor(Color.ORANGE);
 
         moneyLabel = new Label("Money: ", skin);
@@ -28,20 +30,25 @@ public class HUDOverlay extends Table {
         incomeLabel = new Label("Income: ", skin);
         incomeLabel.setColor(Color.GREEN);
 
+        currentBetLabel = new Label("Current bet: ", skin);
+        currentBetLabel.setColor(Color.ORANGE);
+
         Table leftStats = new Table();
-        leftStats.add(roundLabel).padRight(30);
-        leftStats.add(stageLabel).padRight(30);
-        leftStats.add(timeLabel);
+
+        leftStats.add(roundLabel).left().row();
+        leftStats.add(stageLabel).left().padTop(15).row();
+        leftStats.add(timeLabel).left().padTop(15).row();
 
         Table rightStats = new Table();
-        rightStats.add(moneyLabel).left().row();
-        rightStats.add(incomeLabel).left().padTop(5).row();
 
-        this.add(leftStats).expandX().left();
-        this.add(rightStats).expandX().right();
+        rightStats.add(moneyLabel).right().row();
+        rightStats.add(incomeLabel).right().padTop(15).row();
+
+        this.add(leftStats).expandX().left().top();
+        this.add(rightStats).expandX().right().top();
     }
 
-    public void updateHUD(int round, String stage, int time, double money, double income) {
+    public void updateHUD(int round, String stage, int time, double money, double income, int currentBet) {
         roundLabel.setText("Round: " + round);
         stageLabel.setText("Stage: " + stage);
         timeLabel.setText("Time: " + time + "s");
