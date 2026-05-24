@@ -43,16 +43,24 @@ public class HUDOverlay extends Table {
 
         rightStats.add(moneyLabel).right().row();
         rightStats.add(incomeLabel).right().padTop(15).row();
+        rightStats.add(currentBetLabel).right().padTop(15).row();
 
         this.add(leftStats).expandX().left().top();
         this.add(rightStats).expandX().right().top();
     }
 
-    public void updateHUD(int round, String stage, int time, double money, double income, int currentBet) {
+    public void updateHUD(int round, String stage, int time, int money, int income, int currentBet) {
         roundLabel.setText("Round: " + round);
         stageLabel.setText("Stage: " + stage);
         timeLabel.setText("Time: " + time + "s");
         moneyLabel.setText("Money: $" + money);
-        incomeLabel.setText("Income: +$" + income);
+        incomeLabel.setText("Income: $" + income);
+        if (stage.equalsIgnoreCase("Auction")) {
+            currentBetLabel.setVisible(true);
+            currentBetLabel.setText("Current bet: $" + currentBet);
+        }
+        else {
+            currentBetLabel.setVisible(false);
+        }
     }
 }

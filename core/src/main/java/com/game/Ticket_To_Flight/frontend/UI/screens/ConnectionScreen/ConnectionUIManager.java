@@ -14,6 +14,8 @@ public class ConnectionUIManager extends Table {
     private final Skin skin;
     private final LowLevelHandlerFront llh;
 
+    public boolean isNicknameInput = false;
+
     public ConnectionUIManager(Skin skin, LowLevelHandlerFront llh) {
         this.skin = skin;
         this.llh = llh;
@@ -39,6 +41,7 @@ public class ConnectionUIManager extends Table {
     }
 
     public void showNicknameInputScreen() {
+        isNicknameInput = true;
         this.clearChildren();
 
         Label promptLabel = new Label("Enter your Nickname", skin);
@@ -56,6 +59,7 @@ public class ConnectionUIManager extends Table {
                 if (!nickname.isEmpty()) {
                     System.out.println("Nickname submitted: " + nickname);
                     llh.sendJoinRequest(nickname);
+                    isNicknameInput = false;
                 }
             }
         });
@@ -79,5 +83,40 @@ public class ConnectionUIManager extends Table {
         this.add(promptLabel).padBottom(30).row();
         this.add(nicknameField).width(800).height(150).padBottom(50).row();
         this.add(acceptBtn).width(500).height(150);
+
+        if (this.getStage() != null) {
+            this.getStage().setKeyboardFocus(nicknameField);
+        }
+    }
+
+    public void showMessageWindow(String title, String message) {
+        if (this.getStage() == null) return;
+
+        final Window popupWindow = new Window(title, skin);
+        popupWindow.setMovable(false);
+        popupWindow.setModal(true);
+
+        Label msgLabel = new Label(message, skin);
+        msgLabel.setWrap(true);
+        msgLabel.setAlignment(com.badlogic.gdx.utils.Align.center);
+
+        TextButton okBtn = new TextButton("OK", skin);
+        okBtn.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                popupWindow.remove();
+            }
+        });
+
+        popupWindow.add(msgLabel).width(500).pad(30).row();
+        popupWindow.add(okBtn).width(200).height(60).padBottom(20);
+
+        popupWindow.pack();
+        popupWindow.setPosition(
+            (this.getStage().getWidth() - popupWindow.getWidth()) / 2f,
+            (this.getStage().getHeight() - popupWindow.getHeight()) / 2f
+        );
+
+        this.getStage().addActor(popupWindow);
     }
 }

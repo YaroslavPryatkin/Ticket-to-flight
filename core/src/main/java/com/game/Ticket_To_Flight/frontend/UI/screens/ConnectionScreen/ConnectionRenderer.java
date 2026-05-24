@@ -21,8 +21,6 @@ public class ConnectionRenderer extends ScreenAdapter {
     private final Skin skin;
     private final ConnectionUIManager uiManager;
 
-    private boolean inputIsPrinted = false;
-
     public ConnectionRenderer(Game game, LowLevelHandlerFront llh, MainClient mainClient) {
         this.game = game;
         this.llh = llh;
@@ -45,13 +43,15 @@ public class ConnectionRenderer extends ScreenAdapter {
     }
 
     public void showNicknameInput() {
-        if (!inputIsPrinted)
-            uiManager.showNicknameInputScreen();
-        inputIsPrinted = true;
+        uiManager.showNicknameInputScreen();
     }
 
-    public void setInputIsPrinted(boolean ch) {
-        inputIsPrinted = ch;
+    public boolean getInput() {
+        return uiManager.isNicknameInput;
+    }
+
+    public void showMessageWindow(String message) {
+        uiManager.showMessageWindow("", message);
     }
 
     @Override

@@ -22,8 +22,8 @@ public class HUDController {
         int round = gameData.roundNumber;
         String stage = gameData.currentState.toString();
         int time = 120;
-        double money = gameData.players.get(llh.getMyId()).getMoney();
-        double income = gameData.players.get(llh.getMyId()).getIncome();
+        int money = gameData.players.get(llh.getMyId()).getMoney();
+        int income = gameData.players.get(llh.getMyId()).getIncome();
         int currentBet = gameData.players.get(llh.getMyId()).getAuctionBet();
 
         hudOverlay.updateHUD(round, stage, time, money, income, currentBet);
