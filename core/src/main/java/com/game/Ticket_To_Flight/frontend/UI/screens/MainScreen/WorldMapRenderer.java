@@ -100,6 +100,10 @@ public class WorldMapRenderer extends ScreenAdapter {
         camera.position.y = MathUtils.clamp(camera.position.y, halfViewHeight, WORLD_HEIGHT - halfViewHeight);
     }
 
+    public void updateHUDData() {
+        uiManager.updateHUDData();
+    }
+
     public void addAirportsOnTheMap() {
         for (Airport airport : gameData.airports) {
             batch.setColor(airport.getColor());
@@ -176,8 +180,6 @@ public class WorldMapRenderer extends ScreenAdapter {
         addAirportsOnTheMap();
         batch.setColor(Color.WHITE);
         batch.end();
-
-        uiManager.updateHUDData();
 
         uiStageWindow.getViewport().apply();
         uiStageWindow.act(delta);

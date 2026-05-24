@@ -80,7 +80,7 @@ public class MainClient {
     }
 
     public void gameDataWasUpdated(){
-
+        worldMapRenderer.updateHUDData();
     }
 
     public void mainPreparationCycle(float delta) {
