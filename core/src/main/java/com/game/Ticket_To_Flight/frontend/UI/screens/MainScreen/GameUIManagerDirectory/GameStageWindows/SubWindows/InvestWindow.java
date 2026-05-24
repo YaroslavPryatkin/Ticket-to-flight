@@ -4,18 +4,22 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.game.Ticket_To_Flight.backend.gameLogicEntities.Player;
+import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
+import com.game.Ticket_To_Flight.commonFrontAndBack.StaticGameData;
 import com.game.Ticket_To_Flight.frontend.LowLevelHandlerFront;
 import com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.GameUIManager;
 import com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.GameUIManagerDirectory.GameStageWindows.BaseGameWindow;
 
 public class InvestWindow extends BaseGameWindow {
 
-    public InvestWindow(Skin skin, final GameUIManager uiManager, final LowLevelHandlerFront llh) {
+    public InvestWindow(Skin skin, final GameUIManager uiManager, final LowLevelHandlerFront llh, GameData gameData) {
         super("Investing", skin, 800, 600);
 
+        Player curPl = gameData.players.get(llh.getMyId());
         Label subtitleLabel = new Label("invest your incomes to money", skin);
-        final Slider slider = new Slider(0, 10, 1, false, skin);
-        final Label amountLabel = new Label("1", skin);
+        final Slider slider = new Slider(0, StaticGameData.maxAmountOfShares - curPl.amountOfShares, 1, false, skin);
+        final Label amountLabel = new Label("0", skin);
 
         slider.addListener(new ChangeListener() {
             @Override

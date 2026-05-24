@@ -56,7 +56,7 @@ public class WindowManager {
     public boolean showInvestWindow() {
         if (isWindowOpen) return false;
 
-        currentWindow = new InvestWindow(investSkin, facade, llh);
+        currentWindow = new InvestWindow(investSkin, facade, llh, gameData);
         openWindow(currentWindow);
         return true;
     }
