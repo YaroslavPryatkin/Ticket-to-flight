@@ -70,6 +70,7 @@ public class PlaneWindow extends BaseGameWindow {
 
             Table singlePlaneTable = new Table();
             Label nameLabel = new Label(plane.description, skin);
+            Label numLabel = new Label("Left: " + num, skin);
 
             boolean canAfford = playerMoney >= plane.price;
 
@@ -83,6 +84,7 @@ public class PlaneWindow extends BaseGameWindow {
             }
 
             singlePlaneTable.add(nameLabel).padBottom(20).row();
+            singlePlaneTable.add(numLabel).padBottom(20).row();
             singlePlaneTable.add(priceBtn).width(250).height(80);
 
             planesTable.add(singlePlaneTable).pad(30);
