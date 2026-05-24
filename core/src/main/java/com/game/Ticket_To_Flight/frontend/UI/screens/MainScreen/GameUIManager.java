@@ -43,7 +43,7 @@ public class GameUIManager {
     public void removeTooltip() { tooltipManager.removeTooltip(); }
 
     public void updateHUDData() {
-        hud.updateHUD();
+        hud.updateHUD(null);
     }
 
     public void resize(int width, int height) {

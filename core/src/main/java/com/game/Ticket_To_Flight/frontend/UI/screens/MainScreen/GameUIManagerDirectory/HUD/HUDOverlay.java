@@ -17,6 +17,7 @@ import java.util.Map;
 public class HUDOverlay extends Table {
     private final GameData gameData;
     private final LowLevelHandlerFront llh;
+    private final Skin skin;
 
     private final Label roundLabel;
     private final Label stageLabel;
@@ -25,12 +26,14 @@ public class HUDOverlay extends Table {
     private final Label moneyLabel;
     private final Label incomeLabel;
     private final Label currentBetLabel;
-
     private final Label planesLabel;
+
+    private final Table playersTable;
 
     public HUDOverlay(Stage uiStageHUD, Skin skin, GameData gameData, LowLevelHandlerFront llh) {
         this.gameData = gameData;
         this.llh = llh;
+        this.skin = skin;
 
         this.setFillParent(true);
         this.top();
@@ -53,15 +56,18 @@ public class HUDOverlay extends Table {
         planesLabel = new Label("Planes: None", skin);
         planesLabel.setColor(Color.CYAN);
 
+        playersTable = new Table();
+
         Table leftStats = new Table();
         leftStats.add(roundLabel).left().row();
         leftStats.add(stageLabel).left().padTop(15).row();
         leftStats.add(timeLabel).left().padTop(15).row();
 
+        leftStats.add(playersTable).left().padTop(30).expandX().fillX().row();
+
         Table rightStats = new Table();
         rightStats.add(moneyLabel).right().row();
         rightStats.add(incomeLabel).right().padTop(15).row();
-
         rightStats.add(planesLabel).right().padTop(15).row();
         rightStats.add(currentBetLabel).right().padTop(15).row();
 
@@ -71,12 +77,12 @@ public class HUDOverlay extends Table {
         uiStageHUD.addActor(this);
     }
 
-    public void updateHUD() {
+    public void updateHUD(Player chosenPlayer) {
         int round = gameData.roundNumber;
         String stage = gameData.currentState.toString();
-        int time = 120;
+        int time = 120; // В будущем заменить на таймер
 
-        Player me = gameData.players.get(llh.getMyId());
+        Player me = chosenPlayer == null ? gameData.players.get(llh.getMyId()) : chosenPlayer;
 
         int money = me.getMoney();
         int income = me.getIncome();
@@ -86,7 +92,9 @@ public class HUDOverlay extends Table {
         stageLabel.setText("Stage: " + stage);
         timeLabel.setText("Time: " + time + "s");
         moneyLabel.setText("Money: $" + money);
-        incomeLabel.setText("Income: +$" + income);
+
+        String formattedGetIncome = me.getIncome() >=0 ? "+" + me.getIncome().toString() : me.getIncome().toString();
+        incomeLabel.setText("Income: $" + formattedGetIncome);
 
         if (stage.equalsIgnoreCase("Auction")) {
             currentBetLabel.setVisible(true);
@@ -104,7 +112,6 @@ public class HUDOverlay extends Table {
             if (e != null && e.getValue() > 0) {
                 PlaneType plane = e.getKey();
                 Integer amount = e.getValue();
-
                 planesText.append(plane.description).append(" (").append(amount).append("), ");
                 hasPlanes = true;
             }
@@ -115,8 +122,40 @@ public class HUDOverlay extends Table {
         } else {
             planesText.append("None");
         }
-
         planesLabel.setText(planesText.toString());
+
+
+        playersTable.clearChildren();
+
+        for (Player p : gameData.players) {
+            if (p == null) continue;
+
+            Table playerRow = new Table();
+            playerRow.left().pad(8, 15, 8, 15);
+
+            boolean isCurrentTurn = (p.getId() == gameData.currentPlayer);
+
+            if (isCurrentTurn) {
+                playerRow.setBackground(skin.getDrawable("blue-bg"));
+            } else {
+                playerRow.setBackground(skin.getDrawable("dark-bg"));
+            }
+
+            Label nameLabel = new Label(p.getName(), skin);
+
+            if (p.getColor() != null) {
+                nameLabel.setColor(p.getColor());
+            }
+
+            String formattedGetIncomeMe = p.getIncome() >=0 ? "+" + p.getIncome().toString() : p.getIncome().toString();
+            Label statsLabel = new Label("  $" + p.getMoney() + " (" + formattedGetIncomeMe + ")", skin);
+            statsLabel.setColor(Color.WHITE);
+
+            playerRow.add(nameLabel).left().row();
+            playerRow.add(statsLabel).left();
+
+            playersTable.add(playerRow).width(400).padBottom(5).left().row();
+        }
     }
 
     public void resize() {

@@ -16,10 +16,16 @@ public class WorldMapStyleFactory extends BaseSkinFactory {
         Color buttonDownColor = new Color(0.25f, 0.25f, 0.28f, 1f);
         Color disabledColor = new Color(0.15f, 0.15f, 0.18f, 0.8f);
 
+        Color darkBgColor = new Color(0.15f, 0.15f, 0.15f, 0.8f);
+        Color blueBgColor = new Color(0.2f, 0.4f, 0.8f, 0.9f);
+
         skin.add("background", createRoundedPatch(windowBgColor, 16));
         skin.add("btn-up", createRoundedPatch(buttonNormalColor, 12));
         skin.add("btn-down", createRoundedPatch(buttonDownColor, 12));
         skin.add("btn-disabled", createRoundedPatch(disabledColor, 12));
+
+        skin.add("dark-bg", createRoundedPatch(darkBgColor, 8));
+        skin.add("blue-bg", createRoundedPatch(blueBgColor, 8));
 
         Window.WindowStyle windowStyle = new Window.WindowStyle();
         windowStyle.titleFont = skin.getFont("default-font");
