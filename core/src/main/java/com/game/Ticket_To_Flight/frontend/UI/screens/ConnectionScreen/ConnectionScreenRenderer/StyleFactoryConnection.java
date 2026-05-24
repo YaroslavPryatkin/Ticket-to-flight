@@ -3,16 +3,20 @@ package com.game.Ticket_To_Flight.frontend.UI.screens.ConnectionScreen.Connectio
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.ui.TextField;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.game.Ticket_To_Flight.skin.BaseSkinFactory;
 
 public class StyleFactoryConnection extends BaseSkinFactory {
     public static Skin createConnectionSkin() {
         Skin skin = new Skin();
         skin.add("default-font", generateCustomFont(42));
+
+        Window.WindowStyle windowStyle = new Window.WindowStyle();
+
+        windowStyle.titleFont = skin.getFont("default-font");
+        windowStyle.titleFontColor = com.badlogic.gdx.graphics.Color.WHITE;
+        windowStyle.background = skin.getDrawable("background");
+        skin.add("default", windowStyle);
 
         Color bgDarkColor = new Color(0.15f, 0.20f, 0.28f, 0.95f);
         Color selectionColor = new Color(0.3f, 0.5f, 0.8f, 0.8f);
