@@ -58,6 +58,8 @@ public class AuctionHandler {
     }
 
     private double returnPercent(int i){
-        return 1 - Math.pow((double) i/(gameData.players.size()-1), 1.5);
+        if(gameData.players.size()==1)
+            return 0.0;
+        return 1.0 - Math.pow((double) i/(gameData.players.size()-1), 1.5);
     }
 }

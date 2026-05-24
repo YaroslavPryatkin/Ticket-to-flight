@@ -2,7 +2,6 @@ package com.game.Ticket_To_Flight.network;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.EndPoint;
-import com.game.Ticket_To_Flight.backend.gameLogicEntities.Player;
 import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
 
 import java.lang.reflect.Field;
@@ -14,6 +13,8 @@ public class Network {
     public static final int TCP_PORT = 54678;
     public static final int UDP_PORT = 54911;
     public static final int timeoutTime = 5000;
+    public static final int writeBufferSize = 131072;
+    public static final int objectBufferSize = 32768;
 
     //old register
     /*
@@ -136,7 +137,7 @@ public class Network {
         public GameMessage(){}
     }
 
-    public static enum FinishStatus{
+    public enum FinishStatus{
         NOT_FINISHED,
         FINISHED,
         PASS

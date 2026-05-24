@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airport;
 import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
 
-import java.io.FileReader;
 import java.io.Reader;
 import java.util.*;
 
@@ -162,11 +161,11 @@ public class WorldMapUpdater {
                     break;
                 }
             }
-            if (selectedAirport == null) selectedAirport = validAirports.get(validAirports.size() - 1);
+            if (selectedAirport == null) selectedAirport = validAirports.getLast();
 
             Integer passengerType = pickPassengerType(selectedAirport);
             if (passengerType != null) {
-                dataChangesCreator.addPassengers(selectedAirport, passengerType);
+                dataChangesCreator.addPassenger(selectedAirport, passengerType);
 
                 double oldWeight = currentWeights.get(selectedAirport);
                 double newWeight = nextWeight(oldWeight);
@@ -189,7 +188,7 @@ public class WorldMapUpdater {
         List<PrefixProbability> prefixes = passengerPrefixes.get(airportId);
         if (prefixes == null || prefixes.isEmpty()) return null;
 
-        double totalProb = prefixes.get(prefixes.size() - 1).prefixSum;
+        double totalProb = prefixes.getLast().prefixSum;
         double randomValue = random.nextDouble() * totalProb;
 
         for (PrefixProbability p : prefixes) {
@@ -198,6 +197,6 @@ public class WorldMapUpdater {
             }
         }
 
-        return prefixes.get(prefixes.size() - 1).type;
+        return prefixes.getLast().type;
     }
 }

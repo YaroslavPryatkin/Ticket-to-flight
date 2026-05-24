@@ -49,18 +49,15 @@ public class MainLogic extends MainLoopBack {
                 if (gameData.currentState == GameData.State.WORLD_UPDATE) {
                     worldMapUpdater.loadRound();
                 }
-                llh.finishTurnSuccessfully(null);
+                llh.finishTurnSuccessfully();
             }
             else {
                 if(llh.getCurrentPlayerState() == Flags.CurrentPlayerState.ANSWERED){
                    //something went wrong
                     llh.setWaitingForResponseFlag();
                 }
-                else if(llh.getCurrentPlayerState() == Flags.CurrentPlayerState.NOT_FINISHED_STATE){
-                    llh.finishTurnSuccessfully(false);
-                }
-                else if(llh.getCurrentPlayerState() == Flags.CurrentPlayerState.FINISHED_STATE){
-                    llh.finishTurnSuccessfully(true);
+                else if(llh.getCurrentPlayerState() == Flags.CurrentPlayerState.GOOD_RESPONSE){
+                    llh.finishTurnSuccessfully();
                 }
             }
         }
@@ -68,16 +65,11 @@ public class MainLogic extends MainLoopBack {
 
     @Override
     public void handlePlayerResponse(Network.GameMessage message){
-        if(message instanceof Network.PlayerInvestmentChoiceResponse){
+        if(message instanceof Network.PlayerInvestmentChoiceResponse resp){
             if(gameData.currentState != GameData.State.INVESTMENTS)
                 llh.sendWrongStateError();
             else {
-                Network.PlayerInvestmentChoiceResponse resp = (Network.PlayerInvestmentChoiceResponse) message;
-                Integer addedAmountOfShares = resp.amountOfShares;
-                if (addedAmountOfShares == null) {
-                    llh.sendError("Could not parse");
-                    return;
-                }
+                int addedAmountOfShares = resp.amountOfShares;
                 if (addedAmountOfShares <= 0) {
                     llh.sendError("Amount of shares should be > 0");
                     return;
@@ -85,22 +77,21 @@ public class MainLogic extends MainLoopBack {
                 Player pl = gameData.players.get(gameData.currentPlayer);
                 if (pl.amountOfShares + addedAmountOfShares <= StaticGameData.maxAmountOfShares) {
                     llh.dataChangesCreator.addAmountOfShares(addedAmountOfShares);
-                    llh.setFinishedStateFlag();
+                    llh.playerFinished();
                 } else {
                     llh.sendError("Amount of shares should be < maximum amount of shares");
                 }
             }
         }
-        else if(message instanceof Network.PlayerAuctionChoiceResponse){
+        else if(message instanceof Network.PlayerAuctionChoiceResponse resp){
             if(gameData.currentState != GameData.State.AUCTION)
                 llh.sendWrongStateError();
             else {
-                Network.PlayerAuctionChoiceResponse resp = (Network.PlayerAuctionChoiceResponse) message;
                 if (resp.isPass) {
                     if (auctionHandler.pass()) {
                         if (auctionHandler.areAllPlayersReady())
                             auctionHandler.finishAndResetAuction();
-                        llh.setFinishedStateFlag();
+                        llh.playerFinished();
                     } else {
                         llh.sendError("Already passed");
                     }
@@ -109,49 +100,47 @@ public class MainLogic extends MainLoopBack {
                     String betRepl = auctionHandler.canBet(newPlayerBet);
                     if (betRepl == null) {
                         auctionHandler.bet(newPlayerBet);
-                        llh.setNotFinishedStateFlag();
+                        llh.playerNotFinished();
                     } else {
                         llh.sendError(betRepl);
                     }
                 }
             }
         }
-        else if(message instanceof Network.PlayerAbilityChoiceResponse){
+        else if(message instanceof Network.PlayerAbilityChoiceResponse resp){
             if(gameData.currentState != GameData.State.ABILITIES)
                 llh.sendWrongStateError();
             else {
-                Network.PlayerAbilityChoiceResponse resp = (Network.PlayerAbilityChoiceResponse) message;
                 if (StaticGameData.abilityTypes.contains(resp.ability)) {
                     if (resp.ability != 0 && gameData.availableAbilities.contains(resp.ability)) {
                         llh.dataChangesCreator.giveAbility(resp.ability);
-                        llh.setFinishedStateFlag();
+                        llh.playerFinished();
                     } else
                         llh.sendError("The chosen ability is unavailable");
                 } else
                     llh.sendError("Unknown ability id");
             }
         }
-        else if(message instanceof Network.PlayerPlaneChoiceResponse){
+        else if(message instanceof Network.PlayerPlaneChoiceResponse resp){
             if(gameData.currentState != GameData.State.PLANES)
                 llh.sendWrongStateError();
             else {
-                Network.PlayerPlaneChoiceResponse resp = (Network.PlayerPlaneChoiceResponse) message;
                 if(resp.finishStatus == PASS){
-                    llh.setFinishedStateFlag();
+                    llh.playerFinished();
                 }
                 else {
                     Player pl = gameData.players.get(gameData.currentPlayer);
                     if (pl.actionPoints > 0) {
                         if (gameData.availablePlanes.getOrDefault(resp.plane, 0) > 0) {
-                            Integer price = StaticGameData.planeTypes.get(resp.plane).price;
+                            int price = StaticGameData.planeTypes.get(resp.plane).price;
                             if(pl.money >= price) {
-                                llh.dataChangesCreator.moneyChange(-price);
+                                llh.dataChangesCreator.moneyLoss(price);
                                 llh.dataChangesCreator.takeActionPoint();
                                 llh.dataChangesCreator.sellPlane(resp.plane);
                                 if (resp.finishStatus == FINISHED) {
-                                    llh.setFinishedStateFlag();
+                                    llh.playerFinished();
                                 } else {
-                                    llh.setNotFinishedStateFlag();
+                                    llh.playerNotFinished();
                                 }
                             }
                             else{
@@ -166,13 +155,12 @@ public class MainLogic extends MainLoopBack {
                 }
             }
         }
-        else if(message instanceof Network.PlayerAirlineChoiceResponse){
+        else if(message instanceof Network.PlayerAirlineChoiceResponse resp){
             if(gameData.currentState != GameData.State.AIRLINES)
                 llh.sendWrongStateError();
             else {
-                Network.PlayerAirlineChoiceResponse resp = (Network.PlayerAirlineChoiceResponse) message;
                 if(resp.finishStatus == PASS){
-                    llh.setFinishedStateFlag();
+                    llh.playerFinished();
                 }
                 else {
                     Player pl = gameData.players.get(gameData.currentPlayer);
@@ -180,13 +168,13 @@ public class MainLogic extends MainLoopBack {
                         Airline line = gameData.availableAirlines.get(resp.line);
                         if (line != null) {
                             if(pl.money >= line.getPrice()) {
-                                llh.dataChangesCreator.moneyChange(-line.getPrice());
+                                llh.dataChangesCreator.moneyLoss(line.getPrice());
                                 llh.dataChangesCreator.takeActionPoint();
                                 llh.dataChangesCreator.sellAirline(resp.line);
                                 if (resp.finishStatus == FINISHED) {
-                                    llh.setFinishedStateFlag();
+                                    llh.playerFinished();
                                 } else {
-                                    llh.setNotFinishedStateFlag();
+                                    llh.playerNotFinished();
                                 }
                             }
                             else{
@@ -201,11 +189,11 @@ public class MainLogic extends MainLoopBack {
                 }
             }
         }
-        else if(message instanceof Network.PlayerRouteChoiceResponse){
+        else if(message instanceof Network.PlayerRouteChoiceResponse resp){
             if(gameData.currentState != GameData.State.FLIGHTS)
                 llh.sendWrongStateError();
             else {
-                Network.PlayerRouteChoiceResponse resp = (Network.PlayerRouteChoiceResponse) message;
+                //work in progress, currently soft lock
             }
         }
         else{

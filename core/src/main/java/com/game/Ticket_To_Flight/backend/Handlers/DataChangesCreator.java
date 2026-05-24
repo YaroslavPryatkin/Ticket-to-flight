@@ -1,11 +1,8 @@
 package com.game.Ticket_To_Flight.backend.Handlers;
 
 import com.badlogic.gdx.math.Vector2;
-import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airport;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Player;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.AbilityType;
-import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.AirlineType;
-import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.AirportType;
 import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
 import com.game.Ticket_To_Flight.commonFrontAndBack.StaticGameData;
 
@@ -18,15 +15,15 @@ public class DataChangesCreator {
     private GameData.DataChanges dataChanges = new GameData.DataChanges();
     private final GameData gameData;
 
-    public DataChangesCreator(GameData gameData) {this.gameData = gameData;}
+    DataChangesCreator(GameData gameData) {this.gameData = gameData;}
 
-    public GameData.DataChanges takeDataChanges(){
+    GameData.DataChanges takeDataChanges(){
         GameData.DataChanges res = this.dataChanges;
         this.dataChanges = new GameData.DataChanges();
         return res;
     }
 
-    public Integer addPlayer(String name){
+    Integer addPlayer(String name){
         if(dataChanges.playersToAdd == null)
             dataChanges.playersToAdd = new HashSet<>();
         GameData.PlayerDTO dto = new GameData.PlayerDTO(name, ColorSupplier.getColor());
@@ -34,11 +31,11 @@ public class DataChangesCreator {
         return dto.getId();
     }
 
-    public void addAirport(int id, Integer type, Integer x, Integer y, String airportName){
+    void addAirport(int id, Integer type, Integer x, Integer y, String airportName){
         addAirport(id, type, new Vector2(x,y), airportName);
     }
 
-    public void addAirport(int id, Integer type, Vector2 position, String airportName){
+    void addAirport(int id, Integer type, Vector2 position, String airportName){
         if(dataChanges.airportsToAdd == null){
             dataChanges.airportsToAdd = new HashSet<>();
         }
@@ -46,7 +43,7 @@ public class DataChangesCreator {
     }
 
 
-    public void addAirline(Integer type, Integer portA, Integer portB){
+    void addAirline(Integer type, Integer portA, Integer portB){
         if(dataChanges.airlinesToAdd == null){
             dataChanges.airlinesToAdd = new HashSet<>();
         }
@@ -73,35 +70,36 @@ public class DataChangesCreator {
         return false;
     }
 
-    public void addPassengers (Integer airport, Integer type){
-        if(dataChanges.airportPassengersToAdd == null){
-            dataChanges.airportPassengersToAdd = new HashMap<>();
+    void addPassenger(Integer airport, Integer type){
+        if(dataChanges.airportPassengersChange == null){
+            dataChanges.airportPassengersChange = new HashMap<>();
         }
-        dataChanges.airportPassengersToAdd.computeIfAbsent(airport, k -> new HashMap<>());
-        dataChanges.airportPassengersToAdd.get(airport)
+        dataChanges.airportPassengersChange.computeIfAbsent(airport, k -> new HashMap<>());
+        dataChanges.airportPassengersChange.get(airport)
             .compute(type, (k,v)-> v == null ? 1 : v + 1);
 
     }
 
-    public void removePassengers (Integer airport, Integer type, Integer amount){
-        if(dataChanges.airportPassengersToRemove == null){
-            dataChanges.airportPassengersToRemove = new HashMap<>();
+    public void removePassenger (Integer airport, Integer type){
+        if(dataChanges.airportPassengersChange == null){
+            dataChanges.airportPassengersChange = new HashMap<>();
         }
-        dataChanges.airportPassengersToRemove.computeIfAbsent(airport, k -> new HashMap<>());
-        dataChanges.airportPassengersToRemove.get(airport)
-            .compute(type, (k,v)-> v == null ? amount : v + amount);
+        dataChanges.airportPassengersChange.computeIfAbsent(airport, k -> new HashMap<>());
+        dataChanges.airportPassengersChange.get(airport)
+            .compute(type, (k,v)-> v == null ? -1 : v - 1);
 
     }
 
-    public void addAvailablePlanes(Integer type, Integer amount){
-        if(dataChanges.availablePlanesToAdd == null) dataChanges.availablePlanesToAdd = new HashMap<>();
-        dataChanges.availablePlanesToAdd.compute(type, (k,v) -> (v==null) ? amount : v + amount );
+    void addAvailablePlanes(Integer type, Integer amount){
+        if(dataChanges.availablePlanesChange == null) dataChanges.availablePlanesChange = new HashMap<>();
+        dataChanges.availablePlanesChange.compute(type, (k,v) -> (v==null) ? amount : v + amount );
     }
 
     public boolean sellPlane(Integer plane){
         if(gameData.availablePlanes.containsKey(plane)) {
-            if (dataChanges.availablePlanesToRemove == null) dataChanges.availablePlanesToRemove = new HashMap<>();
+            if (dataChanges.availablePlanesChange == null) dataChanges.availablePlanesChange = new HashMap<>();
             if (dataChanges.playerPlanesToAdd == null) dataChanges.playerPlanesToAdd = new HashMap<>();
+            dataChanges.availablePlanesChange.compute(plane, (k,v) -> v==null ? -1 : v-1);
             dataChanges.playerPlanesToAdd.computeIfAbsent(gameData.currentPlayer, k -> new HashMap<>());
             dataChanges.playerPlanesToAdd.get(gameData.currentPlayer)
                 .compute(plane, (k,v)->(v==null) ? 1 : v + 1);
@@ -131,25 +129,25 @@ public class DataChangesCreator {
                 v + amountOfShares * StaticGameData.plusMoneyPerShare);
     }
 
-    public void setCurrentPLayer(Integer pl){
+    void setCurrentPLayer(Integer pl){
         dataChanges.currentPlayer = pl;
     }
 
-    public void setCurrentState(GameData.State gameState){
+    void setCurrentState(GameData.State gameState){
         dataChanges.currentState = gameState;
     }
 
-    public void setCurrentRound(Integer roundNumber){
+    void setCurrentRound(Integer roundNumber){
         dataChanges.roundNumber = roundNumber;
     }
 
-    public void setTurnOrder(List<Integer> newTurnOrder){
+    void setTurnOrder(List<Integer> newTurnOrder){
         if(dataChanges.turnOrder == null) dataChanges.turnOrder = new ArrayList<>(gameData.players.size());
         else dataChanges.turnOrder.clear();
         dataChanges.turnOrder.addAll(newTurnOrder);
     }
 
-    public void setDefaultTurnOrder(){
+    void setDefaultTurnOrder(){
         if(dataChanges.turnOrder == null) dataChanges.turnOrder = new ArrayList<>(gameData.players.size());
         else dataChanges.turnOrder.clear();
         for(Player pl : gameData.players){
@@ -157,19 +155,19 @@ public class DataChangesCreator {
         }
     }
 
-    public void addHasPassed(){
+    void addHasPassed(){
         if(dataChanges.playerHasPassedSet == null) dataChanges.playerHasPassedSet = new HashMap<>();
         dataChanges.playerHasPassedSet.put(gameData.currentPlayer, true);
     }
 
-    public void removeAllPassed(){
+    void removeAllPassed(){
         if(dataChanges.playerHasPassedSet == null) dataChanges.playerHasPassedSet = new HashMap<>();
         for(Player pl : gameData.players){
             dataChanges.playerHasPassedSet.put(pl.getId(), false);
         }
     }
 
-    public void playerMakeBet(Integer player, Integer playerBetChange){
+    void playerMakeBet(Integer player, Integer playerBetChange){
         if(dataChanges.playerAuctionBetChanges == null) dataChanges.playerAuctionBetChanges = new HashMap<>();
         if(dataChanges.playerMoneyChange == null) dataChanges.playerMoneyChange = new HashMap<>();
         dataChanges.playerMoneyChange.compute(player,
@@ -179,7 +177,7 @@ public class DataChangesCreator {
 
     }
 
-    public void returnBetPercent(Integer player, Double percentage){
+    void returnBetPercent(Integer player, Double percentage){
         if(dataChanges.playerAuctionBetChanges == null) dataChanges.playerAuctionBetChanges = new HashMap<>();
         if(dataChanges.playerMoneyChange == null) dataChanges.playerMoneyChange = new HashMap<>();
 
@@ -192,11 +190,11 @@ public class DataChangesCreator {
             (k, v) ->  -gameData.players.get(k).auctionBet);
     }
 
-    public void setCurrentBet(Integer newCurrentBet){
+    void setCurrentBet(Integer newCurrentBet){
         dataChanges.currentBet = newCurrentBet;
     }
 
-    public void resetCurrentBet(){
+    void resetCurrentBet(){
         dataChanges.currentBet = 0;
     }
 
@@ -207,7 +205,7 @@ public class DataChangesCreator {
         dataChanges.playerAbilityChoice.put(gameData.currentPlayer, ability);
     }
 
-    public void resetAllAbilities(){
+    void resetAllAbilities(){
         if(dataChanges.availableAbilitiesToAdd == null) dataChanges.availableAbilitiesToAdd = new HashSet<>();
         if(dataChanges.playerAbilityChoice == null) dataChanges.playerAbilityChoice = new HashMap<>();
         for(Player pl : gameData.players){
@@ -227,7 +225,7 @@ public class DataChangesCreator {
             (k,v) -> (v==null) ? -1 : v-1);
     }
 
-    public void resetActionPoints(){
+    void resetActionPoints(){
         if(dataChanges.playerActionPointsChange == null) dataChanges.playerActionPointsChange = new HashMap<>();
         for(Player pl : gameData.players){
             dataChanges.playerActionPointsChange.compute(pl.getId(),
@@ -235,15 +233,27 @@ public class DataChangesCreator {
         }
     }
 
-    public void moneyChange(int moneyChange){
+    public void moneyGain(int moneyGain){
         if(dataChanges.playerMoneyChange == null) dataChanges.playerMoneyChange=new HashMap<>();
         dataChanges.playerMoneyChange.compute(gameData.currentPlayer, (k,v) -> (v==null) ?
-            moneyChange : v + moneyChange);
+            moneyGain : v + moneyGain);
     }
 
-    public void incomeChange(int incomeChange){
+    public void moneyLoss(int moneyLoss){
+        if(dataChanges.playerMoneyChange == null) dataChanges.playerMoneyChange=new HashMap<>();
+        dataChanges.playerMoneyChange.compute(gameData.currentPlayer, (k,v) -> (v==null) ?
+            -moneyLoss : v - moneyLoss);
+    }
+
+    public void incomeGain(int incomeGain){
         if(dataChanges.playerIncomeChange == null) dataChanges.playerIncomeChange=new HashMap<>();
         dataChanges.playerIncomeChange.compute(gameData.currentPlayer, (k,v) -> (v==null) ?
-            incomeChange : v + incomeChange);
+            incomeGain : v + incomeGain);
+    }
+
+    public void incomeLoss(int incomeLoss){
+        if(dataChanges.playerIncomeChange == null) dataChanges.playerIncomeChange=new HashMap<>();
+        dataChanges.playerIncomeChange.compute(gameData.currentPlayer, (k,v) -> (v==null) ?
+            -incomeLoss : v - incomeLoss);
     }
 }
