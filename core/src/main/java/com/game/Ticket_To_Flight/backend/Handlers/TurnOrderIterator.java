@@ -14,16 +14,18 @@ public class TurnOrderIterator {
     }
 
     void reset(Integer abilityId){
-        currentPlayerInTurnOrder=-1;
+        currentPlayerInTurnOrder=0;
         playerWithAbility=-1;
         if(abilityId != null && gameData.turnOrder!=null && !gameData.turnOrder.isEmpty()){
             for(int i=0;i<gameData.turnOrder.size();++i){
                 if(gameData.turnOrder.get(i).ability.getId() == abilityId) {
                     playerWithAbility = i;
+                    //System.out.println("turn order reset. Player with ability = " + playerWithAbility);
                     return;
                 }
             }
         }
+        //System.out.println("turn order reset. Player with ability = " + playerWithAbility);
     }
 
     Integer getNextPlayer(){
@@ -34,9 +36,11 @@ public class TurnOrderIterator {
             int cur = next();
             Player curPlayer = gameData.turnOrder.get(cur);
             if (!curPlayer.hasPassed) {
+                //System.out.println("Current player in order = " + cur);
                 return curPlayer.getId();
             }
         }
+        //System.out.println("Found no current player");
         return null;
     }
     private int next(){
@@ -64,5 +68,11 @@ public class TurnOrderIterator {
         }
         if(indexToRemove <= currentPlayerInTurnOrder)
             --currentPlayerInTurnOrder;
+    }
+
+    int getFirstId(){
+        if(gameData.turnOrder==null) return -1;
+        if(playerWithAbility != -1) return gameData.turnOrder.get(playerWithAbility).getId();
+        return gameData.turnOrder.getFirst().getId();
     }
 }

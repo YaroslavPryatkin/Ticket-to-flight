@@ -97,13 +97,13 @@ public class StateIterator {
         Integer nextPlayer = turnOrderIterator.getNextPlayer();
         if(nextPlayer != null){ // at least one not passed player
             dataChangesCreator.setCurrentPLayer(nextPlayer);
-
         }
         else { // everybody passed
+            System.out.println("Changing state player to player");
             dataChangesCreator.removeAllPassed();
             dataChangesCreator.setCurrentState(nextState);
             turnOrderIterator.reset(ability);
-            dataChangesCreator.setCurrentPLayer(turnOrderIterator.getNextPlayer());
+            dataChangesCreator.setCurrentPLayer(turnOrderIterator.getFirstId());
         }
         flags.currentPlayerState = LowLevelHandlerBack.Flags.CurrentPlayerState.WAITING_FOR_RESPONSE;
     }
@@ -115,6 +115,7 @@ public class StateIterator {
             flags.currentPlayerState = LowLevelHandlerBack.Flags.CurrentPlayerState.WAITING_FOR_RESPONSE;
         }
         else {
+            System.out.println("Changing state player to non player");
             dataChangesCreator.removeAllPassed();
             dataChangesCreator.setCurrentState(nextState);
             dataChangesCreator.setCurrentPLayer(-1);
@@ -123,13 +124,15 @@ public class StateIterator {
     }
 
     private void nonPlayerStateToPlayerState(State nextState, Integer ability){
+        System.out.println("Changing state non player to player");
         dataChangesCreator.setCurrentState(nextState);
         turnOrderIterator.reset(ability);
-        dataChangesCreator.setCurrentPLayer(turnOrderIterator.getNextPlayer());
+        dataChangesCreator.setCurrentPLayer(turnOrderIterator.getFirstId());
         flags.currentPlayerState = LowLevelHandlerBack.Flags.CurrentPlayerState.WAITING_FOR_RESPONSE;
     }
 
     private void nonPlayerStateToNonPlayerState(State nextState){
+        System.out.println("Changing state non player to non player");
         dataChangesCreator.setCurrentState(nextState);
         dataChangesCreator.setCurrentPLayer(-1);
     }

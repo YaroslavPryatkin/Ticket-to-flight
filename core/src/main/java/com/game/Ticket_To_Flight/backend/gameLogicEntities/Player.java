@@ -67,7 +67,7 @@ public class Player extends Identifiable {
 
     @Override
     public String toString(){
-        return "Player " + name + " money = " + money + " income = " + income;
+        return "Player " + name + " money = " + money + " income = " + income + " ability = " + ability.description;
     }
 
 }
