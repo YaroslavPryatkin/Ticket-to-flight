@@ -68,6 +68,6 @@ public abstract class BaseSkinFactory extends Skin {
         pixmap.fill();
         Texture texture = new Texture(pixmap);
         pixmap.dispose();
-        return texture;
+        return texture;//
     }
 }
