@@ -63,6 +63,7 @@ public abstract class MainLoopBack {
         llh.clearAllMessages();
     }
 
+    public abstract void stopServer();
 
     protected abstract void mainCycle();
 

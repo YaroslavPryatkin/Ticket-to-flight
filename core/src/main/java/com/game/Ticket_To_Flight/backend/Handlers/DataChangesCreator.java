@@ -1,15 +1,13 @@
 package com.game.Ticket_To_Flight.backend.Handlers;
 
 import com.badlogic.gdx.math.Vector2;
+import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airline;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Player;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.AbilityType;
 import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
 import com.game.Ticket_To_Flight.commonFrontAndBack.StaticGameData;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 public class DataChangesCreator {
     private GameData.DataChanges dataChanges = new GameData.DataChanges();
@@ -31,8 +29,41 @@ public class DataChangesCreator {
         return dto.getId();
     }
 
-    void removePlayer(Integer id){
+    void removeAllAirlinesFromThePlayer(int id){
+        Player pl  = gameData.players.get(id);
+        if(pl.airlines != null && !pl.airlines.isEmpty()) {
+            if(dataChanges.playerAirlinesToRemove == null) dataChanges.playerAirlinesToRemove = new HashMap<>();
+            dataChanges.playerAirlinesToRemove.putIfAbsent(id, new HashSet<>());
+            Set<Integer> target = dataChanges.playerAirlinesToRemove.get(id);
+            for (Airline line : pl.airlines) {
+                target.add(line.getId());
+            }
+        }
+    }
 
+    Integer removePlayerAndGetTurnInd(int id){
+        Integer indexInTurnOrder = null;
+        List<Integer> newTurnOrder = null;
+        if(dataChanges.turnOrder != null){
+            newTurnOrder = new ArrayList<>();
+            for(int i=0;i<dataChanges.turnOrder.size();++i){
+                int curId = dataChanges.turnOrder.get(i);
+                if( curId == id) indexInTurnOrder = i;
+                else newTurnOrder.add(curId);
+            }
+        }
+        else if(gameData.turnOrder != null){
+            newTurnOrder = new ArrayList<>();
+            for(int i=0;i<gameData.turnOrder.size();++i){
+                int curId = gameData.turnOrder.get(i).getId();
+                if( curId == id) indexInTurnOrder = i;
+                else newTurnOrder.add(curId);
+            }
+        }
+        dataChanges.turnOrder = newTurnOrder;
+        if(dataChanges.playersToRemove == null) dataChanges.playersToRemove = new HashSet<>();
+        dataChanges.playersToRemove.add(id);
+        return indexInTurnOrder;
     }
 
     void addAirport(int id, Integer type, Integer x, Integer y, String airportName){

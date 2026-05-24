@@ -57,6 +57,10 @@ public class LowLevelHandlerBack extends LowLevelHandler {
             return;
         }
 
+        if(con2int.isEmpty()){
+            logic.stopServer();
+        }
+
         if (gameData.currentPlayer != null && gameData.currentPlayer.equals(playerId)) {
             flags.currentPlayerState = Flags.CurrentPlayerState.GOOD_RESPONSE;
             dataChangesCreator.addHasPassed();

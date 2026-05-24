@@ -25,7 +25,8 @@ public class MainLogic extends MainLoopBack {
         return instance;
     }
 
-    public static synchronized void stopServer(){
+    @Override
+    public synchronized void stopServer(){
         instance.stop();
         instance = null;
     }
@@ -45,7 +46,10 @@ public class MainLogic extends MainLoopBack {
             llh.beforeStartCycle();
         }
         else{
-            if(llh.getCurrentPlayerState() == Flags.CurrentPlayerState.NO_PLAYER_STAGE) {
+            if(gameData.players.isEmpty()){
+                stopServer();
+            }
+            else if(llh.getCurrentPlayerState() == Flags.CurrentPlayerState.NO_PLAYER_STAGE) {
                 if (gameData.currentState == GameData.State.WORLD_UPDATE) {
                     worldMapUpdater.loadRound();
                 }

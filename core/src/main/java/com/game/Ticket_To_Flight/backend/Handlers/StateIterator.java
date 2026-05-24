@@ -6,6 +6,11 @@ import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
 import com.game.Ticket_To_Flight.commonFrontAndBack.GameData.State;
 import com.game.Ticket_To_Flight.commonFrontAndBack.StaticGameData;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 public class StateIterator {
     private final GameData gameData;
     private final DataChangesCreator dataChangesCreator;
@@ -29,6 +34,7 @@ public class StateIterator {
 
     public boolean nextState(){
         llh.applyAndSendDataChanges(); // sending changes from main logic
+        removeAllDisconnectedPlayers();
         if(gameData.currentState == GameData.State.NO_STATE){
             nonPlayerStateToNonPlayerState(State.WORLD_UPDATE);
              dataChangesCreator.setCurrentRound(round);
@@ -129,8 +135,30 @@ public class StateIterator {
     }
 
     private void removeAllDisconnectedPlayers(){
+        List<Integer> playersToRemove = new ArrayList<>();
         for(Player pl : gameData.players){
+            int id = pl.getId();
+            Connection con  = llh.int2con.get(id);
+            if(con != null && !con.isConnected()){
+                llh.con2int.remove(con);
+                llh.int2con.remove(id);
+                playersToRemove.add(pl.getId());
+            }
+            else if(con == null){
+                playersToRemove.add(pl.getId());
+            }
+        }
 
+        if(!playersToRemove.isEmpty()) {
+            for (Integer id : playersToRemove) {
+                dataChangesCreator.removeAllAirlinesFromThePlayer(id);
+            }
+            llh.applyAndSendDataChanges();
+            for (Integer id : playersToRemove){
+                int indInTurn = dataChangesCreator.removePlayerAndGetTurnInd(id);
+                turnOrderIterator.removePlayer(indInTurn);
+            }
+            llh.applyAndSendDataChanges();
         }
     }
 
