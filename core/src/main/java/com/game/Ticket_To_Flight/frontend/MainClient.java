@@ -10,8 +10,6 @@ import com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.WorldMapRenderer
 import com.game.Ticket_To_Flight.network.Network;
 import com.game.Ticket_To_Flight.frontend.LowLevelHandlerFront.Flags;
 
-import java.util.concurrent.ConcurrentLinkedDeque;
-
 public class MainClient {
     private final Game myGame;
     private final GameData gameData = new GameData();
@@ -36,37 +34,35 @@ public class MainClient {
     }
 
     private void mainCycle(float delta){
-        if(llh.flags.gamePreparationsState == Flags.GamePreparationsState.RUNNING) {
-            if(llh.flags.currentStateState == Flags.CurrentStateState.SERVER_DISCONNECTED){
+        if(llh.getGamePreparationState() == Flags.GamePreparationsState.RUNNING) {
+            if(llh.getCurrentStateState() == Flags.CurrentStateState.SERVER_DISCONNECTED){
                 //stop game and return to connecting screen
             }
             else if (gameData.currentState == GameData.State.WORLD_UPDATE) {
                 this.myGame.setScreen(this.worldMapRenderer);
             } else if (gameData.currentState == GameData.State.INVESTMENTS && llh.getMyId() == gameData.currentPlayer) {
-                if (llh.flags.currentStateState == Flags.CurrentStateState.PLAYER_STAGE) {
+                if (llh.getCurrentStateState() == Flags.CurrentStateState.PLAYER_STAGE) {
                     if (worldMapRenderer.drawInvestmentWindow()) {
-                        llh.flags.currentStateState = LowLevelHandlerFront.Flags.CurrentStateState.WAITING_FOR_PLAYER_CHOICE;
+                        llh.setWaitingForPlayerChoiceFlag();
                     }
                 }
             } else if (gameData.currentState == GameData.State.AUCTION && llh.getMyId() == gameData.currentPlayer) {
-                if (llh.flags.currentStateState == Flags.CurrentStateState.PLAYER_STAGE) {
+                if (llh.getCurrentStateState() == Flags.CurrentStateState.PLAYER_STAGE) {
                     if (worldMapRenderer.drawAuctionWindow()) {
-                        llh.flags.currentStateState = LowLevelHandlerFront.Flags.CurrentStateState.WAITING_FOR_PLAYER_CHOICE;
+                        llh.setWaitingForPlayerChoiceFlag();
                     }
                 }
                 worldMapRenderer.drawAuctionWindow();
             } else if (gameData.currentState == GameData.State.ABILITIES && llh.getMyId() == gameData.currentPlayer) {
-                if (llh.flags.currentStateState == Flags.CurrentStateState.PLAYER_STAGE) {
+                if (llh.getCurrentStateState() == Flags.CurrentStateState.PLAYER_STAGE) {
                     if (worldMapRenderer.drawAbilitiesWindow()) {
-                        llh.flags.currentStateState = LowLevelHandlerFront.Flags.CurrentStateState.WAITING_FOR_PLAYER_CHOICE;
+                        llh.setWaitingForPlayerChoiceFlag();
                     }
                 }
             } else if (gameData.currentState == GameData.State.PLANES && llh.getMyId() == gameData.currentPlayer) {
-                if (llh.flags.currentStateState == Flags.CurrentStateState.PLAYER_STAGE) {
-                    System.out.println("Something");
+                if (llh.getCurrentStateState() == Flags.CurrentStateState.PLAYER_STAGE) {
                     if (worldMapRenderer.drawPlaneWindow()) {
-                        System.out.println("Changing to something");
-                        llh.flags.currentStateState = LowLevelHandlerFront.Flags.CurrentStateState.WAITING_FOR_PLAYER_CHOICE;
+                        llh.setWaitingForPlayerChoiceFlag();
                     }
                 }
             } else if (gameData.currentState == GameData.State.AIRLINES && llh.getMyId() == gameData.currentPlayer) {
@@ -97,27 +93,27 @@ public class MainClient {
 
 
     private void GamePreparationStage() {
-        if(llh.flags.gamePreparationsState == Flags.GamePreparationsState.WAITING_FOR_CONNECT_CALL) {
+        if(llh.getGamePreparationState() == Flags.GamePreparationsState.WAITING_FOR_CONNECT_CALL) {
             if(!llh.connectToServer()){
                 this.myGame.setScreen(this.mainMenuRenderer);
             }
         }
-        else if(llh.flags.gamePreparationsState == Flags.GamePreparationsState.READY_TO_JOIN_THE_GAME) {
-            if (llh.flags.joinGameResponse == null && !connectionRenderer.getInput()) {
+        else if(llh.getGamePreparationState() == Flags.GamePreparationsState.READY_TO_JOIN_THE_GAME) {
+            if (llh.getJoinGameResponse() == null && !connectionRenderer.getInput()) {
                 connectionRenderer.showNicknameInput();
             }
-            else if(llh.flags.joinGameResponse == Network.JoinGameResponse.Response.NAME_ALREADY_EXISTS){
+            else if(llh.getJoinGameResponse() == Network.JoinGameResponse.Response.NAME_ALREADY_EXISTS){
                 connectionRenderer.showMessageWindow("Name already exists");
-                llh.flags.joinGameResponse = null;
+                llh.truncateJoinGameResponse();
             }
-            else if(llh.flags.joinGameResponse == Network.JoinGameResponse.Response.GAME_IS_RUNNING){
+            else if(llh.getJoinGameResponse() == Network.JoinGameResponse.Response.GAME_IS_RUNNING){
                 mainMenuClient.killMainClient();
             }
         }
-        else if(llh.flags.gamePreparationsState == Flags.GamePreparationsState.WAITING_FOR_SERVER_RESPONSE){
+        else if(llh.getGamePreparationState() == Flags.GamePreparationsState.WAITING_FOR_SERVER_RESPONSE){
             connectionRenderer.showLoadingScreen("Waiting for server response");
         }
-        else if(llh.flags.gamePreparationsState == Flags.GamePreparationsState.WAITING_FOR_OTHER_PLAYERS_TO_JOIN){
+        else if(llh.getGamePreparationState() == Flags.GamePreparationsState.WAITING_FOR_OTHER_PLAYERS_TO_JOIN){
             connectionRenderer.showLoadingScreen("Waiting for other players");
         }
     }

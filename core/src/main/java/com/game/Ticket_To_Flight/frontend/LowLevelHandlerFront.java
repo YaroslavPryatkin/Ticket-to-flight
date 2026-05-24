@@ -2,7 +2,6 @@ package com.game.Ticket_To_Flight.frontend;
 
 import com.esotericsoftware.kryonet.Connection;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airline;
-import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.AbilityType;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.PlaneType;
 import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
 import com.game.Ticket_To_Flight.commonFrontAndBack.LowLevelHandler;
@@ -44,7 +43,27 @@ public class LowLevelHandlerFront extends LowLevelHandler {
         public volatile String errorMessage = null;
     }
 
-    public Flags flags = new Flags();
+    private Flags flags = new Flags();
+
+    public Flags.GamePreparationsState getGamePreparationState(){
+        return flags.gamePreparationsState;
+    }
+
+    public Flags.CurrentStateState getCurrentStateState(){
+        return flags.currentStateState;
+    }
+    public Network.JoinGameResponse.Response getJoinGameResponse(){
+        return flags.joinGameResponse;
+    }
+
+    public void truncateJoinGameResponse(){
+        flags.joinGameResponse = null;
+    }
+
+    public void setWaitingForPlayerChoiceFlag(){
+        //System.out.println("Changing current state state flag to " + Flags.CurrentStateState.WAITING_FOR_PLAYER_CHOICE);
+        flags.currentStateState = Flags.CurrentStateState.WAITING_FOR_PLAYER_CHOICE;
+    }
 
     public LowLevelHandlerFront(GameData data,  MainClient mainClient){
         super(data); this.mainClient = mainClient;}
@@ -176,15 +195,18 @@ public class LowLevelHandlerFront extends LowLevelHandler {
     }
 
     private void changeFlagDependingOnNewState(GameData.State st){
-        if(st == null) return;
+        if(st == null) st = gameData.currentState;
+        Flags.CurrentStateState res;
         if(st == GameData.State.WORLD_UPDATE ||
             st == GameData.State.INCOME||
             st == GameData.State.TAXES ||
             st == GameData.State.EVENT
         )
-            flags.currentStateState = Flags.CurrentStateState.NO_PLAYER_STAGE;
+             res = Flags.CurrentStateState.NO_PLAYER_STAGE;
         else
-            flags.currentStateState = Flags.CurrentStateState.PLAYER_STAGE;
+            res  = Flags.CurrentStateState.PLAYER_STAGE;
+        //System.out.println("Changing current state state flag to " + res);
+        flags.currentStateState = res;
     }
 
     //------------------------------------- data changes part
