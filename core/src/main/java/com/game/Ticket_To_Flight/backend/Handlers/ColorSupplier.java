@@ -8,8 +8,6 @@ public class ColorSupplier {
     private static final List<Color> colorList = List.of(
 // Базовые яркие
         new Color(1.0f, 0.0f, 0.0f, 1.0f),     // Красный
-        new Color(0.0f, 0.0f, 1.0f, 1.0f),     // Синий
-        new Color(0.0f, 1.0f, 0.0f, 1.0f),     // Зеленый
         new Color(1.0f, 0.5f, 0.0f, 1.0f),     // Оранжевый
         new Color(1.0f, 0.0f, 1.0f, 1.0f),     // Маджента
         new Color(0.0f, 1.0f, 1.0f, 1.0f),     // Циан / Голубой

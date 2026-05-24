@@ -92,6 +92,7 @@ public class ConnectionUIManager extends Table {
     public void showMessageWindow(String title, String message) {
         if (this.getStage() == null) return;
 
+
         final Window popupWindow = new Window(title, skin);
         popupWindow.setMovable(false);
         popupWindow.setModal(true);
