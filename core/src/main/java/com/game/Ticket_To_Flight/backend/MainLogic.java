@@ -74,8 +74,8 @@ public class MainLogic extends MainLoopBack {
                 llh.sendWrongStateError();
             else {
                 int addedAmountOfShares = resp.amountOfShares;
-                if (addedAmountOfShares <= 0) {
-                    llh.sendError("Amount of shares should be > 0");
+                if (addedAmountOfShares < 0) {
+                    llh.sendError("Amount of shares should be >= 0");
                     return;
                 }
                 Player pl = gameData.players.get(gameData.currentPlayer);

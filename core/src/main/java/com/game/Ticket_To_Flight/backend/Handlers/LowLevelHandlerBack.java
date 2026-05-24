@@ -174,6 +174,7 @@ public class LowLevelHandlerBack extends LowLevelHandler {
     }
 
     public void sendError(String error){
+        System.err.println("Sending error: [" + error + "] at state + " + gameData.currentState + " to the player " + gameData.currentPlayer);
         flags.currentPlayerState = Flags.CurrentPlayerState.BAD_RESPONSE;
         Connection con = int2con.get(gameData.currentPlayer);
         if(con!=null){
