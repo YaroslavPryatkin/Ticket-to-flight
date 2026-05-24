@@ -111,7 +111,7 @@ public class MainClient {
             }
         }
         else if(llh.getGamePreparationState() == Flags.GamePreparationsState.WAITING_FOR_SERVER_RESPONSE){
-            connectionRenderer.showLoadingScreen("Waiting for server response");
+                connectionRenderer.showLoadingScreen("Waiting for server response");
         }
         else if(llh.getGamePreparationState() == Flags.GamePreparationsState.WAITING_FOR_OTHER_PLAYERS_TO_JOIN){
             connectionRenderer.showLoadingScreen("Waiting for other players");

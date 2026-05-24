@@ -43,7 +43,9 @@ public class ConnectionRenderer extends ScreenAdapter {
     public void showLoadingScreen(String message) {
         if (message.equals(lastLoadingScreenTitle))
             return;
+        System.out.println("Hello");
         uiManager.showLoadingScreen(message);
+        lastLoadingScreenTitle = message;
     }
 
     public void showNicknameInput() {
