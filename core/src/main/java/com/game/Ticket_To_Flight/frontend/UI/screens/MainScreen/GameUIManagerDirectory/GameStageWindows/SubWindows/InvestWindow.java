@@ -29,7 +29,6 @@ public class InvestWindow extends BaseGameWindow {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 int investedAmount = (int) slider.getValue();
-                System.out.println("Sending response " + investedAmount);
                 llh.sendInvestmentResponse(investedAmount);
                 remove();
                 uiManager.showSuccessWindow("Your request was sent to server");

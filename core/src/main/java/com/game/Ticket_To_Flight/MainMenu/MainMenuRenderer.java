@@ -12,16 +12,20 @@ public class MainMenuRenderer extends ScreenAdapter {
     private final Stage stage;
     private final Skin skin;
     private final MainMenuClient mainMenuClient;
+    private final MainMenuUI mainMenuUI;
 
     public MainMenuRenderer(MainMenuClient mainMenuClient) {
         this.mainMenuClient = mainMenuClient;
         this.stage = new Stage(new FitViewport(1920, 1080));
         this.skin = MainMenuSkinFactory.createMenuSkin();
 
-        Gdx.input.setInputProcessor(stage);
-
-        MainMenuUI mainMenuUI = new MainMenuUI(skin, mainMenuClient);
+        this.mainMenuUI = new MainMenuUI(skin, mainMenuClient);
         stage.addActor(mainMenuUI.getTable());
+    }
+
+    @Override
+    public void show() {
+        Gdx.input.setInputProcessor(stage);
     }
 
     @Override

@@ -24,7 +24,6 @@ public class LowLevelHandlerFront extends LowLevelHandler {
     public class Flags{
         public enum GamePreparationsState{
             WAITING_FOR_CONNECT_CALL,
-            SEARCHING_FOR_SERVER,
             READY_TO_JOIN_THE_GAME,
             WAITING_FOR_SERVER_RESPONSE,
             WAITING_FOR_OTHER_PLAYERS_TO_JOIN, // waiting for other players
@@ -269,15 +268,8 @@ public class LowLevelHandlerFront extends LowLevelHandler {
     public boolean connectToServer(){
         if(flags.gamePreparationsState != Flags.GamePreparationsState.WAITING_FOR_CONNECT_CALL) return false;
         //System.out.println("Looking for server");
-        flags.gamePreparationsState = Flags.GamePreparationsState.SEARCHING_FOR_SERVER;
         flags.currentStateState = Flags.CurrentStateState.NOT_IN_GAME;
-        gameClient.connect();
-
-        if(!isConnected()) {
-            flags.gamePreparationsState = Flags.GamePreparationsState.WAITING_FOR_CONNECT_CALL;
-            return false;
-        }
-        return true;
+        return gameClient.connect();
     }
 
     public boolean sendJoinRequest(String name){

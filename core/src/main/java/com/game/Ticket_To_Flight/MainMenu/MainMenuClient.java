@@ -26,6 +26,13 @@ public class MainMenuClient {
     }
 
     public void createMainClient() {
-        this.mainClient = new MainClient(this.gm);
+        if (this.mainClient == null)
+            this.mainClient = new MainClient(this.gm, this.mainMenuRenderer, this);
+        this.gm.setScreen(mainClient.connectionRenderer);
+    }
+
+    public void killMainClient() {
+        this.mainClient = null;
+        this.gm.setScreen(mainMenuRenderer);
     }
 }

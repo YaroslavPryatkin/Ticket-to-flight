@@ -24,7 +24,10 @@ public class ConnectionUIManager extends Table {
         this.clearChildren();
 
         Image loadingIcon = new Image(skin.getDrawable("loading-icon"));
+
+        loadingIcon.setSize(50, 50);
         loadingIcon.setOrigin(Align.center);
+
         loadingIcon.addAction(Actions.forever(Actions.rotateBy(-360f, 1.5f)));
 
         Label messageLabel = new Label(message, skin);

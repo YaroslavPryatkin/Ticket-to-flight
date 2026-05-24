@@ -10,6 +10,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 public class MainMenuUI {
     private final Table mainTable;
     private final MainMenuClient mainMenuClient;
+    private TextButton createServerBtn, connectServerBtn;
+
 
     public MainMenuUI(Skin skin, MainMenuClient mainMenuClient) {
         this.mainMenuClient = mainMenuClient;
@@ -20,18 +22,18 @@ public class MainMenuUI {
         buildUI(skin);
     }
 
-    private void buildUI(Skin skin) {
+    public void buildUI(Skin skin) {
         Label titleLabel = new Label("Ticket to Flight", skin);
         titleLabel.setFontScale(2.5f);
         mainTable.add(titleLabel).padBottom(150).row();
 
-        TextButton createServerBtn = new TextButton("Create server", skin);
-        TextButton connectServerBtn = new TextButton("Connect to server", skin);
+        createServerBtn = new TextButton("Create server", skin);
+        connectServerBtn = new TextButton("Connect to server", skin);
 
         createServerBtn.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                //System.out.println("Create server clicked");
+                System.out.println("Create server clicked");
                 if (mainMenuClient.createMainLogic()) {
                     MainMenuMessageDialog dialog = new MainMenuMessageDialog("Server", "Server was created succesfully", skin);
                     dialog.show(mainTable.getStage());
@@ -43,7 +45,8 @@ public class MainMenuUI {
         connectServerBtn.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                //System.out.println("Connect to server clicked");
+                System.out.println("Connect to server clicked");
+
                 mainMenuClient.createMainClient();
             }
         });

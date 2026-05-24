@@ -2,6 +2,7 @@ package com.game.Ticket_To_Flight.frontend;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.game.Ticket_To_Flight.MainMenu.MainMenuClient;
 import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
 import com.game.Ticket_To_Flight.MainMenu.MainMenuRenderer;
 import com.game.Ticket_To_Flight.frontend.UI.screens.ConnectionScreen.ConnectionRenderer;
@@ -16,13 +17,15 @@ public class MainClient {
     private final GameData gameData = new GameData();
     private final LowLevelHandlerFront llh = new LowLevelHandlerFront(gameData, this);
     private WorldMapRenderer worldMapRenderer;
-    private ConnectionRenderer connectionRenderer;
+    private MainMenuRenderer mainMenuRenderer;
+    public ConnectionRenderer connectionRenderer;
+    private MainMenuClient mainMenuClient;
 
-
-    public MainClient(Game gm){
+    public MainClient(Game gm, MainMenuRenderer mainMenuRenderer, MainMenuClient mainMenuClient) {
         this.myGame = gm;
+        this.mainMenuRenderer = mainMenuRenderer;
+        this.mainMenuClient = mainMenuClient;
         this.connectionRenderer = new ConnectionRenderer(myGame, llh, this);
-        this.myGame.setScreen(this.connectionRenderer);
     }
 
     public void mainCycleWithUpdate(float delta) {
@@ -93,10 +96,9 @@ public class MainClient {
 
     private void GamePreparationStage() {
         if(llh.flags.gamePreparationsState == Flags.GamePreparationsState.WAITING_FOR_CONNECT_CALL) {
-            llh.connectToServer();
-        }
-        else if(llh.flags.gamePreparationsState == Flags.GamePreparationsState.SEARCHING_FOR_SERVER) {
-            connectionRenderer.showLoadingScreen("Searching for server");
+            if(!llh.connectToServer()){
+                this.myGame.setScreen(this.mainMenuRenderer);
+            }
         }
         else if(llh.flags.gamePreparationsState == Flags.GamePreparationsState.READY_TO_JOIN_THE_GAME) {
             if (llh.flags.joinGameResponse == null) {
@@ -106,7 +108,9 @@ public class MainClient {
                 connectionRenderer.setInputIsPrinted(false);
                 connectionRenderer.showNicknameInput();
             }
-
+            else if(llh.flags.joinGameResponse == Network.JoinGameResponse.Response.GAME_IS_RUNNING){
+                mainMenuClient.killMainClient();
+            }
         }
         else if(llh.flags.gamePreparationsState == Flags.GamePreparationsState.WAITING_FOR_SERVER_RESPONSE){
             connectionRenderer.showLoadingScreen("Waiting for server response");

@@ -43,6 +43,8 @@ public class WorldMapRenderer extends ScreenAdapter {
     private final MainClient client;
     private final GameData gameData;
 
+    InputMultiplexer multiplexer;
+
 
     public WorldMapRenderer(MainClient client) {
         this.client = client;
@@ -77,10 +79,9 @@ public class WorldMapRenderer extends ScreenAdapter {
         this.uiManager = new GameUIManager(uiStageWindow, uiStageHUD, client);
         this.inputCtrl = new MapInputController(camera, gameData, uiManager);
 
-        InputMultiplexer multiplexer = new InputMultiplexer();
+        multiplexer = new InputMultiplexer();
         multiplexer.addProcessor(uiStageWindow);
         multiplexer.addProcessor(inputCtrl);
-        Gdx.input.setInputProcessor(multiplexer);
     }
 
     private void clampCamera() {
@@ -157,6 +158,11 @@ public class WorldMapRenderer extends ScreenAdapter {
 
     public void setMapCurrentStrategy(MapInteractionStrategy currentStrategy) {
         inputCtrl.setCurrentStrategy(currentStrategy);
+    }
+
+    @Override
+    public void show() {
+        Gdx.input.setInputProcessor(multiplexer);
     }
 
     @Override
