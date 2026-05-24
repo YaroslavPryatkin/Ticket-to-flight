@@ -98,6 +98,7 @@ public class LowLevelHandlerFront extends LowLevelHandler {
                 //System.out.println("Applying changes");
                 gameData.applyChangesUnsafe(checkedChanges);
                 changeFlagDependingOnNewState(checkedChanges.currentState);
+                mainClient.gameDataWasUpdated();
                 checkedChanges = null;
             }
             catch (Exception e){

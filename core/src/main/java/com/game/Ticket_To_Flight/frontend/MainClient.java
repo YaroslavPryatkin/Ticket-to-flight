@@ -79,6 +79,9 @@ public class MainClient {
         worldMapRenderer.renderNoLogic(delta);
     }
 
+    public void gameDataWasUpdated(){
+
+    }
 
     public void mainPreparationCycle(float delta) {
         llh.update();
