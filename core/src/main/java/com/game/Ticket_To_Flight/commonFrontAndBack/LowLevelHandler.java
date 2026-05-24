@@ -66,7 +66,9 @@ public abstract class LowLevelHandler {
         MessageAndConnection mc;
         while ((mc = sendMessageQueue.poll()) != null) {
             if(mc.con != null && mc.con.isConnected()) {
-                //System.out.println("Sending message " + mc.message.getClass().getSimpleName());
+//                System.out.println("Sending message " + mc.message.getClass().getSimpleName());
+//                if(mc.message instanceof Network.DataChangesMessage)
+//                    System.out.println("         cur state is "+ ((Network.DataChangesMessage) mc.message).dc.currentState);
                 mc.con.sendTCP(mc.message);
             }
             else{
@@ -79,7 +81,9 @@ public abstract class LowLevelHandler {
     protected void handleAllIncomingMessages() {
         MessageAndConnection mc;
         while ((mc = receiveMessageQueue.poll()) != null) {
-            //System.out.println("Got message " + mc.message.getClass().getSimpleName());
+//            System.out.println("Got message " + mc.message.getClass().getSimpleName());
+//            if(mc.message instanceof Network.DataChangesMessage)
+//                System.out.println("         new state is "+ ((Network.DataChangesMessage) mc.message).dc.currentState);
             handleIncomingMessage(mc.con, mc.message);
         }
     }

@@ -33,6 +33,7 @@ public class StateIterator {
     }
 
     public boolean nextState(){
+        System.out.println("Nex state");
         llh.applyAndSendDataChanges(); // sending changes from main logic
         removeAllDisconnectedPlayers();
         if(gameData.currentState == GameData.State.NO_STATE){

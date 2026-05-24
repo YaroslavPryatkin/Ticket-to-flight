@@ -60,4 +60,9 @@ public class TemporarySetHolder<C extends Identifiable, T extends Identifiable> 
             return containCheck(((Identifiable) o).getId());
         return false;
     }
+
+    @Override
+    public int size(){
+        return cur.size() + toAdd.size() - toRemove.size();
+    }
 }

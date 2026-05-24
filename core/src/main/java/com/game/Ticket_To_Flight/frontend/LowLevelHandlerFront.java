@@ -77,8 +77,11 @@ public class LowLevelHandlerFront extends LowLevelHandler {
             if(dataChanges != null) {
                 gameData.applyChangesUnsafe(dataChanges);
                 changeFlagDependingOnNewState(dataChanges.currentState);
+                mainClient.gameDataWasUpdated();
+                showGameData();
             }
         } catch (Exception e) {
+            System.err.println("Error during game data reload. Error " + e.getMessage());
             dataInconsistent();
         } finally {
             gameData.releaseWriteLock();
@@ -98,19 +101,12 @@ public class LowLevelHandlerFront extends LowLevelHandler {
                 gameData.applyChangesUnsafe(checkedChanges);
                 changeFlagDependingOnNewState(checkedChanges.currentState);
                 mainClient.gameDataWasUpdated();
-                System.out.println("------------------------------------------------\nChanges were applied, current game data:");
-                System.out.println("Current state = " + gameData.currentState);
-                System.out.println("Current player = " + gameData.currentPlayer);
-                System.out.println("Players:");
-                gameData.players.printAllToConsole();
-                System.out.println("Current turn order:");
-                for(int i=0;i<gameData.turnOrder.size()-1;++i){
-                    System.out.print(gameData.turnOrder.get(i).name + " -> ");
-                }
-                System.out.println(gameData.turnOrder.getLast().name + "\n\n");
                 checkedChanges = null;
+                showGameData();
             }
             catch (Exception e){
+                System.err.println("Error during data changing. Error " + e.getMessage());
+                e.printStackTrace();
                 dataInconsistent();
             }
             finally {
@@ -146,7 +142,7 @@ public class LowLevelHandlerFront extends LowLevelHandler {
                     }
                 }
 
-                isValid = gameData.checkChanges(change);
+                isValid = gameData.checkChangesDebug(change);
 
                 if (interruptValidator.compareAndSet(true, false)) {
                     return;
@@ -155,6 +151,7 @@ public class LowLevelHandlerFront extends LowLevelHandler {
                 if (isValid) {
                     checkedChanges = change;
                 } else {
+                    System.err.println("Data changes isnt valid");
                     dataInconsistent();
                 }
 
@@ -163,7 +160,7 @@ public class LowLevelHandlerFront extends LowLevelHandler {
                 if (interruptValidator.compareAndSet(true, false)) {
                     return;
                 }
-                System.out.println("Error: " + e.toString());
+                System.err.println("Error during data changes checking in separate thread. Error " + e.getMessage());
                 dataInconsistent();
             } finally {
                 gameData.releaseReadLock();
@@ -191,6 +188,24 @@ public class LowLevelHandlerFront extends LowLevelHandler {
     }
 
     //------------------------------------- data changes part
+
+    private void showGameData(){
+        System.out.println("------------------------------------------------\nCurrent game data:");
+        System.out.println("Current state = " + gameData.currentState);
+        System.out.println("Current player = " + gameData.currentPlayer);
+        System.out.println("Players:");
+        gameData.players.printAllToConsole();
+        if(gameData.turnOrder!=null) {
+            System.out.println("Current turn order:");
+            for (int i = 0; i < gameData.turnOrder.size() - 1; ++i) {
+                System.out.print(gameData.turnOrder.get(i).name + " -> ");
+            }
+            System.out.println(gameData.turnOrder.getLast().name);
+        }
+        else
+            System.out.println("No turn order yet");
+       System.out.println("------------------------------------------------\n");
+    }
 
     //------------------------------------- messages part
 
