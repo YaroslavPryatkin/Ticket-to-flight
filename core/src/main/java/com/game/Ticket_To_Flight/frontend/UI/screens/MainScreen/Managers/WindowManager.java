@@ -36,7 +36,7 @@ public class WindowManager {
         isWindowOpen = false;
     }
 
-    private void centerCurrentWindow() {
+    public void centerCurrentWindow() {
         if (currentWindow != null) {
             currentWindow.setPosition(
                 (uiStageWindow.getWidth() - currentWindow.getWidth()) / 2f,
