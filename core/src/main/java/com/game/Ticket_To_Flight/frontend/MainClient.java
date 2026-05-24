@@ -99,12 +99,12 @@ public class MainClient {
             }
         }
         else if(llh.getGamePreparationState() == Flags.GamePreparationsState.READY_TO_JOIN_THE_GAME) {
-            if (llh.getJoinGameResponse() == null && !connectionRenderer.getInput()) {
+            if (llh.getJoinGameResponse() == null) {
                 connectionRenderer.showNicknameInput();
             }
             else if(llh.getJoinGameResponse() == Network.JoinGameResponse.Response.NAME_ALREADY_EXISTS){
-                connectionRenderer.showMessageWindow("Name already exists");
                 llh.truncateJoinGameResponse();
+                connectionRenderer.showMessageWindow("Name already exists");
             }
             else if(llh.getJoinGameResponse() == Network.JoinGameResponse.Response.GAME_IS_RUNNING){
                 mainMenuClient.killMainClient();

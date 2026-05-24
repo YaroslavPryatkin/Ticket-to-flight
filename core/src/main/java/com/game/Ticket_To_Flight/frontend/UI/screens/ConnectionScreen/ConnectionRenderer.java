@@ -43,6 +43,7 @@ public class ConnectionRenderer extends ScreenAdapter {
     public void showLoadingScreen(String message) {
         if (message.equals(lastLoadingScreenTitle))
             return;
+        uiManager.shouldShowNicknameInput = true;
         System.out.println("Hello");
         uiManager.showLoadingScreen(message);
         lastLoadingScreenTitle = message;
@@ -52,9 +53,6 @@ public class ConnectionRenderer extends ScreenAdapter {
         uiManager.showNicknameInputScreen();
     }
 
-    public boolean getInput() {
-        return uiManager.isNicknameInput;
-    }
 
     public void showMessageWindow(String message) {
         uiManager.showMessageWindow("", message);

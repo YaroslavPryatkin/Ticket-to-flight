@@ -14,7 +14,7 @@ public class ConnectionUIManager extends Table {
     private final Skin skin;
     private final LowLevelHandlerFront llh;
 
-    public boolean isNicknameInput = false;
+    public boolean shouldShowNicknameInput = true;
 
     public ConnectionUIManager(Skin skin, LowLevelHandlerFront llh) {
         this.skin = skin;
@@ -41,7 +41,8 @@ public class ConnectionUIManager extends Table {
     }
 
     public void showNicknameInputScreen() {
-        isNicknameInput = true;
+        if(!shouldShowNicknameInput) return;
+        shouldShowNicknameInput = false;
         this.clearChildren();
 
         Label promptLabel = new Label("Enter your Nickname", skin);
@@ -59,7 +60,6 @@ public class ConnectionUIManager extends Table {
                 if (!nickname.isEmpty()) {
                     System.out.println("Nickname submitted: " + nickname);
                     llh.sendJoinRequest(nickname);
-                    isNicknameInput = false;
                 }
             }
         });
@@ -73,6 +73,7 @@ public class ConnectionUIManager extends Table {
                     if (!nickname.isEmpty()) {
                         System.out.println("Nickname submitted via Enter: " + nickname);
                         llh.sendJoinRequest(nickname);
+                        shouldShowNicknameInput=true;
                     }
                     return true;
                 }
