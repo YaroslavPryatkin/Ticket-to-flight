@@ -14,7 +14,7 @@ public class InvestWindow extends BaseGameWindow {
         super("Investing", skin, 800, 600);
 
         Label subtitleLabel = new Label("invest your incomes to money", skin);
-        final Slider slider = new Slider(1, 10, 1, false, skin);
+        final Slider slider = new Slider(0, 10, 1, false, skin);
         final Label amountLabel = new Label("1", skin);
 
         slider.addListener(new ChangeListener() {

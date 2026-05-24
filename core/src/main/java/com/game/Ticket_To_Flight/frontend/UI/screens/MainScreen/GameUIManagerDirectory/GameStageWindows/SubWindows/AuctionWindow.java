@@ -35,17 +35,19 @@ public class AuctionWindow extends BaseGameWindow {
 
         if (leftVal <= rightVal) {
             final Slider slider;
-            Label amountLabel;
+            Label leftLabel, rightLabel, currentLabel;
             TextButton betBtn;
 
             subtitleLabel = new Label("Bet more to walk first in this round", skin);
-            amountLabel = new Label(String.valueOf(leftVal), skin);
+            leftLabel = new Label(String.valueOf(leftVal), skin);
+            rightLabel = new Label(String.valueOf(rightVal), skin);
+            currentLabel = new Label(String.valueOf(leftVal), skin);
             slider = new Slider(leftVal, rightVal, 1, false, skin);
 
             slider.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, com.badlogic.gdx.scenes.scene2d.Actor actor) {
-                    amountLabel.setText(String.valueOf((int) slider.getValue()));
+                    currentLabel.setText(String.valueOf((int) slider.getValue()));
                 }
             });
 
@@ -61,22 +63,24 @@ public class AuctionWindow extends BaseGameWindow {
                 }
             });
 
-            this.add(subtitleLabel).colspan(2).padBottom(60).row();
+            this.add(subtitleLabel).padBottom(30).row();
+            this.add(currentLabel).padBottom(20).row();
 
-            this.add(slider).width(500).padLeft(110).padRight(30).padBottom(40);
-            this.add(amountLabel).width(80).left().padBottom(40).row();
+            Table sliderTable = new Table();
+            sliderTable.add(leftLabel).width(80).right().padRight(20);
+            sliderTable.add(slider).width(500);
+            sliderTable.add(rightLabel).width(80).left().padLeft(20);
+            this.add(sliderTable).padBottom(40).row();
 
             Table buttonTable = new Table();
-
             buttonTable.add(betBtn).width(250).height(80).padRight(40);
             buttonTable.add(passBtn).width(250).height(80);
-
-            this.add(buttonTable).colspan(2).padTop(30).row();
+            this.add(buttonTable).padTop(30).row();
         }
         else {
             subtitleLabel = new Label("You have no money to go on", skin);
             this.add(subtitleLabel).padBottom(60).row();
-            this.add(passBtn).width(250).height(8);
+            this.add(passBtn).width(250).height(80);
         }
     }
 }
