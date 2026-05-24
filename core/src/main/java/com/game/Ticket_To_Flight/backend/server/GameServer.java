@@ -39,7 +39,8 @@ public class GameServer {
             server.start();
             System.out.println("Server launched!");
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("FATAL: Failed to start server: " + e.getMessage());
+            throw new RuntimeException("Server startup failed", e);
         }
     }
 }
