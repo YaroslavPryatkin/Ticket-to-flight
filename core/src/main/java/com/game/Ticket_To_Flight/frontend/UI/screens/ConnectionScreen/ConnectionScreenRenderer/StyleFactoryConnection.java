@@ -11,11 +11,15 @@ public class StyleFactoryConnection extends BaseSkinFactory {
         Skin skin = new Skin();
         skin.add("default-font", generateCustomFont(42));
 
-        Window.WindowStyle windowStyle = new Window.WindowStyle();
+        Color windowBgColor = new Color(0.18f, 0.18f, 0.20f, 0.95f);
+        skin.add("background", createRoundedPatch(windowBgColor, 16));
 
+        Window.WindowStyle windowStyle = new Window.WindowStyle();
         windowStyle.titleFont = skin.getFont("default-font");
         windowStyle.titleFontColor = com.badlogic.gdx.graphics.Color.WHITE;
+
         windowStyle.background = skin.getDrawable("background");
+
         skin.add("default", windowStyle);
 
         Color bgDarkColor = new Color(0.15f, 0.20f, 0.28f, 0.95f);
