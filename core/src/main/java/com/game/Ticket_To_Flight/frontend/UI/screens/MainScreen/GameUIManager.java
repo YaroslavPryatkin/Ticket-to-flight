@@ -168,7 +168,17 @@ public class GameUIManager {
     }
 
     public boolean showPlaneWindow() {
-        uiStage.addActor(new PlaneWindow(skin_invest_window, this));
+        if (blueWindowPrinted)
+            return false;
+        if (window != null) {
+            window.remove();
+        }
+
+        window = new PlaneWindow(skin_invest_window, this, llh, gameData);
+        uiStage.addActor(window);
+
+        setPositionForWindow(window);
+        blueWindowPrinted = true;
         return true;
     }
 

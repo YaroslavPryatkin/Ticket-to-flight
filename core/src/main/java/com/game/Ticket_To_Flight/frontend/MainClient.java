@@ -57,8 +57,9 @@ public class MainClient {
                 }
             } else if (gameData.currentState == GameData.State.PLANES && llh.getMyId() == gameData.currentPlayer) {
                 if (llh.flags.currentStateState == Flags.CurrentStateState.PLAYER_STAGE) {
-                    worldMapRenderer.drawPlaneWindow();
-                    llh.flags.currentStateState = Flags.CurrentStateState.WAITING_FOR_PLAYER_CHOICE;
+                    if (worldMapRenderer.drawPlaneWindow()) {
+                        llh.flags.currentStateState = LowLevelHandlerFront.Flags.CurrentStateState.WAITING_FOR_PLAYER_CHOICE;
+                    }
                 }
             } else if (gameData.currentState == GameData.State.AIRLINES && llh.getMyId() == gameData.currentPlayer) {
                 // mainDrawer.reDrawAirlinesWindow();

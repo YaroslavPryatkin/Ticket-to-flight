@@ -1,90 +1,121 @@
 package com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.GameUIManagerDirectory.GameStageWindows;
 
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.game.Ticket_To_Flight.Utilities.MapHolder;
+import com.game.Ticket_To_Flight.backend.gameLogicEntities.Player;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.PlaneType;
+import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
+import com.game.Ticket_To_Flight.commonFrontAndBack.StaticGameData;
+import com.game.Ticket_To_Flight.frontend.LowLevelHandlerFront;
 import com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.GameUIManager;
+import com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.GameUIManagerDirectory.BaseGameWindow;
 
-import java.util.Iterator;
+public class PlaneWindow extends BaseGameWindow {
 
-public class PlaneWindow extends Table {
-    private final GameUIManager uiManager;
+    private final ButtonGroup<TextButton> buttonGroup;
 
-    public PlaneWindow(Skin skin, GameUIManager uiManager) {
+    public PlaneWindow(Skin skin, final GameUIManager uiManager, final LowLevelHandlerFront llh, GameData gameData) {
+        super("Plane Purchase", skin, 1400, 750);
 
-        this.uiManager = uiManager;
+        Player pl = gameData.players.get(gameData.currentPlayer);
+        int playerMoney = pl.money;
 
-        final Table overlayWindow = new Table();
-        overlayWindow.setFillParent(true);
-        overlayWindow.setBackground(skin.getDrawable("blue-bg"));
-        overlayWindow.setTouchable(com.badlogic.gdx.scenes.scene2d.Touchable.enabled);
+        TextButton.TextButtonStyle affordableStyle = new TextButton.TextButtonStyle();
+        affordableStyle.font = skin.getFont("default-font");
+        affordableStyle.up = skin.getDrawable("dark-bg");
+        affordableStyle.checked = skin.getDrawable("blue-bg");
+        affordableStyle.fontColor = Color.WHITE;
+        affordableStyle.checkedFontColor = Color.CYAN;
+        affordableStyle.disabledFontColor = Color.GRAY;
 
-        Label titleLabel = new Label("Purchase planes", skin);
-        titleLabel.setFontScale(1.5f);
-        Label subtitleLabel = new Label("Buy new planes", skin);
+        TextButton.TextButtonStyle expensiveStyle = new TextButton.TextButtonStyle();
+        expensiveStyle.font = skin.getFont("default-font");
+        expensiveStyle.up = skin.getDrawable("dark-bg");
+        expensiveStyle.fontColor = Color.RED;
+        expensiveStyle.disabledFontColor = Color.RED;
+
+        buttonGroup = new ButtonGroup<>();
+        buttonGroup.setMaxCheckCount(1);
+        buttonGroup.setMinCheckCount(0);
 
         Table planesTable = new Table();
 
-        planesTable.add(new Label("Regional Jet", skin)).pad(20);
-        planesTable.add(new Label("Business Plane", skin)).pad(20);
-        planesTable.add(new Label("Usual Jet", skin)).pad(20);
-        planesTable.row();
+        TextButton submitBtn = new TextButton("Choose the plane", skin, "default");
 
-        planesTable.add(new Label("$500", skin)).padBottom(20);
-        planesTable.add(new Label("$1200", skin)).padBottom(20);
-        planesTable.add(new Label("$2500", skin)).padBottom(20);
-        planesTable.row();
+        for (PlaneType plane : StaticGameData.planeTypes) {
+            Table singlePlaneTable = new Table();
 
-        TextButton buyRegBtn = new TextButton("BUY", skin);
-        TextButton buyBusBtn = new TextButton("BUY", skin);
-        TextButton buyUsuBtn = new TextButton("BUY", skin);
+            Label nameLabel = new Label(plane.description, skin);
 
-        buyRegBtn.addListener(new ClickListener() {
+            boolean canAfford = playerMoney >= plane.price;
+
+            TextButton priceBtn = new TextButton("$" + plane.price, canAfford ? affordableStyle : expensiveStyle);
+            priceBtn.setUserObject(plane.getId());
+
+            if (!canAfford) {
+                priceBtn.setDisabled(true);
+            } else {
+                buttonGroup.add(priceBtn);
+
+                priceBtn.addListener(new ChangeListener() {
+                    @Override
+                    public void changed(ChangeEvent event, Actor actor) {
+                        if (buttonGroup.getChecked() == null) {
+                            submitBtn.setText("Choose the plane");
+                        } else {
+                            submitBtn.setText("Submit the purchase");
+                        }
+                    }
+                });
+            }
+
+            singlePlaneTable.add(nameLabel).padBottom(20).row();
+            singlePlaneTable.add(priceBtn).width(250).height(80);
+
+            planesTable.add(singlePlaneTable).pad(30);
+        }
+
+        ScrollPane scrollPane = new ScrollPane(planesTable, skin);
+        scrollPane.setScrollingDisabled(false, true);
+        scrollPane.setFadeScrollBars(false);
+
+        this.add(scrollPane).expandX().fillX().padTop(50).padBottom(50).row();
+
+        Table bottomTable = new Table();
+
+        submitBtn.addListener(new ClickListener() {
             @Override
-            public void clicked(com.badlogic.gdx.scenes.scene2d.InputEvent event, float x, float y) {
-                System.out.println("Куплен Regional Jet");
-                overlayWindow.remove();
-                uiManager.showSuccessWindow("Regional Jet purchased successfully!");
+            public void clicked(InputEvent event, float x, float y) {
+                TextButton selected = buttonGroup.getChecked();
+                if (selected == null) {
+                    return;
+                }
+
+                int selectedPlaneId = (int) selected.getUserObject();
+
+                llh.sendPlaneResponse(selectedPlaneId, false);
+
+                buttonGroup.uncheckAll();
             }
         });
 
-        buyBusBtn.addListener(new ClickListener() {
+        TextButton exitBtn = new TextButton("Exit", skin, "red");
+        exitBtn.addListener(new ClickListener() {
             @Override
-            public void clicked(com.badlogic.gdx.scenes.scene2d.InputEvent event, float x, float y) {
-                System.out.println("Куплен Business Plane");
-                overlayWindow.remove();
-                uiManager.showSuccessWindow("Business Plane purchased successfully!");
+            public void clicked(InputEvent event, float x, float y) {
+                llh.sendPlanePass();
+                remove();
+                uiManager.showSuccessWindow("Plane purchase finished!");
             }
         });
 
-        buyUsuBtn.addListener(new ClickListener() {
-            @Override
-            public void clicked(com.badlogic.gdx.scenes.scene2d.InputEvent event, float x, float y) {
-                System.out.println("Куплен Usual Jet");
-                overlayWindow.remove();
-                uiManager.showSuccessWindow("Usual Jet purchased successfully!");
-            }
-        });
+        bottomTable.add(submitBtn).width(600).height(80).padBottom(20).row();
+        bottomTable.add(exitBtn).width(300).height(80);
 
-        planesTable.add(buyRegBtn).width(140).height(45);
-        planesTable.add(buyBusBtn).width(140).height(45);
-        planesTable.add(buyUsuBtn).width(140).height(45);
-
-        TextButton closeBtn = new TextButton("Cancel", skin);
-        closeBtn.addListener(new ClickListener() {
-            @Override
-            public void clicked(com.badlogic.gdx.scenes.scene2d.InputEvent event, float x, float y) {
-                overlayWindow.remove();
-            }
-        });
-
-        overlayWindow.add(titleLabel).padBottom(10).row();
-        overlayWindow.add(subtitleLabel).padBottom(50).row();
-        overlayWindow.add(planesTable).padBottom(50).row(); // Вставляем всю таблицу с самолетами целиком
-        overlayWindow.add(closeBtn).width(150).height(50);
+        this.add(bottomTable).padBottom(40);
     }
 }
