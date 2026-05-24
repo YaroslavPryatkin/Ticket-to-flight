@@ -99,6 +99,16 @@ public class LowLevelHandlerFront extends LowLevelHandler {
                 gameData.applyChangesUnsafe(checkedChanges);
                 changeFlagDependingOnNewState(checkedChanges.currentState);
                 mainClient.gameDataWasUpdated();
+                System.out.println("------------------------------------------------\nChanges were applied, current game data:");
+                System.out.println("Current state = " + gameData.currentState);
+                System.out.println("Current player = " + gameData.currentPlayer);
+                System.out.println("Players:");
+                gameData.players.printAllToConsole();
+                System.out.println("Current turn order:");
+                for(int i=0;i<gameData.turnOrder.size()-1;++i){
+                    System.out.print(gameData.turnOrder.get(i).name + " -> ");
+                }
+                System.out.println(gameData.turnOrder.getLast().name + "\n\n");
                 checkedChanges = null;
             }
             catch (Exception e){

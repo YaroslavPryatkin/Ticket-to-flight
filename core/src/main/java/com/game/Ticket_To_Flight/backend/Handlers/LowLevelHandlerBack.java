@@ -72,6 +72,9 @@ public class LowLevelHandlerBack extends LowLevelHandler {
         @Override
     protected void handleIncomingMessage(Connection con, Network.GameMessage message){
         if(message instanceof Network.JoinGameRequest) {
+            if (flags.gamePreparationsState == Flags.GamePreparationsState.RUNNING) {
+                addMessage(con, new Network.JoinGameResponse(Network.JoinGameResponse.Response.GAME_IS_RUNNING));
+            }
             Network.JoinGameRequest req = (Network.JoinGameRequest) message;
             addMessage(con ,  gameStarter.handleJoinGameRequest(con, req.playerName));
         }
@@ -129,17 +132,6 @@ public class LowLevelHandlerBack extends LowLevelHandler {
     void applyAndSendDataChanges(){
         GameData.DataChanges dataChanges = dataChangesCreator.takeDataChanges();
         gameData.applyChangesUnsafe(dataChanges);
-        System.out.println("Changes were applied, current game data:");
-        System.out.println("Current state = " + gameData.currentState);
-        System.out.println("Current player = " + gameData.currentPlayer);
-        System.out.println("Players:");
-        gameData.players.printAllToConsole();
-        System.out.println("Airports:");
-        gameData.airports.printAllToConsole();
-        System.out.println("Airlines:");
-        gameData.airlines.printAllToConsole();
-        System.out.println("Available Planes");
-        gameData.availablePlanes.printToConsole();
         sendToAllPlayers(new Network.DataChangesMessage(dataChanges));
     }
 

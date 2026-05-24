@@ -227,7 +227,8 @@ public class Network {
         private JoinGameResponse(){}
         public enum Response {
             SUCCESS,
-            NAME_ALREADY_EXISTS
+            NAME_ALREADY_EXISTS,
+            GAME_IS_RUNNING
         }
         public Response response=null;
         public JoinGameResponse(Response response){this.response = response;}
