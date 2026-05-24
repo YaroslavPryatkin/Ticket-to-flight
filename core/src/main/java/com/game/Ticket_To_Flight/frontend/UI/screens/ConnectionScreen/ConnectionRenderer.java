@@ -21,6 +21,8 @@ public class ConnectionRenderer extends ScreenAdapter {
     private final Skin skin;
     private final ConnectionUIManager uiManager;
 
+    private String lastLoadingScreenTitle = null;
+
     public ConnectionRenderer(Game game, LowLevelHandlerFront llh, MainClient mainClient) {
         this.game = game;
         this.llh = llh;
@@ -39,6 +41,8 @@ public class ConnectionRenderer extends ScreenAdapter {
     }
 
     public void showLoadingScreen(String message) {
+        if (message.equals(lastLoadingScreenTitle))
+            return;
         uiManager.showLoadingScreen(message);
     }
 
