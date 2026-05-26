@@ -25,7 +25,7 @@ public class LowLevelHandlerFront extends LowLevelHandler {
             WAITING_FOR_CONNECT_CALL,
             READY_TO_JOIN_THE_GAME,
             WAITING_FOR_SERVER_RESPONSE,
-            WAITING_FOR_OTHER_PLAYERS_TO_JOIN, // waiting for other players
+            WAITING_FOR_OTHER_PLAYERS_TO_JOIN,
             RUNNING
         }
         public volatile GamePreparationsState gamePreparationsState = GamePreparationsState.WAITING_FOR_CONNECT_CALL;
@@ -363,6 +363,11 @@ public class LowLevelHandlerFront extends LowLevelHandler {
     }
     public void sendPlanePass(){
         sendMessageToServer(new Network.PlayerPlaneChoiceResponse());
+        flags.currentStateState = Flags.CurrentStateState.WAITING_FOR_SERVER_RESPONSE;
+    }
+
+    public void sendRouteResponse(int airport, int airline, int passengerType) {
+        sendMessageToServer(new Network.PlayerRouteChoiceResponse(airport, airline, passengerType));
         flags.currentStateState = Flags.CurrentStateState.WAITING_FOR_SERVER_RESPONSE;
     }
 

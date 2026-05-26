@@ -198,7 +198,14 @@ public class Network {
 
     public static class PlayerRouteChoiceResponse extends GameMessage{
         public PlayerRouteChoiceResponse(){}
-        //no route class yet
+        public int airport;
+        public int airline;
+        public int passengerType;
+        public PlayerRouteChoiceResponse(int airport, int airline, int passengerType){
+            this.airport = airport;
+            this.airline = airline;
+            this.passengerType = passengerType;
+        }
     }
 
     public static class DataChangesMessage extends GameMessage{

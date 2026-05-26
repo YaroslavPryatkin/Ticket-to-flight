@@ -7,6 +7,8 @@ import com.badlogic.gdx.math.Vector3;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airline;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airport;
 import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
+import com.game.Ticket_To_Flight.frontend.MainClient;
+import com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.MapStrategies.FlightInteractionStrategy;
 import com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.MapStrategies.MapInteractionStrategy;
 
 public class MapInputController extends InputAdapter {
@@ -18,14 +20,11 @@ public class MapInputController extends InputAdapter {
 
     private MapInteractionStrategy currentStrategy;
 
-    public MapInputController(OrthographicCamera camera, GameData gameData, GameUIManager uiManager) {
+    public MapInputController(OrthographicCamera camera, GameData gameData, GameUIManager uiManager, MainClient client, MapSelectionState selectionState) {
         this.camera = camera;
         this.gameData = gameData;
         this.uiManager = uiManager;
-    }
-
-    public void setCurrentStrategy(MapInteractionStrategy currentStrategy) {
-        this.currentStrategy = currentStrategy;
+        this.currentStrategy = new FlightInteractionStrategy(gameData, uiManager, client.getLlh(), selectionState);
     }
 
     private float distanceToSegment(float px, float py, float x1, float y1, float x2, float y2) {
@@ -75,6 +74,10 @@ public class MapInputController extends InputAdapter {
         return null;
     }
 
+    public void setCurrentStrategy(MapInteractionStrategy currentStrategy) {
+        this.currentStrategy = currentStrategy;
+    }
+
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         Vector3 worldClick = new Vector3(screenX, screenY, 0);
@@ -92,7 +95,7 @@ public class MapInputController extends InputAdapter {
             return true;
         }
 
-        uiManager.removeTooltip();
+        currentStrategy.onEmptyMapClicked(worldClick.x, worldClick.y);
         lastMousePos.set(screenX, screenY, 0);
         return true;
     }

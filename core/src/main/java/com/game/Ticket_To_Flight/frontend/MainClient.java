@@ -66,7 +66,7 @@ public class MainClient {
                     }
                 }
             } else if (gameData.currentState == GameData.State.AIRLINES && llh.getMyId() == gameData.currentPlayer) {
-                // mainDrawer.reDrawAirlinesWindow();
+
             } else if (gameData.currentState == GameData.State.EVENT && llh.getMyId() == gameData.currentPlayer) {
                 //mainDrawer.eventWindow();
             } else if (gameData.currentState == GameData.State.FLIGHTS && llh.getMyId() == gameData.currentPlayer) {

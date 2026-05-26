@@ -197,7 +197,8 @@ public class MainLogic extends MainLoopBack {
             if(gameData.currentState != GameData.State.FLIGHTS)
                 llh.sendWrongStateError();
             else {
-                //work in progress, currently soft lock
+                // Flight resolution is not implemented yet, but accepting the response prevents the turn from soft-locking.
+                llh.playerFinished();
             }
         }
         else{

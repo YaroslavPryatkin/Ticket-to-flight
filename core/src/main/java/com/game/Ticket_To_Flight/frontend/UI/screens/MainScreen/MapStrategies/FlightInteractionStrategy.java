@@ -1,70 +1,63 @@
 package com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.MapStrategies;
 
-import com.badlogic.gdx.graphics.Color;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airline;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airport;
+import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
 import com.game.Ticket_To_Flight.frontend.LowLevelHandlerFront;
+import com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.GameUIManager;
+import com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.MapSelectionState;
 
 public class FlightInteractionStrategy implements MapInteractionStrategy {
-    private Airport selectedDepartureAirport = null;
+    private final GameData gameData;
+    private final GameUIManager uiManager;
     private final LowLevelHandlerFront llh;
+    private final MapSelectionState selectionState;
 
-    private final float NORMAL_ALPHA = 1.0f;
-    private final float SELECTED_ALPHA = 0.4f;
-
-    public FlightInteractionStrategy(LowLevelHandlerFront llh) {
+    public FlightInteractionStrategy(GameData gameData, GameUIManager uiManager, LowLevelHandlerFront llh, MapSelectionState selectionState) {
+        this.gameData = gameData;
+        this.uiManager = uiManager;
         this.llh = llh;
-    }
-
-    private Color getTransparentColor(Color originalColor, float alpha) {
-        return new Color(originalColor.r, originalColor.g, originalColor.b, alpha);
+        this.selectionState = selectionState;
     }
 
     @Override
     public void onAirportClicked(Airport airport) {
-        if (selectedDepartureAirport == null) {
-            selectedDepartureAirport = airport;
-            //airport.setColor(getTransparentColor(airport.getColor(), SELECTED_ALPHA));
-            System.out.println("Selected departure: " + airport.getCityName());
+        if (canChooseFlight()) {
+            selectionState.selectAirport(airport);
         }
-        else if (selectedDepartureAirport != airport) {
-         //   selectedDepartureAirport.setColor(getTransparentColor(selectedDepartureAirport.getColor(), NORMAL_ALPHA));
-
-            selectedDepartureAirport = airport;
-           // airport.setColor(getTransparentColor(airport.getColor(), SELECTED_ALPHA));
-            System.out.println("Changed departure to: " + airport.getCityName());
-        }
+        uiManager.showAirportTooltip(airport);
     }
 
     @Override
     public void onAirlineClicked(Airline airline) {
-        if (selectedDepartureAirport == null) {
-            System.out.println("Please select departure airport first!");
+        if (!canChooseFlight()) {
+            uiManager.showAirlineTooltip(airline);
             return;
         }
 
-        if (airline.getPortA() == selectedDepartureAirport || airline.getPortB() == selectedDepartureAirport) {
-
-            //airline.setColor(getTransparentColor(airline.getColor(), SELECTED_ALPHA));
-            System.out.println("Flight route selected!");
-
-            // llh.sendFlightRequest(selectedDepartureAirport.getId(), airline.getId());
-
-            //selectedDepartureAirport.setColor(getTransparentColor(selectedDepartureAirport.getColor(), NORMAL_ALPHA));
-            selectedDepartureAirport = null;
-
+        Integer selectedAirportId = selectionState.getSelectedAirportId();
+        if (selectedAirportId == null) {
+            uiManager.showAirlineTooltip(airline);
+            return;
         }
-        else {
-            System.out.println("This airline is not connected to the selected airport.");
+
+        boolean connectedToSelectedAirport =
+            airline.getPortA().getId() == selectedAirportId || airline.getPortB().getId() == selectedAirportId;
+        if (connectedToSelectedAirport) {
+            selectionState.selectAirline(airline);
+            uiManager.removeTooltip();
+        } else {
+            uiManager.showAirlineTooltip(airline);
         }
     }
 
     @Override
     public void onEmptyMapClicked(float worldX, float worldY) {
-        if (selectedDepartureAirport != null) {
-            //selectedDepartureAirport.setColor(getTransparentColor(selectedDepartureAirport.getColor(), NORMAL_ALPHA));
-            selectedDepartureAirport = null;
-            System.out.println("Selection cleared.");
-        }
+        selectionState.clearFlightSelection();
+        uiManager.removeTooltip();
+    }
+
+    private boolean canChooseFlight() {
+        return gameData.currentState == GameData.State.FLIGHTS && gameData.currentPlayer == llh.getMyId();
     }
 }

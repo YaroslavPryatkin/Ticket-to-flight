@@ -16,22 +16,29 @@ public class AirlineTooltipWindow extends Window {
 
     public AirlineTooltipWindow(Skin skin, final GameUIManager uiManager, final Airline airline, final double playerMoney, boolean isBuyingPhase, LowLevelHandlerFront llh) {
         super("Route Details", skin);
-        this.pad(20);
+        this.pad(35);
+        this.defaults().pad(8);
 
         Table table = new Table();
+        table.defaults().pad(10);
 
 
         if (airline.getPlayer() != null) {
-            table.add(new Label("Owned by: " + airline.getPlayer().getName(), skin));
+            table.add(new Label("Owned by:", skin)).padBottom(8).row();
+            table.add(new Label(airline.getPlayer().getName(), skin)).minWidth(360);
         }
         else {
-            final TextButton buyButton = new TextButton("Buy for $" + airline.getPrice(), skin);
+            table.add(new Label("Buy for", skin)).padBottom(12).row();
+
+            final TextButton buyButton = new TextButton("$" + airline.getPrice(), skin);
+            boolean canAfford = playerMoney >= airline.getPrice();
+            boolean canBuyNow = isBuyingPhase && canAfford;
 
             if (!isBuyingPhase) {
                 buyButton.setDisabled(true);
-            }
-
-            if (playerMoney < airline.getPrice()) {
+                buyButton.getLabel().setColor(Color.LIGHT_GRAY);
+            } else if (!canAfford) {
+                buyButton.setDisabled(true);
                 buyButton.getLabel().setColor(Color.RED);
             }
             else {
@@ -41,19 +48,18 @@ public class AirlineTooltipWindow extends Window {
             buyButton.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    if (buyButton.isDisabled() || playerMoney < airline.getPrice()) return;
-                    System.out.println("Buying route!");
-                    if(airline == null) llh.sendAirlinePass();
-                    else llh.sendAirlineResponse(airline, false);
+                    if (buyButton.isDisabled() || !canBuyNow) return;
+                    llh.sendAirlineResponse(airline, false);
                     uiManager.removeTooltip();
                     uiManager.showSuccessWindow("Airline was bought successfully!");
                 }
             });
 
-            table.add(buyButton).width(150).height(40);
+            table.add(buyButton).width(360).height(110);
         }
 
         this.add(table);
         this.pack();
+        this.setSize(Math.max(this.getWidth(), 460), Math.max(this.getHeight(), 240));
     }
 }
