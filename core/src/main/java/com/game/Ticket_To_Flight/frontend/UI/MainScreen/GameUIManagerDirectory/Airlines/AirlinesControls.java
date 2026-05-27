@@ -97,7 +97,7 @@ public class AirlinesControls {
     }
 
     private TextButton createFinishButton() {
-        TextButton button = new RoundedButton("Finish the purchase", skin, "default");
+        TextButton button = new RoundedButton("Finish this stage", skin, "default");
         button.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {

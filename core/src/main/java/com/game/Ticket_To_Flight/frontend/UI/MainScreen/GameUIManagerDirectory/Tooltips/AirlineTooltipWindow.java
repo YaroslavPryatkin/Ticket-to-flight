@@ -19,20 +19,23 @@ public class AirlineTooltipWindow extends BaseGameWindow implements MapTooltipWi
     public AirlineTooltipWindow(Skin skin, final GameUIManager uiManager, final Airline airline, final double playerMoney, boolean canBuyDuringCurrentStage, LowLevelHandlerFront llh) {
         super("Route Details", skin, 150, 200);
         this.pad(35);
+
+        this.padTop(130);
+
         this.defaults().pad(8);
 
-        this.getTitleTable().padTop(20);
+        this.getTitleTable().padTop(25);
 
         Table table = new Table();
-        table.defaults().pad(10);
+        table.defaults().pad(12);
 
 
         if (airline.getPlayer() != null) {
-            table.add(new SingleLineText("Owned by:", skin)).padBottom(8).row();
+            table.add(new SingleLineText("Owned by:", skin)).padBottom(45).row();
             table.add(new SingleLineText(airline.getPlayer().getName(), skin)).minWidth(360);
         }
         else {
-            table.add(new SingleLineText("Buy for", skin)).padBottom(12).row();
+            table.add(new SingleLineText("Buy for", skin)).padBottom(45).row();
 
             final TextButton buyButton = new RoundedButton("$" + airline.getPrice(), skin);
             boolean canAfford = playerMoney >= airline.getPrice();
