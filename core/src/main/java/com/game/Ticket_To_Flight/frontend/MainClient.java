@@ -2,11 +2,11 @@ package com.game.Ticket_To_Flight.frontend;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
-import com.game.Ticket_To_Flight.MainMenu.MainMenuClient;
+import com.game.Ticket_To_Flight.frontend.UI.MainMenuScreen.MainMenuClient;
 import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
-import com.game.Ticket_To_Flight.MainMenu.MainMenuRenderer;
-import com.game.Ticket_To_Flight.frontend.UI.screens.ConnectionScreen.ConnectionRenderer;
-import com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.WorldMapRenderer;
+import com.game.Ticket_To_Flight.frontend.UI.MainMenuScreen.MainMenuRenderer;
+import com.game.Ticket_To_Flight.frontend.UI.ConnectionScreen.ConnectionRenderer;
+import com.game.Ticket_To_Flight.frontend.UI.MainScreen.WorldMapRenderer;
 import com.game.Ticket_To_Flight.network.Network;
 import com.game.Ticket_To_Flight.frontend.LowLevelHandlerFront.Flags;
 

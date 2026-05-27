@@ -1,10 +1,8 @@
 package com.game.Ticket_To_Flight;
 
 import com.badlogic.gdx.Game;
-import com.game.Ticket_To_Flight.MainMenu.MainMenuClient;
-import com.game.Ticket_To_Flight.backend.MainLogic;
+import com.game.Ticket_To_Flight.frontend.UI.MainMenuScreen.MainMenuClient;
 import com.game.Ticket_To_Flight.commonFrontAndBack.StaticGameData;
-import com.game.Ticket_To_Flight.frontend.MainClient;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class TicketToFlight extends Game {
