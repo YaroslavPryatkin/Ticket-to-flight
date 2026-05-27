@@ -63,7 +63,6 @@ public class WindowManager {
 
     public void showSuccessWindow(String message) {
         closeCurrentWindow();
-
         currentWindow = new SuccessWindow(defaultSkin, facade, message);
         openWindow(currentWindow);
     }

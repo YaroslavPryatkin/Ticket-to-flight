@@ -11,13 +11,16 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airline;
 import com.game.Ticket_To_Flight.frontend.LowLevelHandlerFront;
 import com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.GameUIManager;
+import com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.GameUIManagerDirectory.GameStageWindows.BaseGameWindow;
 
-public class AirlineTooltipWindow extends Window {
+public class AirlineTooltipWindow extends BaseGameWindow {
 
-    public AirlineTooltipWindow(Skin skin, final GameUIManager uiManager, final Airline airline, final double playerMoney, boolean isBuyingPhase, LowLevelHandlerFront llh) {
-        super("Route Details", skin);
+    public AirlineTooltipWindow(Skin skin, final GameUIManager uiManager, final Airline airline, final double playerMoney, boolean canBuyDuringCurrentStage, LowLevelHandlerFront llh) {
+        super("Route Details", skin, 150, 200);
         this.pad(35);
         this.defaults().pad(8);
+
+        this.getTitleTable().padTop(20);
 
         Table table = new Table();
         table.defaults().pad(10);
@@ -32,9 +35,9 @@ public class AirlineTooltipWindow extends Window {
 
             final TextButton buyButton = new TextButton("$" + airline.getPrice(), skin);
             boolean canAfford = playerMoney >= airline.getPrice();
-            boolean canBuyNow = isBuyingPhase && canAfford;
+            boolean canBuyNow = canBuyDuringCurrentStage && canAfford;
 
-            if (!isBuyingPhase) {
+            if (!canBuyDuringCurrentStage) {
                 buyButton.setDisabled(true);
                 buyButton.getLabel().setColor(Color.LIGHT_GRAY);
             } else if (!canAfford) {

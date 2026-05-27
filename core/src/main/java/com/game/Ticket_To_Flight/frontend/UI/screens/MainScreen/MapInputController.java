@@ -7,7 +7,9 @@ import com.badlogic.gdx.math.Vector3;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airline;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airport;
 import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
+import com.game.Ticket_To_Flight.frontend.LowLevelHandlerFront;
 import com.game.Ticket_To_Flight.frontend.MainClient;
+import com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.MapStrategies.DefaultInteractionStrategy;
 import com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.MapStrategies.FlightInteractionStrategy;
 import com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.MapStrategies.MapInteractionStrategy;
 
@@ -17,6 +19,10 @@ public class MapInputController extends InputAdapter {
     private final GameUIManager uiManager;
     private final Vector3 lastMousePos = new Vector3();
     private final float clickTolerance = 10f;
+    private final LowLevelHandlerFront llh;
+    private final MapSelectionState mapSelectionState;
+    private final MapInteractionStrategy defaultStrategy;
+    private final MapInteractionStrategy flightStrategy;
 
     private MapInteractionStrategy currentStrategy;
 
@@ -24,7 +30,11 @@ public class MapInputController extends InputAdapter {
         this.camera = camera;
         this.gameData = gameData;
         this.uiManager = uiManager;
-        this.currentStrategy = new FlightInteractionStrategy(gameData, uiManager, client.getLlh(), selectionState);
+        this.llh = client.getLlh();
+        this.mapSelectionState = selectionState;
+        this.defaultStrategy = new DefaultInteractionStrategy(uiManager);
+        this.flightStrategy = new FlightInteractionStrategy(gameData, uiManager, llh, mapSelectionState);
+        this.currentStrategy = defaultStrategy;
     }
 
     private float distanceToSegment(float px, float py, float x1, float y1, float x2, float y2) {
@@ -72,6 +82,15 @@ public class MapInputController extends InputAdapter {
             if (dist <= clickTolerance) return airline;
         }
         return null;
+    }
+
+    public void updateCurrentStrategy() {
+        if (gameData.currentState == GameData.State.FLIGHTS) {
+            currentStrategy = flightStrategy;
+        }
+        else {
+            currentStrategy = defaultStrategy;
+        }
     }
 
     public void setCurrentStrategy(MapInteractionStrategy currentStrategy) {

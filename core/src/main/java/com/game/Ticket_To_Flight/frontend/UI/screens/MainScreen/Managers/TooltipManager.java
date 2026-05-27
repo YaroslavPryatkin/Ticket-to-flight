@@ -40,9 +40,9 @@ public class TooltipManager {
 
     public void showAirportTooltip(Airport airport) {
         removeTooltip();
-        anchoredWorldPosition = new Vector2(airport.getX(), airport.getY());
         boolean canSelectGroup = gameData.currentState == GameData.State.FLIGHTS && gameData.currentPlayer == llh.getMyId();
         currentTooltip = new AirportTooltipWindow(skin, airport, selectionState, canSelectGroup);
+        anchoredWorldPosition = airportPosition(airport);
         uiStageHUD.addActor(currentTooltip);
         updateTooltipPosition();
     }
@@ -51,13 +51,10 @@ public class TooltipManager {
         removeTooltip();
 
         double currentPlayerMoney = gameData.players.get(llh.getMyId()).getMoney();
-        boolean currentBuyingPhase = gameData.currentState == GameData.State.AIRLINES;
+        boolean canBuyDuringCurrentStage = gameData.currentState == GameData.State.AIRLINES;
 
-        currentTooltip = new AirlineTooltipWindow(skin, facade, airline, currentPlayerMoney, currentBuyingPhase, llh);
-        anchoredWorldPosition = new Vector2(
-            (airline.getPortA().getX() + airline.getPortB().getX()) / 2f,
-            (airline.getPortA().getY() + airline.getPortB().getY()) / 2f
-        );
+        currentTooltip = new AirlineTooltipWindow(skin, facade, airline, currentPlayerMoney, canBuyDuringCurrentStage, llh);
+        anchoredWorldPosition = airlineMidpoint(airline);
         uiStageHUD.addActor(currentTooltip);
         updateTooltipPosition();
     }
@@ -82,5 +79,16 @@ public class TooltipManager {
         }
         uiStageHUD.screenToStageCoordinates(stageCoords);
         currentTooltip.setPosition(stageCoords.x + 15, stageCoords.y + 15);
+    }
+
+    private Vector2 airportPosition(Airport airport) {
+        return new Vector2(airport.getX(), airport.getY());
+    }
+
+    private Vector2 airlineMidpoint(Airline airline) {
+        return new Vector2(
+            (airline.getPortA().getX() + airline.getPortB().getX()) / 2f,
+            (airline.getPortA().getY() + airline.getPortB().getY()) / 2f
+        );
     }
 }

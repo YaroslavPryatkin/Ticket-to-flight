@@ -46,6 +46,7 @@ public class WorldMapRenderer extends ScreenAdapter {
 
         this.multiplexer = new InputMultiplexer();
         multiplexer.addProcessor(uiStageWindow);
+        multiplexer.addProcessor(uiStageHUD);
         multiplexer.addProcessor(inputCtrl);
     }
 
@@ -57,6 +58,7 @@ public class WorldMapRenderer extends ScreenAdapter {
     public boolean drawAuctionWindow() { return uiManager.showAuctionWindow(); }
     public boolean drawPlaneWindow() { return uiManager.showPlaneWindow(); }
     public boolean drawAbilitiesWindow() { return uiManager.showAbilitiesWindow(); }
+    public void drawSuccessWindow(String message) { uiManager.showSuccessWindow(message); }
 
     public void setMapCurrentStrategy(MapInteractionStrategy currentStrategy) {
         inputCtrl.setCurrentStrategy(currentStrategy);
@@ -73,10 +75,11 @@ public class WorldMapRenderer extends ScreenAdapter {
     }
 
     public void renderNoLogic(float delta) {
+        inputCtrl.updateCurrentStrategy();
         mapDrawer.render(gameData);
         uiManager.updateDynamicControls();
-        showUiStage(uiStageWindow, delta);
         showUiStage(uiStageHUD, delta);
+        showUiStage(uiStageWindow, delta);
     }
 
     @Override

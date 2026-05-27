@@ -10,7 +10,6 @@ import com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.Managers.WindowM
 public class SuccessWindow extends BaseGameWindow {
     public SuccessWindow(Skin skin, final GameUIManager uiManager, String message) {
         super("Notification", skin);
-
         this.setModal(true);
 
         this.pad(60);

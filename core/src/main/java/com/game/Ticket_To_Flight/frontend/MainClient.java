@@ -66,7 +66,10 @@ public class MainClient {
                     }
                 }
             } else if (gameData.currentState == GameData.State.AIRLINES && llh.getMyId() == gameData.currentPlayer) {
-
+                if (llh.getCurrentStateState() == Flags.CurrentStateState.PLAYER_STAGE) {
+                    worldMapRenderer.drawSuccessWindow("Your turn. Buy the airline.");
+                    llh.setWaitingForPlayerChoiceFlag();
+                }
             } else if (gameData.currentState == GameData.State.EVENT && llh.getMyId() == gameData.currentPlayer) {
                 //mainDrawer.eventWindow();
             } else if (gameData.currentState == GameData.State.FLIGHTS && llh.getMyId() == gameData.currentPlayer) {

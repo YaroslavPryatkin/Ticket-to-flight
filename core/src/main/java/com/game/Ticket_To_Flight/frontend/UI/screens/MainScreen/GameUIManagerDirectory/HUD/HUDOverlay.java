@@ -41,18 +41,14 @@ public class HUDOverlay extends Table {
 
         roundLabel = new Label("Round: ", skin);
         stageLabel = new Label("Stage: ", skin);
-
         timeLabel = new Label("Time: ", skin);
         timeLabel.setColor(Color.ORANGE);
 
         moneyLabel = new Label("Money: ", skin);
-
         incomeLabel = new Label("Income: ", skin);
         incomeLabel.setColor(Color.GREEN);
-
         currentBetLabel = new Label("Current bet: ", skin);
         currentBetLabel.setColor(Color.ORANGE);
-
         planesLabel = new Label("Planes: None", skin);
         planesLabel.setColor(Color.CYAN);
 
@@ -62,7 +58,6 @@ public class HUDOverlay extends Table {
         leftStats.add(roundLabel).left().row();
         leftStats.add(stageLabel).left().padTop(15).row();
         leftStats.add(timeLabel).left().padTop(15).row();
-
         leftStats.add(playersTable).left().padTop(30).expandX().fillX().row();
 
         Table rightStats = new Table();
@@ -78,41 +73,47 @@ public class HUDOverlay extends Table {
     }
 
     public void updateHUD(Player chosenPlayer) {
+        String currentStage = gameData.currentState.toString();
+        Player activePlayer = chosenPlayer == null ? gameData.players.get(llh.getMyId()) : chosenPlayer;
+
+        updateGlobalGameStats(currentStage);
+        updatePlayerStats(activePlayer, currentStage);
+        updatePlayersListTable();
+    }
+
+    private void updateGlobalGameStats(String stage) {
         int round = gameData.roundNumber;
-        String stage = gameData.currentState.toString();
-        int time = 120; // В будущем заменить на таймер
-
-        Player me = chosenPlayer == null ? gameData.players.get(llh.getMyId()) : chosenPlayer;
-
-        int money = me.getMoney();
-        int income = me.getIncome();
-        int currentBet = me.getAuctionBet();
+        int time = 120;
 
         roundLabel.setText("Round: " + round);
         stageLabel.setText("Stage: " + stage);
         timeLabel.setText("Time: " + time + "s");
-        moneyLabel.setText("Money: $" + money);
+    }
 
-        String formattedGetIncome = me.getIncome() >=0 ? "+" + me.getIncome().toString() : me.getIncome().toString();
-        incomeLabel.setText("Income: $" + formattedGetIncome);
+    private void updatePlayerStats(Player player, String stage) {
+        moneyLabel.setText("Money: $" + player.getMoney());
+        incomeLabel.setText("Income: " + formatIncome(player.getIncome()));
 
         if (stage.equalsIgnoreCase("Auction")) {
             currentBetLabel.setVisible(true);
-            currentBetLabel.setText("Current bet: $" + currentBet);
+            currentBetLabel.setText("Current bet: $" + player.getAuctionBet());
         } else {
             currentBetLabel.setVisible(false);
         }
 
+        planesLabel.setText(getPlanesFormattedText(player));
+    }
+
+    private String getPlanesFormattedText(Player player) {
         StringBuilder planesText = new StringBuilder("Planes: ");
         boolean hasPlanes = false;
 
-        Iterator<Map.Entry<PlaneType, Integer>> it = MapHolder.viewAsEntrySet(me.planes);
+        Iterator<Map.Entry<PlaneType, Integer>> it = MapHolder.viewAsEntrySet(player.planes);
         while (it.hasNext()) {
             Map.Entry<PlaneType, Integer> e = it.next();
             if (e != null && e.getValue() > 0) {
-                PlaneType plane = e.getKey();
-                Integer amount = e.getValue();
-                planesText.append(plane.description).append(" (").append(amount).append("), ");
+                planesText.append(e.getKey().description)
+                    .append(" (").append(e.getValue()).append("), ");
                 hasPlanes = true;
             }
         }
@@ -122,40 +123,46 @@ public class HUDOverlay extends Table {
         } else {
             planesText.append("None");
         }
-        planesLabel.setText(planesText.toString());
 
+        return planesText.toString();
+    }
 
+    private void updatePlayersListTable() {
         playersTable.clearChildren();
 
         for (Player p : gameData.players) {
             if (p == null) continue;
 
-            Table playerRow = new Table();
-            playerRow.left().pad(8, 15, 8, 15);
-
-            boolean isCurrentTurn = (p.getId() == gameData.currentPlayer);
-
-            if (isCurrentTurn) {
-                playerRow.setBackground(skin.getDrawable("blue-bg"));
-            } else {
-                playerRow.setBackground(skin.getDrawable("dark-bg"));
-            }
-
-            Label nameLabel = new Label(p.getName(), skin);
-
-            if (p.getColor() != null) {
-                nameLabel.setColor(p.getColor());
-            }
-
-            String formattedGetIncomeMe = p.getIncome() >=0 ? "+" + p.getIncome().toString() : p.getIncome().toString();
-            Label statsLabel = new Label("  $" + p.getMoney() + " (" + formattedGetIncomeMe + ")", skin);
-            statsLabel.setColor(Color.WHITE);
-
-            playerRow.add(nameLabel).left().row();
-            playerRow.add(statsLabel).left();
-
+            Table playerRow = createPlayerRow(p);
             playersTable.add(playerRow).width(400).padBottom(5).left().row();
         }
+    }
+
+    private Table createPlayerRow(Player p) {
+        Table playerRow = new Table();
+        playerRow.left().pad(8, 15, 8, 15);
+
+        boolean isCurrentTurn = (p.getId() == gameData.currentPlayer);
+        String bgStyle = isCurrentTurn ? "blue-bg" : "dark-bg";
+        playerRow.setBackground(skin.getDrawable(bgStyle));
+
+        Label nameLabel = new Label(p.getName(), skin);
+        if (p.getColor() != null) {
+            nameLabel.setColor(p.getColor());
+        }
+
+        Label statsLabel = new Label("  $" + p.getMoney() + " (" + formatIncome(p.getIncome()) + ")", skin);
+        statsLabel.setColor(Color.WHITE);
+
+        playerRow.add(nameLabel).left().row();
+        playerRow.add(statsLabel).left();
+
+        return playerRow;
+    }
+
+    private String formatIncome(Integer income) {
+        if (income == null) return "$0";
+        return income >= 0 ? "+$" + income : "-$" + Math.abs(income);
     }
 
     public void resize() {
