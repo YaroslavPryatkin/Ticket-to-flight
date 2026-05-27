@@ -3,8 +3,10 @@ package com.game.Ticket_To_Flight.frontend;
 import com.esotericsoftware.kryonet.Connection;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airline;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.PlaneType;
+import com.game.Ticket_To_Flight.commonFrontAndBack.DTO.RouteDTO;
 import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
 import com.game.Ticket_To_Flight.commonFrontAndBack.LowLevelHandler;
+import com.game.Ticket_To_Flight.commonFrontAndBack.Route;
 import com.game.Ticket_To_Flight.network.Network;
 
 import java.util.Queue;
@@ -340,6 +342,18 @@ public class LowLevelHandlerFront extends LowLevelHandler {
         flags.currentStateState = Flags.CurrentStateState.WAITING_FOR_SERVER_RESPONSE;
     }
 
+    public void sendRouteResponse(Route route, boolean isFinished){
+        if(route == null) throw new NullPointerException("Route should bot be null. To pass call sendRoutePass()");
+        if(!route.canFinishRoute()) throw new IllegalArgumentException("Rout should be finishable before sending it to the server");
+        sendMessageToServer(new Network.PlayerRouteChoiceResponse(new RouteDTO(route), isFinished));
+        flags.currentStateState = Flags.CurrentStateState.WAITING_FOR_SERVER_RESPONSE;
+    }
+
+    public void sendRoutePass(){
+        sendMessageToServer(new Network.PlayerRouteChoiceResponse());
+        flags.currentStateState = Flags.CurrentStateState.WAITING_FOR_SERVER_RESPONSE;
+    }
+
     public void sendAirlineResponse(Airline airline,  boolean isFinished){
         if(airline == null) throw new NullPointerException("Airline should bot be null. To pass call sendAirlinePass()");
         sendAirlineResponse(airline.getId(), isFinished);
@@ -363,11 +377,6 @@ public class LowLevelHandlerFront extends LowLevelHandler {
     }
     public void sendPlanePass(){
         sendMessageToServer(new Network.PlayerPlaneChoiceResponse());
-        flags.currentStateState = Flags.CurrentStateState.WAITING_FOR_SERVER_RESPONSE;
-    }
-
-    public void sendRouteResponse(int airport, int airline, int passengerType) {
-        sendMessageToServer(new Network.PlayerRouteChoiceResponse(airport, airline, passengerType));
         flags.currentStateState = Flags.CurrentStateState.WAITING_FOR_SERVER_RESPONSE;
     }
 

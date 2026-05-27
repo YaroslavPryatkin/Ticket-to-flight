@@ -2,6 +2,7 @@ package com.game.Ticket_To_Flight.network;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.EndPoint;
+import com.game.Ticket_To_Flight.commonFrontAndBack.DTO.RouteDTO;
 import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
 
 import java.lang.reflect.Field;
@@ -143,6 +144,19 @@ public class Network {
         PASS
     }
 
+    public static class PlayerRouteChoiceResponse extends GameMessage {
+        public RouteDTO dto;
+        public FinishStatus finishStatus;
+        public PlayerRouteChoiceResponse(RouteDTO route, boolean isFinish){
+            this.dto = route;
+            if(isFinish)
+                finishStatus = FinishStatus.FINISHED;
+            else
+                finishStatus = FinishStatus.NOT_FINISHED;
+        }
+        public PlayerRouteChoiceResponse(){finishStatus = FinishStatus.PASS;}
+    }
+
     public static class PlayerAirlineChoiceResponse extends GameMessage{
         public int line = 0;
         public FinishStatus finishStatus;
@@ -175,9 +189,6 @@ public class Network {
         public PlayerInvestmentChoiceResponse(int shares ){this.amountOfShares = shares;}
     }
 
-    /**
-     * Sending null means pass
-     */
     public static class PlayerAuctionChoiceResponse extends GameMessage {
         public int betAmount = 0;
         public boolean isPass;
@@ -194,18 +205,6 @@ public class Network {
     public static class PlayerWorldEventChoiceResponse extends GameMessage{
         public PlayerWorldEventChoiceResponse(){}
         public Integer worldEvent =null;
-    }
-
-    public static class PlayerRouteChoiceResponse extends GameMessage{
-        public PlayerRouteChoiceResponse(){}
-        public int airport;
-        public int airline;
-        public int passengerType;
-        public PlayerRouteChoiceResponse(int airport, int airline, int passengerType){
-            this.airport = airport;
-            this.airline = airline;
-            this.passengerType = passengerType;
-        }
     }
 
     public static class DataChangesMessage extends GameMessage{

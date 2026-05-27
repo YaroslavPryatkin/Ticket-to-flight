@@ -268,12 +268,22 @@ public class Route {
 
     public Airport getCurrentAirport() { return current; }
 
+    /**
+     * to show on the ui. You should only show those passengers where psg.isFinished() == false
+     */
     public List<BoarderPassenger> getPassengers() {
         return Collections.unmodifiableList(passengers);
     }
 
+    /**
+     * to show on the ui. Airlines of the route
+     */
     public List<Airline> getLines() {
         return Collections.unmodifiableList(lines);
+    }
+
+    public Iterator<Map.Entry<Player, Integer>> getIncomeChangeIterator(){
+        return MapHolder.viewAsEntrySet(incomeChange);
     }
 
     /**
@@ -292,6 +302,14 @@ public class Route {
 
     public int getLinesCount() {
         return lines.size();
+    }
+
+    public boolean canFinishRoute(){
+        for(BoarderPassenger psg : passengers){
+            if(!psg.isFinished())
+                return false;
+        }
+        return true;
     }
 
 

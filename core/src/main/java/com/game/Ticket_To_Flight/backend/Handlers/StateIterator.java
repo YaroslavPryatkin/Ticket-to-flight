@@ -63,7 +63,8 @@ public class StateIterator {
              playerStateToPlayerState(State.AIRLINES, 2);
         }
         else if (gameData.currentState == GameData.State.AIRLINES) {
-            playerStateToNonPlayerState(State.EVENT);
+            //playerStateToNonPlayerState(State.EVENT);
+            playerStateToPlayerState(State.FLIGHTS, 3);
         }
         else if (gameData.currentState == GameData.State.EVENT) {
              nonPlayerStateToPlayerState(State.FLIGHTS, 3);

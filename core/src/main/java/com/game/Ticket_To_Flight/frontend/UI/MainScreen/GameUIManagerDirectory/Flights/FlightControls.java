@@ -75,15 +75,15 @@ public class FlightControls {
 
     private void sendFlightRequest() {
         if (flyButton.isDisabled() || !selectionState.hasCompleteFlightSelection()) return;
-
-        llh.sendRouteResponse(
-            selectionState.getSelectedAirportId(),
-            selectionState.getSelectedAirlineId(),
-            selectionState.getSelectedPassengerTypeId()
-        );
-        selectionState.clearFlightSelection();
-        uiManager.removeTooltip();
-        uiManager.showSuccessWindow("Flight request was sent to server");
+        throw new UnsupportedOperationException("Route message was changed");
+//        llh.sendRouteResponse(
+//            selectionState.getSelectedAirportId(),
+//            selectionState.getSelectedAirlineId(),
+//            selectionState.getSelectedPassengerTypeId()
+//        );
+//        selectionState.clearFlightSelection();
+//        uiManager.removeTooltip();
+//        uiManager.showSuccessWindow("Flight request was sent to server");
     }
 
     private void remove() {
