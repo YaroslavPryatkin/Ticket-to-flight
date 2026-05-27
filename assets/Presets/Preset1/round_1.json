@@ -5,23 +5,30 @@
     {
       "id": 1,
       "type": 101,
-      "x": 100,
-      "y": 100,
-      "name": "Test port 1"
+      "x": 1542,
+      "y": 526,
+      "name": "Budapest"
     },
     {
       "id": 2,
       "type": 102,
-      "x": 200,
-      "y": 200,
-      "name": "Test port 2"
+      "x": 2073,
+      "y": 896,
+      "name": "Moscow"
     },
     {
       "id": 3,
       "type": 103,
-      "x": 100,
-      "y": 200,
-      "name": "Test port 3"
+      "x": 917,
+      "y": 726,
+      "name": "London"
+    },
+    {
+      "id": 4,
+      "type": 104,
+      "x": 1849,
+      "y": 280,
+      "name": "Istanbul"
     }
   ],
 
@@ -35,6 +42,11 @@
       "type": 202,
       "portA": 2,
       "portB": 3
+    },
+    {
+      "type": 203,
+      "portA": 1,
+      "portB": 4
     }
   ],
 

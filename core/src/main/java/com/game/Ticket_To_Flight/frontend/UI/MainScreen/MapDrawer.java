@@ -21,6 +21,7 @@ public class MapDrawer {
     private final Texture mapTexture;
     private final Texture airportTexture;
     private final Texture airlineTexture;
+    private final GameData gameData;
 
     private final OrthographicCamera camera;
     private final Viewport viewport;
@@ -28,13 +29,15 @@ public class MapDrawer {
     private final float WORLD_HEIGHT;
     private final MapSelectionState selectionState;
 
-    public MapDrawer(MapSelectionState selectionState) {
+    public MapDrawer(MapSelectionState selectionState, GameData gameData) {
+        this.gameData = gameData;
+
         this.batch = new SpriteBatch();
         this.selectionState = selectionState;
         this.mapTexture = new Texture(Gdx.files.internal(PresetPaths.presetPaths.get(1) + "map.png"));
 
-        this.WORLD_WIDTH = 1920f;
-        this.WORLD_HEIGHT = 1080f;
+        this.WORLD_WIDTH = 2750f;
+        this.WORLD_HEIGHT = 1536f;
 
         int baseRadius = 32;
         Pixmap pixmap = new Pixmap(baseRadius * 2, baseRadius * 2, Pixmap.Format.RGBA8888);
@@ -118,7 +121,7 @@ public class MapDrawer {
         }
     }
 
-    public void render(GameData gameData) {
+    public void render(float delta) {
         Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 

@@ -36,10 +36,10 @@ public class WorldMapRenderer extends ScreenAdapter {
         this.gameData = client.getGameData();
 
         MapSelectionState selectionState = new MapSelectionState();
-        this.mapDrawer = new MapDrawer(selectionState);
+        this.mapDrawer = new MapDrawer(selectionState, gameData);
 
-        this.uiStageWindow = new Stage(new FitViewport(1920, 1080));
-        this.uiStageHUD = new Stage(new ExtendViewport(1920, 1080));
+        this.uiStageWindow = new Stage(new FitViewport(2750, 1536));
+        this.uiStageHUD = new Stage(new ExtendViewport(2750, 1536));
 
         this.uiManager = new GameUIManager(uiStageWindow, uiStageHUD, client, selectionState, mapDrawer.getCamera());
 
@@ -77,8 +77,13 @@ public class WorldMapRenderer extends ScreenAdapter {
 
     public void renderNoLogic(float delta) {
         inputCtrl.updateCurrentStrategy();
-        mapDrawer.render(gameData);
+
+        Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+
+        mapDrawer.render(delta);
+
         uiManager.updateDynamicControls();
+
         showUiStage(uiStageHUD, delta);
         showUiStage(uiStageWindow, delta);
     }
