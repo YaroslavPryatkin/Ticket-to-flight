@@ -4,6 +4,9 @@ import com.badlogic.gdx.math.Vector2;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airline;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Player;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.AbilityType;
+import com.game.Ticket_To_Flight.commonFrontAndBack.DTO.AirlineDTO;
+import com.game.Ticket_To_Flight.commonFrontAndBack.DTO.AirportDTO;
+import com.game.Ticket_To_Flight.commonFrontAndBack.DTO.PlayerDTO;
 import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
 import com.game.Ticket_To_Flight.commonFrontAndBack.StaticGameData;
 
@@ -24,7 +27,7 @@ public class DataChangesCreator {
     Integer addPlayer(String name){
         if(dataChanges.playersToAdd == null)
             dataChanges.playersToAdd = new HashSet<>();
-        GameData.PlayerDTO dto = new GameData.PlayerDTO(name, ColorSupplier.getColor());
+        PlayerDTO dto = new PlayerDTO(name, ColorSupplier.getColor());
         dataChanges.playersToAdd.add(dto);
         return dto.getId();
     }
@@ -74,7 +77,7 @@ public class DataChangesCreator {
         if(dataChanges.airportsToAdd == null){
             dataChanges.airportsToAdd = new HashSet<>();
         }
-        dataChanges.airportsToAdd.add(new GameData.AirportDTO(id, type, position, airportName));
+        dataChanges.airportsToAdd.add(new AirportDTO(id, type, position, airportName));
     }
 
 
@@ -85,7 +88,7 @@ public class DataChangesCreator {
         if(dataChanges.availableAirlinesToAdd == null){
             dataChanges.availableAirlinesToAdd = new HashSet<>();
         }
-        GameData.AirlineDTO newLine = new GameData.AirlineDTO( type,  portA,  portB);
+        AirlineDTO newLine = new AirlineDTO( type,  portA,  portB);
         dataChanges.airlinesToAdd.add(newLine);
         dataChanges.availableAirlinesToAdd.add(newLine.getId());
     }

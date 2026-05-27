@@ -27,6 +27,11 @@ public class ClosedInterval<T extends Comparable<T>> {
         return value.compareTo(from) >= 0 && value.compareTo(to) <= 0;
     }
 
+    public boolean lessThenMax(T value){
+        if(to == null) return true;
+        return value.compareTo(to)<=0;
+    }
+
     public T getFrom() { return from; }
     public T getTo() { return to; }
 }

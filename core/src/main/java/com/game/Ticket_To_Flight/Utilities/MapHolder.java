@@ -9,8 +9,10 @@ import java.util.*;
 import java.util.function.*;
 
 public class MapHolder<K extends Identifiable, V> implements Map<Integer, V> {
+
     private final Int2ObjectOpenHashMap<V> storage = new Int2ObjectOpenHashMap<>();
     private final SetHolder<K> keyHolder;
+
 
     public MapHolder(SetHolder<K> keyHolder) {
         if (keyHolder == null) throw new NullPointerException();

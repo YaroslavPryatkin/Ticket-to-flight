@@ -29,8 +29,8 @@ public class Airline extends Identifiable {
 
     //returns null if nothing fit
     public Airport getAnotherEnd(Airport end){
-        if(end == portA) return portB;
-        else if (end == portB) return portA;
+        if(end.equals(portA)) return portB;
+        else if (end.equals(portB)) return portA;
         return null;
     }
 
