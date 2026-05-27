@@ -8,6 +8,8 @@ import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
 import com.game.Ticket_To_Flight.frontend.MainClient;
+import com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.MapInput.MapInputController;
+import com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.MapInput.MapSelectionState;
 import com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.MapStrategies.MapInteractionStrategy;
 
 public class WorldMapRenderer extends ScreenAdapter {
@@ -15,7 +17,6 @@ public class WorldMapRenderer extends ScreenAdapter {
     private final GameData gameData;
 
     private final MapDrawer mapDrawer;
-    private final MapSelectionState selectionState;
 
     private final Stage uiStageWindow;
     private final Stage uiStageHUD;
@@ -34,7 +35,7 @@ public class WorldMapRenderer extends ScreenAdapter {
         this.client = client;
         this.gameData = client.getGameData();
 
-        this.selectionState = new MapSelectionState();
+        MapSelectionState selectionState = new MapSelectionState();
         this.mapDrawer = new MapDrawer(selectionState);
 
         this.uiStageWindow = new Stage(new FitViewport(1920, 1080));

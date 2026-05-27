@@ -1,4 +1,4 @@
-package com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen;
+package com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.MapInput;
 
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airline;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airport;

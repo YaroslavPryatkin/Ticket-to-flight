@@ -13,11 +13,11 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.game.Ticket_To_Flight.Utilities.MapHolder;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airport;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.PassengerType;
-import com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.MapSelectionState;
+import com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.MapInput.MapSelectionState;
 
 import java.util.Iterator;
 
-public class AirportTooltipWindow extends Window {
+public class AirportTooltipWindow extends Window implements MapTooltipWindow {
 
     public AirportTooltipWindow(Skin skin, final Airport airport, final MapSelectionState selectionState, boolean canSelectGroup) {
         super(airport.getCityName(), skin);
@@ -113,5 +113,10 @@ public class AirportTooltipWindow extends Window {
         this.add(table).row();
         this.add(chooseButton).width(280).height(60).padTop(20);
         this.pack();
+    }
+
+    @Override
+    public Window asWindow() {
+        return this;
     }
 }

@@ -1,4 +1,4 @@
-package com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen;
+package com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.MapInput;
 
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -9,6 +9,7 @@ import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airport;
 import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
 import com.game.Ticket_To_Flight.frontend.LowLevelHandlerFront;
 import com.game.Ticket_To_Flight.frontend.MainClient;
+import com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.GameUIManager;
 import com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.MapStrategies.DefaultInteractionStrategy;
 import com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.MapStrategies.FlightInteractionStrategy;
 import com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.MapStrategies.MapInteractionStrategy;
@@ -16,11 +17,8 @@ import com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.MapStrategies.Ma
 public class MapInputController extends InputAdapter {
     private final OrthographicCamera camera;
     private final GameData gameData;
-    private final GameUIManager uiManager;
     private final Vector3 lastMousePos = new Vector3();
     private final float clickTolerance = 10f;
-    private final LowLevelHandlerFront llh;
-    private final MapSelectionState mapSelectionState;
     private final MapInteractionStrategy defaultStrategy;
     private final MapInteractionStrategy flightStrategy;
 
@@ -29,28 +27,24 @@ public class MapInputController extends InputAdapter {
     public MapInputController(OrthographicCamera camera, GameData gameData, GameUIManager uiManager, MainClient client, MapSelectionState selectionState) {
         this.camera = camera;
         this.gameData = gameData;
-        this.uiManager = uiManager;
-        this.llh = client.getLlh();
-        this.mapSelectionState = selectionState;
+        LowLevelHandlerFront llh = client.getLlh();
         this.defaultStrategy = new DefaultInteractionStrategy(uiManager);
-        this.flightStrategy = new FlightInteractionStrategy(gameData, uiManager, llh, mapSelectionState);
+        this.flightStrategy = new FlightInteractionStrategy(gameData, uiManager, llh, selectionState);
         this.currentStrategy = defaultStrategy;
     }
 
     private float distanceToSegment(float px, float py, float x1, float y1, float x2, float y2) {
-        float A = px - x1;
-        float B = py - y1;
-        float C = x2 - x1;
-        float D = y2 - y1;
+        float a = px - x1;
+        float b = py - y1;
+        float c = x2 - x1;
+        float d = y2 - y1;
 
-        float dot = A * C + B * D;
-        float len_sq = C * C + D * D;
-        float param = -1;
-        if (len_sq != 0)
-            param = dot / len_sq;
+        float dot = a * c + b * d;
+        float lenSq = c * c + d * d;
+        float param = lenSq == 0 ? -1 : dot / lenSq;
 
-        float xx, yy;
-
+        float xx;
+        float yy;
         if (param < 0) {
             xx = x1;
             yy = y1;
@@ -58,8 +52,8 @@ public class MapInputController extends InputAdapter {
             xx = x2;
             yy = y2;
         } else {
-            xx = x1 + param * C;
-            yy = y1 + param * D;
+            xx = x1 + param * c;
+            yy = y1 + param * d;
         }
 
         float dx = px - xx;
@@ -85,12 +79,7 @@ public class MapInputController extends InputAdapter {
     }
 
     public void updateCurrentStrategy() {
-        if (gameData.currentState == GameData.State.FLIGHTS) {
-            currentStrategy = flightStrategy;
-        }
-        else {
-            currentStrategy = defaultStrategy;
-        }
+        currentStrategy = gameData.currentState == GameData.State.FLIGHTS ? flightStrategy : defaultStrategy;
     }
 
     public void setCurrentStrategy(MapInteractionStrategy currentStrategy) {
@@ -121,14 +110,11 @@ public class MapInputController extends InputAdapter {
 
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
-
         float deltaX = lastMousePos.x - screenX;
         float deltaY = screenY - lastMousePos.y;
 
         camera.translate(deltaX * camera.zoom, deltaY * camera.zoom);
-
         lastMousePos.set(screenX, screenY, 0);
-
         return true;
     }
 

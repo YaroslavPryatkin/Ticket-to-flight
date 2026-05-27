@@ -6,15 +6,15 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airline;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airport;
 import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
 import com.game.Ticket_To_Flight.frontend.LowLevelHandlerFront;
 import com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.GameUIManager;
-import com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.MapSelectionState;
 import com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.GameUIManagerDirectory.Tooltips.AirlineTooltipWindow;
 import com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.GameUIManagerDirectory.Tooltips.AirportTooltipWindow;
+import com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.GameUIManagerDirectory.Tooltips.MapTooltipWindow;
+import com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.MapInput.MapSelectionState;
 
 public class TooltipManager {
     private final Stage uiStageHUD;
@@ -25,7 +25,7 @@ public class TooltipManager {
     private final MapSelectionState selectionState;
     private final OrthographicCamera mapCamera;
 
-    private Window currentTooltip;
+    private MapTooltipWindow currentTooltip;
     private Vector2 anchoredWorldPosition;
 
     public TooltipManager(Stage uiStageHUD, Skin skin, GameUIManager facade, GameData gameData, LowLevelHandlerFront llh, MapSelectionState selectionState, OrthographicCamera mapCamera) {
@@ -43,7 +43,7 @@ public class TooltipManager {
         boolean canSelectGroup = gameData.currentState == GameData.State.FLIGHTS && gameData.currentPlayer == llh.getMyId();
         currentTooltip = new AirportTooltipWindow(skin, airport, selectionState, canSelectGroup);
         anchoredWorldPosition = airportPosition(airport);
-        uiStageHUD.addActor(currentTooltip);
+        uiStageHUD.addActor(currentTooltip.asWindow());
         updateTooltipPosition();
     }
 
@@ -55,13 +55,13 @@ public class TooltipManager {
 
         currentTooltip = new AirlineTooltipWindow(skin, facade, airline, currentPlayerMoney, canBuyDuringCurrentStage, llh);
         anchoredWorldPosition = airlineMidpoint(airline);
-        uiStageHUD.addActor(currentTooltip);
+        uiStageHUD.addActor(currentTooltip.asWindow());
         updateTooltipPosition();
     }
 
     public void removeTooltip() {
         if (currentTooltip != null) {
-            currentTooltip.remove();
+            currentTooltip.asWindow().remove();
             currentTooltip = null;
         }
         anchoredWorldPosition = null;
@@ -78,7 +78,7 @@ public class TooltipManager {
             stageCoords = new Vector2(screenCoords.x, Gdx.graphics.getHeight() - screenCoords.y);
         }
         uiStageHUD.screenToStageCoordinates(stageCoords);
-        currentTooltip.setPosition(stageCoords.x + 15, stageCoords.y + 15);
+        currentTooltip.asWindow().setPosition(stageCoords.x + 15, stageCoords.y + 15);
     }
 
     private Vector2 airportPosition(Airport airport) {

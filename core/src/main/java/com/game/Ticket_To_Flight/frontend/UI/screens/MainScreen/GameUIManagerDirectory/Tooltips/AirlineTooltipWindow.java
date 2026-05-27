@@ -13,7 +13,7 @@ import com.game.Ticket_To_Flight.frontend.LowLevelHandlerFront;
 import com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.GameUIManager;
 import com.game.Ticket_To_Flight.frontend.UI.screens.MainScreen.GameUIManagerDirectory.GameStageWindows.BaseGameWindow;
 
-public class AirlineTooltipWindow extends BaseGameWindow {
+public class AirlineTooltipWindow extends BaseGameWindow implements MapTooltipWindow {
 
     public AirlineTooltipWindow(Skin skin, final GameUIManager uiManager, final Airline airline, final double playerMoney, boolean canBuyDuringCurrentStage, LowLevelHandlerFront llh) {
         super("Route Details", skin, 150, 200);
@@ -52,9 +52,15 @@ public class AirlineTooltipWindow extends BaseGameWindow {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
                     if (buyButton.isDisabled() || !canBuyNow) return;
-                    llh.sendAirlineResponse(airline, false);
+                    boolean finishStage = uiManager.shouldFinishAirlinesAfterPurchase();
+                    llh.sendAirlineResponse(airline, finishStage);
+                    uiManager.resetAirlinesFinishChoice();
                     uiManager.removeTooltip();
-                    uiManager.showSuccessWindow("Airline was bought successfully!");
+                    uiManager.showSuccessWindow(
+                        finishStage
+                            ? "Airline was bought and airlines stage is finished for you."
+                            : "Airline was bought successfully!"
+                    );
                 }
             });
 
@@ -64,5 +70,10 @@ public class AirlineTooltipWindow extends BaseGameWindow {
         this.add(table);
         this.pack();
         this.setSize(Math.max(this.getWidth(), 460), Math.max(this.getHeight(), 240));
+    }
+
+    @Override
+    public Window asWindow() {
+        return this;
     }
 }
