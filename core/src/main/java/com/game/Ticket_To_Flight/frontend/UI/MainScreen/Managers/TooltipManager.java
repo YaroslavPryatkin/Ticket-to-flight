@@ -11,6 +11,7 @@ import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airport;
 import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
 import com.game.Ticket_To_Flight.frontend.LowLevelHandlerFront;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManager;
+import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.Flights.PassengerSelectionListener;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.Tooltips.AirlineTooltipWindow;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.Tooltips.AirportTooltipWindow;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.Tooltips.MapTooltipWindow;
@@ -39,9 +40,17 @@ public class TooltipManager {
     }
 
     public void showAirportTooltip(Airport airport) {
+        showAirportTooltip(airport, null);
+    }
+
+    public void showAirportTooltipForFlight(Airport airport, PassengerSelectionListener passengerSelectionListener) {
+        showAirportTooltip(airport, passengerSelectionListener);
+    }
+
+    private void showAirportTooltip(Airport airport, PassengerSelectionListener passengerSelectionListener) {
         removeTooltip();
         boolean canSelectGroup = gameData.currentState == GameData.State.FLIGHTS && gameData.currentPlayer == llh.getMyId();
-        currentTooltip = new AirportTooltipWindow(skin, airport, selectionState, canSelectGroup);
+        currentTooltip = new AirportTooltipWindow(skin, airport, selectionState, canSelectGroup, passengerSelectionListener);
         anchoredWorldPosition = airportPosition(airport);
         uiStageHUD.addActor(currentTooltip.asWindow());
         updateTooltipPosition();

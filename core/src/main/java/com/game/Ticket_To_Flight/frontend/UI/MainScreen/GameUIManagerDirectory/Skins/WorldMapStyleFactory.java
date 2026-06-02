@@ -26,6 +26,8 @@ public class WorldMapStyleFactory extends BaseSkinFactory {
 
         skin.add("dark-bg", createRoundedPatch(darkBgColor, 8));
         skin.add("blue-bg", createRoundedPatch(blueBgColor, 8));
+        skin.add("scroll-track", createRoundedPatch(new Color(0.05f, 0.05f, 0.05f, 0.5f), 5));
+        skin.add("scroll-knob", createRoundedPatch(Color.LIGHT_GRAY, 5));
 
         Window.WindowStyle windowStyle = new Window.WindowStyle();
         windowStyle.titleFont = skin.getFont("default-font");
@@ -47,6 +49,13 @@ public class WorldMapStyleFactory extends BaseSkinFactory {
         btnStyle.checked = skin.getDrawable("btn-down");
         btnStyle.disabled = skin.getDrawable("btn-disabled");
         skin.add("default", btnStyle);
+
+        ScrollPane.ScrollPaneStyle scrollStyle = new ScrollPane.ScrollPaneStyle();
+        scrollStyle.vScrollKnob = skin.getDrawable("scroll-knob");
+        scrollStyle.vScroll = skin.getDrawable("scroll-track");
+        scrollStyle.hScrollKnob = skin.getDrawable("scroll-knob");
+        scrollStyle.hScroll = skin.getDrawable("scroll-track");
+        skin.add("default", scrollStyle);
 
         return skin;
     }
