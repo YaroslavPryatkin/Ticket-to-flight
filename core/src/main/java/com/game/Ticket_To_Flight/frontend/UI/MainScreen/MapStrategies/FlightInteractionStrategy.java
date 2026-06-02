@@ -22,33 +22,14 @@ public class FlightInteractionStrategy implements MapInteractionStrategy {
 
     @Override
     public void onAirportClicked(Airport airport) {
-        if (canChooseFlight()) {
-            selectionState.selectAirport(airport);
-        }
-        uiManager.showAirportTooltip(airport);
+        if (!canChooseFlight()) return;
+        uiManager.handleFlightAirportClick(airport);
     }
 
     @Override
     public void onAirlineClicked(Airline airline) {
-        if (!canChooseFlight()) {
-            uiManager.showAirlineTooltip(airline);
-            return;
-        }
-
-        Integer selectedAirportId = selectionState.getSelectedAirportId();
-        if (selectedAirportId == null) {
-            uiManager.showAirlineTooltip(airline);
-            return;
-        }
-
-        boolean connectedToSelectedAirport =
-            airline.getPortA().getId() == selectedAirportId || airline.getPortB().getId() == selectedAirportId;
-        if (connectedToSelectedAirport) {
-            selectionState.selectAirline(airline);
-            uiManager.removeTooltip();
-        } else {
-            uiManager.showAirlineTooltip(airline);
-        }
+        if (!canChooseFlight()) return;
+        uiManager.handleFlightAirlineClick(airline);
     }
 
     @Override

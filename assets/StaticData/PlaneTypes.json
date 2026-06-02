@@ -22,7 +22,7 @@
     "maxGate": 4,
     "minDist": 500.0,
     "maxDist": 100000.0,
-    "price": 400000,
+    "price": 400,
     "description": "big plane"
   }
 ]

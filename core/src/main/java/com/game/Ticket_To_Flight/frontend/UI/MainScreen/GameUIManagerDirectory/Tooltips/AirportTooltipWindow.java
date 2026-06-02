@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.game.Ticket_To_Flight.Utilities.MapHolder;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airport;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.PassengerType;
+import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.Flights.PassengerSelectionListener;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.MapInput.MapSelectionState;
 import com.game.Ticket_To_Flight.frontend.components.buttons.RoundedButton;
 import com.game.Ticket_To_Flight.frontend.components.texts.SingleLineText;
@@ -21,6 +22,16 @@ import java.util.Iterator;
 public class AirportTooltipWindow extends Window implements MapTooltipWindow {
 
     public AirportTooltipWindow(Skin skin, final Airport airport, final MapSelectionState selectionState, boolean canSelectGroup) {
+        this(skin, airport, selectionState, canSelectGroup, null);
+    }
+
+    public AirportTooltipWindow(
+        Skin skin,
+        final Airport airport,
+        final MapSelectionState selectionState,
+        boolean canSelectGroup,
+        final PassengerSelectionListener passengerSelectionListener
+    ) {
         super(airport.getCityName(), skin);
 
         this.setMovable(false);
@@ -107,6 +118,9 @@ public class AirportTooltipWindow extends Window implements MapTooltipWindow {
                 PassengerType passengerType = (PassengerType) checked.getUserObject();
                 selectionState.selectAirport(airport);
                 selectionState.selectPassengerType(passengerType);
+                if (passengerSelectionListener != null) {
+                    passengerSelectionListener.onPassengerSelected(airport, passengerType);
+                }
                 chooseButton.setText("Group selected");
             }
         });

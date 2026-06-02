@@ -73,7 +73,9 @@ public class MainClient {
             } else if (gameData.currentState == GameData.State.EVENT && llh.getMyId() == gameData.currentPlayer) {
                 //mainDrawer.eventWindow();
             } else if (gameData.currentState == GameData.State.FLIGHTS && llh.getMyId() == gameData.currentPlayer) {
-                // smth
+                if (llh.getCurrentStateState() == Flags.CurrentStateState.PLAYER_STAGE) {
+                    llh.setWaitingForPlayerChoiceFlag();
+                }
             } else if (gameData.currentState == GameData.State.INCOME && llh.getMyId() == gameData.currentPlayer) {
                 // change Income
             } else if (gameData.currentState == GameData.State.TAXES && llh.getMyId() == gameData.currentPlayer) {
