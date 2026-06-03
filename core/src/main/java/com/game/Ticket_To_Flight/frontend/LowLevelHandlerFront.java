@@ -2,6 +2,7 @@ package com.game.Ticket_To_Flight.frontend;
 
 import com.esotericsoftware.kryonet.Connection;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airline;
+import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airport;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.PlaneType;
 import com.game.Ticket_To_Flight.commonFrontAndBack.DTO.RouteDTO;
 import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
@@ -99,6 +100,7 @@ public class LowLevelHandlerFront extends LowLevelHandler {
                 gameData.applyChangesUnsafe(dataChanges);
                 changeFlagDependingOnNewState(dataChanges.currentState);
                 mainClient.gameDataWasUpdated();
+                //System.out.println("Resetting game data");
                 showGameData();
             }
         } catch (Exception e) {
@@ -228,6 +230,10 @@ public class LowLevelHandlerFront extends LowLevelHandler {
         }
         else
             System.out.println("No turn order yet");
+        System.out.println("Airports:");
+        for(Airport airport : gameData.airports){
+            System.out.println(airport.toString());
+        }
        System.out.println("------------------------------------------------\n");
     }
 

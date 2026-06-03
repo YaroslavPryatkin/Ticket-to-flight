@@ -68,6 +68,6 @@ public class AirportDTO extends Identifiable {
         } catch (Exception e) {
             return null;
         }
-        return new Airport(this.getId(), type, this.position, this.name);
+        return new Airport(this.getId(), type, this.position, this.name, passengers);
     }
 }

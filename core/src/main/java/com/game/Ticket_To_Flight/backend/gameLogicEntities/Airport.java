@@ -19,13 +19,13 @@ public class Airport extends Identifiable {
     /**
      * Should not be called anywhere except game data
      */
-    public Airport(int id, AirportType type, Vector2 position, String AirportName) {
+    public Airport(int id, AirportType type, Vector2 position, String AirportName, MapHolder<PassengerType, Integer> passengers) {
         super(id);
         if(type == null || position == null) throw new IllegalArgumentException("Null arguments in constructor.");
         this.type = type;
         this.position = position;
         this.airportName = AirportName;
-        this.passengers = new MapHolder<>(StaticGameData.passengerTypes);
+        this.passengers = passengers;
     }
 
     public Color getColor() {
@@ -78,7 +78,7 @@ public class Airport extends Identifiable {
 
     @Override
     public String toString(){
-        String ans  = "Airport [" + airportName + "] of type [" + type.getId() + "]\n Passengers";
+        String ans  = "Airport [" + airportName + "] of type [" + type.getId() + "]\n PassengerType -> Amount";
         for(Map.Entry<Integer, Integer> e : passengers.entrySet()){
             ans += "\n    " + e.getKey() + " -> " + e.getValue();
         }

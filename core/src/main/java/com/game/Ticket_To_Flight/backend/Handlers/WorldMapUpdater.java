@@ -178,8 +178,8 @@ public class WorldMapUpdater {
 
     private double nextWeight(double currentWeight) {
 
-        if (currentWeight > 0.9) return 0.8;
-        if (currentWeight > 0.7) return 0.5;
+        if (currentWeight > 0.9) return 0.7;
+        if (currentWeight > 0.6) return 0.5;
         if (currentWeight > 0.4) return 0.2;
         return 0.05;
     }
