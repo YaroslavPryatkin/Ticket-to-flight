@@ -35,7 +35,7 @@ public class GameUIManager {
         this.windowManager = new WindowManager(uiStageWindow, defaultSkin, investSkin, this, gameData, llh);
         this.tooltipManager = new TooltipManager(uiStageHUD, defaultSkin, this, gameData, llh, selectionState, mapCamera);
         this.hud = new HUDOverlay(uiStageHUD, defaultSkin, gameData, llh);
-        this.flightController = new MainFlightController(uiStageHUD, defaultSkin, gameData, llh, this);
+        this.flightController = new MainFlightController(uiStageHUD, defaultSkin, gameData, llh, this, hud.getFlightHUD());
         this.airlinesControls = new AirlinesControls(uiStageHUD, defaultSkin, gameData, llh, this);
     }
 
