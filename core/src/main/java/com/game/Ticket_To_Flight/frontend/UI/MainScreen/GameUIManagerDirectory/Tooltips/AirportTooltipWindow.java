@@ -1,23 +1,20 @@
 package com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.Tooltips;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.ui.Window;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.game.Ticket_To_Flight.Utilities.MapHolder;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airport;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.PassengerType;
+import com.game.Ticket_To_Flight.commonFrontAndBack.StaticGameData;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.Flights.PassengerSelectionListener;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.MapInput.MapSelectionState;
 import com.game.Ticket_To_Flight.frontend.components.buttons.RoundedButton;
 import com.game.Ticket_To_Flight.frontend.components.texts.SingleLineText;
 
-import java.util.Iterator;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class AirportTooltipWindow extends Window implements MapTooltipWindow {
 
@@ -37,95 +34,106 @@ public class AirportTooltipWindow extends Window implements MapTooltipWindow {
         this.setMovable(false);
         this.pad(20);
 
-        Table table = new Table();
+        Table contentTable = new Table();
 
-        table.add(new SingleLineText("Route", skin)).padRight(20).left();
-        table.add(new SingleLineText("Persons", skin)).padRight(20).center();
+        Set<PassengerType> selectedGroups = new HashSet<>();
 
-        table.add(new SingleLineText("Reward", skin)).padRight(20).center();
-        table.add(new SingleLineText("Class", skin)).padRight(20).center();
+        final TextButton chooseButton = new RoundedButton("Choose groups", skin);
+        chooseButton.setDisabled(true); // Выключена, пока ничего не выбрано
+        chooseButton.getLabel().setColor(Color.LIGHT_GRAY);
 
-        table.add(new SingleLineText("Available", skin)).padRight(20).center();
-        table.add(new SingleLineText("Choice", skin)).padLeft(10);
-        table.row();
+        contentTable.add(new SingleLineText("Route", skin)).padRight(20).padBottom(15).left();
+        contentTable.add(new SingleLineText("Persons", skin)).padRight(20).padBottom(15).center();
+        contentTable.add(new SingleLineText("Reward", skin)).padRight(20).padBottom(15).center();
+        contentTable.add(new SingleLineText("Class", skin)).padRight(20).padBottom(15).center();
+        contentTable.add(new SingleLineText("Available", skin)).padRight(20).padBottom(15).center();
+        contentTable.add(new SingleLineText("Choice", skin)).padLeft(10).padBottom(15).center();
+        contentTable.row();
 
         var guestsMap = airport.getGuests();
-        final com.badlogic.gdx.scenes.scene2d.ui.ButtonGroup<TextButton> groupButtons = new com.badlogic.gdx.scenes.scene2d.ui.ButtonGroup<>();
-        groupButtons.setMaxCheckCount(1);
-        groupButtons.setMinCheckCount(0);
         boolean hasGroups = false;
 
-        int totalColumns = 6;
-
         if (guestsMap != null) {
-            Iterator<PassengerType> it = MapHolder.viewAsListIterator(guestsMap);
-            PassengerType type;
-            while ((type = it.next()) != null) {
-                Integer groupCount = guestsMap.get(type);
-                if (groupCount == null || groupCount == 0) continue;
+            for (Map.Entry<Integer, Integer> e : guestsMap.entrySet()) {
+                int passengerId = e.getKey();
+                int amount = e.getValue();
+
+                if (amount <= 0) continue;
                 hasGroups = true;
 
-                table.add(new SingleLineText(type.description, skin)).padRight(20).left();
-                table.add(new SingleLineText(String.valueOf(type.size), skin)).padRight(20).center();
+                PassengerType pType = StaticGameData.passengerTypes.get(passengerId);
 
-                table.add(new SingleLineText("100$", skin)).padRight(20).center();
-                table.add(new SingleLineText("Economy", skin)).padRight(20).center();
+                String routeText = "To " + pType.typeTo.description;
+                String personsText = String.valueOf(pType.size);
+                String rewardText = "$" + pType.solvency;
+                String classText = pType.description;
+                String availableText = String.valueOf(amount);
 
-                table.add(new SingleLineText(groupCount + " grp", skin)).padRight(20).center();
+                contentTable.add(new SingleLineText(routeText, skin)).padRight(20).padBottom(8).left();
+                contentTable.add(new SingleLineText(personsText, skin)).padRight(20).padBottom(8).center();
+                contentTable.add(new SingleLineText(rewardText, skin)).padRight(20).padBottom(8).center();
+                contentTable.add(new SingleLineText(classText, skin)).padRight(20).padBottom(8).center();
+                contentTable.add(new SingleLineText(availableText, skin)).padRight(20).padBottom(8).center();
 
-                TextButton groupButton = new RoundedButton("Select", skin);
-                groupButton.setUserObject(type);
-                groupButton.setDisabled(!canSelectGroup);
-                if (selectionState.isPassengerTypeSelected(type)) {
-                    groupButton.setChecked(true);
-                }
-                groupButtons.add(groupButton);
-                table.add(groupButton).width(160).height(40).padLeft(10);
+                TextButton selectBtn = new RoundedButton("Select", skin);
+                selectBtn.setDisabled(!canSelectGroup);
 
-                table.row().padTop(10);
+                selectBtn.addListener(new ClickListener() {
+                    @Override
+                    public void clicked(InputEvent event, float x, float y) {
+                        if (!canSelectGroup) return;
+
+                        if (selectedGroups.contains(pType)) {
+                            selectedGroups.remove(pType);
+                            selectBtn.setText("Select");
+                            selectBtn.getColor().set(Color.WHITE);
+                        } else {
+                            // Если не выбрано -> выбираем
+                            selectedGroups.add(pType);
+                            selectBtn.setText("Selected");
+                            selectBtn.getColor().set(Color.GREEN);
+                        }
+
+                        boolean hasSelection = !selectedGroups.isEmpty();
+                        chooseButton.setDisabled(!hasSelection);
+                        chooseButton.getLabel().setColor(hasSelection ? Color.WHITE : Color.LIGHT_GRAY);
+                    }
+                });
+
+                contentTable.add(selectBtn).padLeft(10).padBottom(8).center();
+                contentTable.row();
             }
         }
-        else {
-            table.add(new SingleLineText("No guests", skin)).colspan(totalColumns).center().padTop(10);
+
+        if (!hasGroups) {
+            contentTable.clearChildren();
+            contentTable.add(new SingleLineText("No passengers waiting here", skin)).center().pad(20);
         }
 
-        if (guestsMap != null && !hasGroups) {
-            table.add(new SingleLineText("No groups ready to fly", skin)).colspan(totalColumns).center().padTop(10);
-            table.row();
-        }
-
-        final TextButton chooseButton = new RoundedButton("Choose group", skin);
-        chooseButton.setDisabled(!canSelectGroup || groupButtons.getChecked() == null);
-        chooseButton.getLabel().setColor(chooseButton.isDisabled() ? Color.LIGHT_GRAY : Color.WHITE);
-
-        for (TextButton button : groupButtons.getButtons()) {
-            button.addListener(new ChangeListener() {
-                @Override
-                public void changed(ChangeEvent event, Actor actor) {
-                    boolean hasGroup = groupButtons.getChecked() != null;
-                    chooseButton.setDisabled(!hasGroup);
-                    chooseButton.getLabel().setColor(hasGroup ? Color.WHITE : Color.LIGHT_GRAY);
-                }
-            });
-        }
+        ScrollPane scrollPane = new ScrollPane(contentTable, skin);
+        scrollPane.setFadeScrollBars(false);
+        scrollPane.setScrollingDisabled(true, false);
 
         chooseButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                TextButton checked = groupButtons.getChecked();
-                if (chooseButton.isDisabled() || checked == null) return;
+                if (chooseButton.isDisabled() || selectedGroups.isEmpty()) return;
 
-                PassengerType passengerType = (PassengerType) checked.getUserObject();
                 selectionState.selectAirport(airport);
-                selectionState.selectPassengerType(passengerType);
-                if (passengerSelectionListener != null) {
-                    passengerSelectionListener.onPassengerSelected(airport, passengerType);
+
+                for (PassengerType pt : selectedGroups) {
+                    selectionState.selectPassengerType(pt);
+                    if (passengerSelectionListener != null) {
+                        passengerSelectionListener.onPassengerSelected(airport, pt);
+                    }
                 }
-                chooseButton.setText("Group selected");
+
+                chooseButton.setText("Groups selected");
+                chooseButton.setDisabled(true);
             }
         });
 
-        this.add(table).row();
+        this.add(scrollPane).maxHeight(350).row();
         this.add(chooseButton).width(280).height(60).padTop(20);
         this.pack();
     }
