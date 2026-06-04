@@ -14,14 +14,14 @@
   },
   {
     "id": 2,
-    "fuel": 50000,
+    "fuel": 50000000,
     "stations": 10,
     "luxury": 1,
     "capacity": 180,
     "minGate": 4,
     "maxGate": 4,
     "minDist": 500.0,
-    "maxDist": 100000.0,
+    "maxDist": 1000000.0,
     "price": 400,
     "description": "big plane"
   }

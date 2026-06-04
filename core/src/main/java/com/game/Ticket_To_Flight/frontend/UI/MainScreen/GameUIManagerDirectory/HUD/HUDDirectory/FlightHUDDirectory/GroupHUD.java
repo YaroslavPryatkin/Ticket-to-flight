@@ -1,5 +1,8 @@
 package com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.HUD.HUDDirectory.FlightHUDDirectory;
 
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -26,8 +29,22 @@ public class GroupHUD extends Table {
         passengerTable = new FlightPassengerTableWidget(skin);
         scrollPane = new ScrollPane(passengerTable, skin);
         scrollPane.setFadeScrollBars(false);
-
         scrollPane.setScrollingDisabled(false, false);
+        scrollPane.addListener(new InputListener() {
+            @Override
+            public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
+                if (event.getStage() != null) {
+                    event.getStage().setScrollFocus(scrollPane);
+                }
+            }
+
+            @Override
+            public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
+                if (event.getStage() != null) {
+                    event.getStage().setScrollFocus(null);
+                }
+            }
+        });
 
         add(scrollPane).width(760).height(260);
     }

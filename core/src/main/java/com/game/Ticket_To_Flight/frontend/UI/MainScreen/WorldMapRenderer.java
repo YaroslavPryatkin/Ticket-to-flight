@@ -43,7 +43,7 @@ public class WorldMapRenderer extends ScreenAdapter {
 
         this.uiManager = new GameUIManager(uiStageWindow, uiStageHUD, client, selectionState, mapDrawer.getCamera());
 
-        this.inputCtrl = new MapInputController(mapDrawer.getCamera(), gameData, uiManager, client, selectionState);
+        this.inputCtrl = new MapInputController(mapDrawer.getCamera(), gameData, uiManager, client, selectionState, uiManager.getFlightController());
 
         this.multiplexer = new InputMultiplexer();
         multiplexer.addProcessor(uiStageWindow);

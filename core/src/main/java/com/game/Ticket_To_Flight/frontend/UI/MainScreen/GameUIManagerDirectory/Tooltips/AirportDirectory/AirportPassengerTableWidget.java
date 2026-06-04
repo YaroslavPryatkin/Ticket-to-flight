@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.PassengerType;
+import com.game.Ticket_To_Flight.commonFrontAndBack.Route;
 import com.game.Ticket_To_Flight.frontend.components.AbstractPassengerTableWidget;
 import com.game.Ticket_To_Flight.frontend.components.buttons.RoundedButton;
 import com.game.Ticket_To_Flight.frontend.components.tables.PassengerTableWidget;
@@ -20,29 +21,26 @@ public class AirportPassengerTableWidget extends AbstractPassengerTableWidget {
     private final Runnable onSelectionChanged;
     private final List<PassengerType> selectedPassengers = new ArrayList<>();
 
-    private int maxCapacity = Integer.MAX_VALUE;
+    private Route route;
     private final List<ButtonRecord> buttonRecords = new ArrayList<>();
 
     private static class ButtonRecord {
         TextButton button;
-        int groupSize;
+        PassengerType passengerType;
         boolean isSelected = false;
 
-        ButtonRecord(TextButton button, int groupSize) {
+        ButtonRecord(TextButton button, PassengerType passengerType) {
             this.button = button;
-            this.groupSize = groupSize;
+            this.passengerType = passengerType;
         }
     }
 
-    public AirportPassengerTableWidget(Skin skin, boolean canSelectGroup, Integer maxCapacity, Runnable onSelectionChanged) {
+    public AirportPassengerTableWidget(Skin skin, boolean canSelectGroup, Route route, Runnable onSelectionChanged) {
         super(skin, true);
         this.canSelectGroup = canSelectGroup;
         this.onSelectionChanged = onSelectionChanged;
-        this.maxCapacity = maxCapacity;
-    }
+        this.route = route;
 
-    public void setMaxCapacity(int maxCapacity) {
-        this.maxCapacity = maxCapacity;
         updateAllButtonsState();
     }
 
@@ -58,17 +56,29 @@ public class AirportPassengerTableWidget extends AbstractPassengerTableWidget {
     protected Actor createChoiceActor(PassengerTableWidget row) {
         final PassengerType passengerType = row.passengerType;
         final TextButton selectBtn = new RoundedButton("Select", skin);
-        selectBtn.setDisabled(!canSelectGroup);
 
-        int groupSize = 0;
-        try {
-            groupSize = Integer.parseInt(row.persons().trim());
-        } catch (Exception e) {
-            groupSize = 0;
-        }
-
-        final ButtonRecord record = new ButtonRecord(selectBtn, groupSize);
+        final ButtonRecord record = new ButtonRecord(selectBtn, passengerType);
         buttonRecords.add(record);
+
+        if (!canSelectGroup) {
+            selectBtn.setDisabled(true);
+            selectBtn.getLabel().setColor(Color.DARK_GRAY);
+        } else if (route != null) {
+            boolean canAdd;
+            try {
+                canAdd = (route.checkPassengerAdding(passengerType, selectedPassengers) == null);
+            } catch (Exception e) {
+                canAdd = false;
+            }
+
+            if (!canAdd) {
+                selectBtn.setDisabled(true);
+                selectBtn.getLabel().setColor(Color.DARK_GRAY);
+            } else {
+                selectBtn.setDisabled(false);
+                selectBtn.getLabel().setColor(Color.WHITE);
+            }
+        }
 
         selectBtn.addListener(new ClickListener() {
             @Override
@@ -100,19 +110,17 @@ public class AirportPassengerTableWidget extends AbstractPassengerTableWidget {
     private void updateAllButtonsState() {
         if (!canSelectGroup) return;
 
-        int usedSeats = 0;
-        for (ButtonRecord record : buttonRecords) {
-            if (record.isSelected) {
-                usedSeats += record.groupSize;
-            }
-        }
-
-        int remainingSeats = maxCapacity - usedSeats;
-
         for (ButtonRecord record : buttonRecords) {
             if (record.isSelected) continue;
 
-            if (record.groupSize > remainingSeats) {
+            boolean canAdd;
+            try {
+                canAdd = (route.checkPassengerAdding(record.passengerType, selectedPassengers) == null);
+            } catch (Exception e) {
+                canAdd = false;
+            }
+
+            if (!canAdd) {
                 record.button.setDisabled(true);
                 record.button.getLabel().setColor(Color.DARK_GRAY);
             } else {

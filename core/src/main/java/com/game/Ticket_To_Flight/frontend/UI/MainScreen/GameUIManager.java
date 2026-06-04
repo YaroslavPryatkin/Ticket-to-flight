@@ -73,4 +73,8 @@ public class GameUIManager {
         flightController.position();
         airlinesControls.position();
     }
+
+    public MainFlightController getFlightController() {
+        return flightController;
+    }
 }

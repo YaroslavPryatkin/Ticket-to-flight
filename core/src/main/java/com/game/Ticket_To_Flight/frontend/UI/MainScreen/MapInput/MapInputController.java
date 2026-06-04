@@ -10,6 +10,7 @@ import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
 import com.game.Ticket_To_Flight.frontend.LowLevelHandlerFront;
 import com.game.Ticket_To_Flight.frontend.MainClient;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManager;
+import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.Flights.MainFlightController;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.MapStrategies.DefaultInteractionStrategy;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.MapStrategies.FlightInteractionStrategy;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.MapStrategies.MapInteractionStrategy;
@@ -24,12 +25,12 @@ public class MapInputController extends InputAdapter {
 
     private MapInteractionStrategy currentStrategy;
 
-    public MapInputController(OrthographicCamera camera, GameData gameData, GameUIManager uiManager, MainClient client, MapSelectionState selectionState) {
+    public MapInputController(OrthographicCamera camera, GameData gameData, GameUIManager uiManager, MainClient client, MapSelectionState selectionState, MainFlightController flightController) {
         this.camera = camera;
         this.gameData = gameData;
         LowLevelHandlerFront llh = client.getLlh();
         this.defaultStrategy = new DefaultInteractionStrategy(uiManager);
-        this.flightStrategy = new FlightInteractionStrategy(gameData, uiManager, llh, selectionState);
+        this.flightStrategy = new FlightInteractionStrategy(gameData, uiManager, llh, selectionState, flightController);
         this.currentStrategy = defaultStrategy;
     }
 

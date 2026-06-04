@@ -5,6 +5,7 @@ import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airport;
 import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
 import com.game.Ticket_To_Flight.frontend.LowLevelHandlerFront;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManager;
+import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.Flights.MainFlightController;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.MapInput.MapSelectionState;
 
 public class FlightInteractionStrategy implements MapInteractionStrategy {
@@ -12,12 +13,14 @@ public class FlightInteractionStrategy implements MapInteractionStrategy {
     private final GameUIManager uiManager;
     private final LowLevelHandlerFront llh;
     private final MapSelectionState selectionState;
+    private final MainFlightController flightController;
 
-    public FlightInteractionStrategy(GameData gameData, GameUIManager uiManager, LowLevelHandlerFront llh, MapSelectionState selectionState) {
+    public FlightInteractionStrategy(GameData gameData, GameUIManager uiManager, LowLevelHandlerFront llh, MapSelectionState selectionState, MainFlightController flightController) {
         this.gameData = gameData;
         this.uiManager = uiManager;
         this.llh = llh;
         this.selectionState = selectionState;
+        this.flightController = flightController;
     }
 
     @Override
@@ -35,6 +38,7 @@ public class FlightInteractionStrategy implements MapInteractionStrategy {
     @Override
     public void onEmptyMapClicked(float worldX, float worldY) {
         uiManager.removeTooltip();
+        selectionState.clearFlightSelection();
     }
 
     private boolean canChooseFlight() {

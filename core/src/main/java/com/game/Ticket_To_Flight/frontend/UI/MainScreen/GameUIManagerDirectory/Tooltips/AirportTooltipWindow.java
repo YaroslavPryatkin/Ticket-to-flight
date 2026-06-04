@@ -39,7 +39,7 @@ public class AirportTooltipWindow extends Window implements MapTooltipWindow {
         chooseButton.getLabel().setColor(Color.LIGHT_GRAY);
 
         final AirportPassengerTableWidget[] contentTableRef = new AirportPassengerTableWidget[1];
-        final AirportPassengerTableWidget contentTable = new AirportPassengerTableWidget(skin, canSelectGroup, mainFlightController.getSelectedPlaneCapacity(), () -> {
+        final AirportPassengerTableWidget contentTable = new AirportPassengerTableWidget(skin, canSelectGroup, mainFlightController.getRoute(), () -> {
             boolean hasSelection = contentTableRef[0] != null && contentTableRef[0].hasSelection();
             chooseButton.setDisabled(!hasSelection);
             chooseButton.getLabel().setColor(hasSelection ? Color.WHITE : Color.LIGHT_GRAY);
