@@ -57,7 +57,7 @@ public class GameUIManager {
     public boolean shouldFinishAirlinesAfterPurchase() { return airlinesControls.shouldFinishAfterPurchase(); }
     public void resetAirlinesFinishChoice() { airlinesControls.resetFinishChoice(); }
 
-    public void updateHUDData() { hud.updateHUD(null); }
+    public void updateHUDData() { hud.updateStandardHUD(null); }
 
     public void updateDynamicControls() {
         flightController.update();

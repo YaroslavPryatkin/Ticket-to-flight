@@ -18,6 +18,7 @@ public class WorldMapStyleFactory extends BaseSkinFactory {
 
         Color darkBgColor = new Color(0.15f, 0.15f, 0.15f, 0.8f);
         Color blueBgColor = new Color(0.2f, 0.4f, 0.8f, 0.9f);
+        Color flightPanelBgColor = new Color(0.25f, 0.25f, 0.27f, 0.9f);
 
         skin.add("background", createRoundedPatch(windowBgColor, 16));
         skin.add("btn-up", createRoundedPatch(buttonNormalColor, 12));
@@ -26,6 +27,7 @@ public class WorldMapStyleFactory extends BaseSkinFactory {
 
         skin.add("dark-bg", createRoundedPatch(darkBgColor, 8));
         skin.add("blue-bg", createRoundedPatch(blueBgColor, 8));
+        skin.add("flight-panel-bg", createRoundedPatch(flightPanelBgColor, 12));
         skin.add("scroll-track", createRoundedPatch(new Color(0.05f, 0.05f, 0.05f, 0.5f), 5));
         skin.add("scroll-knob", createRoundedPatch(Color.LIGHT_GRAY, 5));
 

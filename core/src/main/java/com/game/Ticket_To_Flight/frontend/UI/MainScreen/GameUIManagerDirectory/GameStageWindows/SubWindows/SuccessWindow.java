@@ -4,10 +4,9 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManager;
-import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.GameStageWindows.BaseGameWindow;
+import com.game.Ticket_To_Flight.frontend.components.BaseGameWindow;
 import com.game.Ticket_To_Flight.frontend.components.buttons.RoundedButton;
 import com.game.Ticket_To_Flight.frontend.components.texts.SingleLineText;
-import com.game.Ticket_To_Flight.frontend.components.texts.WrappedText;
 
 public class SuccessWindow extends BaseGameWindow {
     public SuccessWindow(Skin skin, final GameUIManager uiManager, String message) {

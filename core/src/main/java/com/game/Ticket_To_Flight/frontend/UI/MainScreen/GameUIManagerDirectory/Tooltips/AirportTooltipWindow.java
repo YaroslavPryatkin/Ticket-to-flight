@@ -8,13 +8,14 @@ import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airport;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.PassengerType;
 import com.game.Ticket_To_Flight.commonFrontAndBack.StaticGameData;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.Flights.PassengerSelectionListener;
+import com.game.Ticket_To_Flight.frontend.components.tables.AirportPassengerTableWidget;
+import com.game.Ticket_To_Flight.frontend.components.tables.PassengerTableWidget;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.MapInput.MapSelectionState;
 import com.game.Ticket_To_Flight.frontend.components.buttons.RoundedButton;
-import com.game.Ticket_To_Flight.frontend.components.texts.SingleLineText;
 
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class AirportTooltipWindow extends Window implements MapTooltipWindow {
 
@@ -30,28 +31,25 @@ public class AirportTooltipWindow extends Window implements MapTooltipWindow {
         final PassengerSelectionListener passengerSelectionListener
     ) {
         super(airport.getCityName(), skin);
-
         this.setMovable(false);
-        this.pad(20);
-
-        Table contentTable = new Table();
-
-        Set<PassengerType> selectedGroups = new HashSet<>();
+        this.top().left();
+        this.pad(30);
+        this.padTop(60);
 
         final TextButton chooseButton = new RoundedButton("Choose groups", skin);
-        chooseButton.setDisabled(true); // Выключена, пока ничего не выбрано
+        chooseButton.setDisabled(true);
         chooseButton.getLabel().setColor(Color.LIGHT_GRAY);
 
-        contentTable.add(new SingleLineText("Route", skin)).padRight(20).padBottom(15).left();
-        contentTable.add(new SingleLineText("Persons", skin)).padRight(20).padBottom(15).center();
-        contentTable.add(new SingleLineText("Reward", skin)).padRight(20).padBottom(15).center();
-        contentTable.add(new SingleLineText("Class", skin)).padRight(20).padBottom(15).center();
-        contentTable.add(new SingleLineText("Available", skin)).padRight(20).padBottom(15).center();
-        contentTable.add(new SingleLineText("Choice", skin)).padLeft(10).padBottom(15).center();
-        contentTable.row();
+        final AirportPassengerTableWidget[] contentTableRef = new AirportPassengerTableWidget[1];
+        final AirportPassengerTableWidget contentTable = new AirportPassengerTableWidget(skin, canSelectGroup, () -> {
+            boolean hasSelection = contentTableRef[0] != null && contentTableRef[0].hasSelection();
+            chooseButton.setDisabled(!hasSelection);
+            chooseButton.getLabel().setColor(hasSelection ? Color.WHITE : Color.LIGHT_GRAY);
+        });
+        contentTableRef[0] = contentTable;
 
         var guestsMap = airport.getGuests();
-        boolean hasGroups = false;
+        List<PassengerTableWidget> rows = new ArrayList<>();
 
         if (guestsMap != null) {
             for (Map.Entry<Integer, Integer> e : guestsMap.entrySet()) {
@@ -59,69 +57,39 @@ public class AirportTooltipWindow extends Window implements MapTooltipWindow {
                 int amount = e.getValue();
 
                 if (amount <= 0) continue;
-                hasGroups = true;
 
-                PassengerType pType = StaticGameData.passengerTypes.get(passengerId);
-
-                String routeText = "To " + pType.typeTo.description;
-                String personsText = String.valueOf(pType.size);
-                String rewardText = "$" + pType.solvency;
-                String classText = pType.description;
-                String availableText = String.valueOf(amount);
-
-                contentTable.add(new SingleLineText(routeText, skin)).padRight(20).padBottom(8).left();
-                contentTable.add(new SingleLineText(personsText, skin)).padRight(20).padBottom(8).center();
-                contentTable.add(new SingleLineText(rewardText, skin)).padRight(20).padBottom(8).center();
-                contentTable.add(new SingleLineText(classText, skin)).padRight(20).padBottom(8).center();
-                contentTable.add(new SingleLineText(availableText, skin)).padRight(20).padBottom(8).center();
-
-                TextButton selectBtn = new RoundedButton("Select", skin);
-                selectBtn.setDisabled(!canSelectGroup);
-
-                selectBtn.addListener(new ClickListener() {
-                    @Override
-                    public void clicked(InputEvent event, float x, float y) {
-                        if (!canSelectGroup) return;
-
-                        if (selectedGroups.contains(pType)) {
-                            selectedGroups.remove(pType);
-                            selectBtn.setText("Select");
-                            selectBtn.getColor().set(Color.WHITE);
-                        } else {
-                            // Если не выбрано -> выбираем
-                            selectedGroups.add(pType);
-                            selectBtn.setText("Selected");
-                            selectBtn.getColor().set(Color.GREEN);
-                        }
-
-                        boolean hasSelection = !selectedGroups.isEmpty();
-                        chooseButton.setDisabled(!hasSelection);
-                        chooseButton.getLabel().setColor(hasSelection ? Color.WHITE : Color.LIGHT_GRAY);
-                    }
-                });
-
-                contentTable.add(selectBtn).padLeft(10).padBottom(8).center();
-                contentTable.row();
+                final PassengerType pType = StaticGameData.passengerTypes.get(passengerId);
+                for (int i = 0; i < amount; i++) {
+                    rows.add(new PassengerTableWidget(pType));
+                }
             }
         }
 
-        if (!hasGroups) {
-            contentTable.clearChildren();
-            contentTable.add(new SingleLineText("No passengers waiting here", skin)).center().pad(20);
-        }
+        contentTable.setRows(rows);
 
         ScrollPane scrollPane = new ScrollPane(contentTable, skin);
         scrollPane.setFadeScrollBars(false);
-        scrollPane.setScrollingDisabled(true, false);
+        scrollPane.setScrollingDisabled(false, false);
+        scrollPane.setForceScroll(true, true);
+        contentTable.top().left();
+
+        this.add(scrollPane).left().width(650).maxHeight(400).padTop(15).row();
+        this.add(chooseButton).left().width(300).height(60).padTop(25);
+
+        this.pack();
+        scrollPane.layout();
+        scrollPane.setScrollPercentX(0f);
+        scrollPane.setScrollPercentY(0f);
+        scrollPane.updateVisualScroll();
 
         chooseButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                if (chooseButton.isDisabled() || selectedGroups.isEmpty()) return;
+                if (chooseButton.isDisabled() || !contentTable.hasSelection()) return;
 
                 selectionState.selectAirport(airport);
 
-                for (PassengerType pt : selectedGroups) {
+                for (PassengerType pt : contentTable.getSelectedPassengers()) {
                     selectionState.selectPassengerType(pt);
                     if (passengerSelectionListener != null) {
                         passengerSelectionListener.onPassengerSelected(airport, pt);
@@ -132,10 +100,6 @@ public class AirportTooltipWindow extends Window implements MapTooltipWindow {
                 chooseButton.setDisabled(true);
             }
         });
-
-        this.add(scrollPane).maxHeight(350).row();
-        this.add(chooseButton).width(280).height(60).padTop(20);
-        this.pack();
     }
 
     @Override

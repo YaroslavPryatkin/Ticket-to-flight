@@ -29,10 +29,9 @@ public class StandardHUD extends Table {
         this.llh = llh;
         this.skin = skin;
 
-        // Магия Scene2D: таблица сама растянется на весь экран и прижмет контент к верху
         this.setFillParent(true);
         this.top();
-        this.pad(20);
+        this.pad(20, 20, 20, 20);
 
         roundLabel = new SingleLineText("Round: ", skin);
         stageLabel = new SingleLineText("Stage: ", skin);

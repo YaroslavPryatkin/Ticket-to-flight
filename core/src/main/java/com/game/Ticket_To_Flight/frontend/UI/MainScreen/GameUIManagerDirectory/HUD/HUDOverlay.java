@@ -20,7 +20,7 @@ public class HUDOverlay {
         uiStageHUD.addActor(flightHUD);
     }
 
-    public void updateHUD(Player chosenPlayer) {
+    public void updateStandardHUD(Player chosenPlayer) {
         standardHUD.updateHUD(chosenPlayer);
     }
 

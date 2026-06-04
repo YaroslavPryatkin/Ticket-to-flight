@@ -29,7 +29,7 @@ public class MainFlightController {
     }
 
     public static class ChosenGroup {
-        public final Airport airport; // Сделали public для FlightHUD
+        public final Airport airport;
         public final PassengerType passengerType;
 
         public ChosenGroup(Airport airport, PassengerType passengerType) {
@@ -43,7 +43,7 @@ public class MainFlightController {
     private final GameData gameData;
     private final LowLevelHandlerFront llh;
     private final GameUIManager uiManager;
-    private final FlightHUD flightHUD; // Наш новый HUD
+    private final FlightHUD flightHUD;
 
     private final Deque<Runnable> undoStack = new ArrayDeque<>();
     private final List<ChosenGroup> chosenGroups = new ArrayList<>();
@@ -54,7 +54,6 @@ public class MainFlightController {
     private Table planeWindow;
     private boolean wasActive = false;
 
-    // В конструктор добавили параметр FlightHUD
     public MainFlightController(Stage stage, Skin skin, GameData gameData, LowLevelHandlerFront llh, GameUIManager uiManager, FlightHUD flightHUD) {
         this.stage = stage;
         this.skin = skin;
@@ -63,13 +62,12 @@ public class MainFlightController {
         this.uiManager = uiManager;
 
         this.flightHUD = flightHUD;
-        // Подключаем кнопки HUD'а к методам контроллера через лямбды
         this.flightHUD.setCallbacks(this::resetAll, this::goBack, this::finishRoute);
     }
 
     public void update() {
         if (!isActive()) {
-            flightHUD.setVisible(false); // Прячем панель полетов
+            flightHUD.setVisible(false);
             clearUi();
             resetState();
             wasActive = false;
@@ -82,25 +80,19 @@ public class MainFlightController {
             wasActive = true;
         }
 
-        flightHUD.setVisible(true); // Показываем панель полетов
-        // Передаем данные в HUD, чтобы он сам обновил тексты
+        flightHUD.setVisible(true);
         flightHUD.updateData(step, selectedPlane, route, chosenGroups);
         position();
     }
 
     public void position() {
         positionPlaneWindow();
-        // Нам больше не нужно позиционировать HUD, он делает это сам через setFillParent(true)
     }
 
     private void clearUi() {
         removePlaneWindow();
-        flightHUD.setVisible(false); // Просто скрываем HUD
+        flightHUD.setVisible(false);
     }
-
-    // =========================================================
-    // ВСЯ ОСТАЛЬНАЯ ЛОГИКА ИГРЫ ОСТАЕТСЯ БЕЗ ИЗМЕНЕНИЙ
-    // =========================================================
 
     private void selectPlane(PlaneType plane) {
         selectedPlane = plane;
@@ -137,10 +129,6 @@ public class MainFlightController {
             uiManager.showSuccessWindow("Choose the airport and group first.");
             return;
         }
-        if (airline.getPlayer() == null) {
-            uiManager.showSuccessWindow("Choose an owned airline.");
-            return;
-        }
 
         Map<Integer, String> errors = route.makeFlight(airline);
         if (errors != null) {
@@ -159,11 +147,6 @@ public class MainFlightController {
     }
 
     private void selectPassengerGroup(Airport airport, PassengerType passengerType) {
-        if (selectedPlane == null) {
-            uiManager.showSuccessWindow("Choose the plane first.");
-            return;
-        }
-
         final boolean createdRoute = route == null;
         if (createdRoute) {
             route = new Route(selectedPlane, gameData, airport);
