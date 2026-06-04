@@ -11,6 +11,7 @@ import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airport;
 import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
 import com.game.Ticket_To_Flight.frontend.LowLevelHandlerFront;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManager;
+import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.Flights.MainFlightController;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.Flights.PassengerSelectionListener;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.Tooltips.AirlineTooltipWindow;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.Tooltips.AirportTooltipWindow;
@@ -24,12 +25,13 @@ public class TooltipManager {
     private final GameData gameData;
     private final LowLevelHandlerFront llh;
     private final MapSelectionState selectionState;
+    private final MainFlightController flightController;
     private final OrthographicCamera mapCamera;
 
     private MapTooltipWindow currentTooltip;
     private Vector2 anchoredWorldPosition;
 
-    public TooltipManager(Stage uiStageHUD, Skin skin, GameUIManager facade, GameData gameData, LowLevelHandlerFront llh, MapSelectionState selectionState, OrthographicCamera mapCamera) {
+    public TooltipManager(Stage uiStageHUD, Skin skin, GameUIManager facade, GameData gameData, LowLevelHandlerFront llh, MapSelectionState selectionState, OrthographicCamera mapCamera, MainFlightController flightController) {
         this.uiStageHUD = uiStageHUD;
         this.skin = skin;
         this.facade = facade;
@@ -37,6 +39,7 @@ public class TooltipManager {
         this.llh = llh;
         this.selectionState = selectionState;
         this.mapCamera = mapCamera;
+        this.flightController = flightController;
     }
 
     public void showAirportTooltip(Airport airport) {
@@ -49,8 +52,11 @@ public class TooltipManager {
 
     private void showAirportTooltip(Airport airport, PassengerSelectionListener passengerSelectionListener) {
         removeTooltip();
-        boolean canSelectGroup = gameData.currentState == GameData.State.FLIGHTS && gameData.currentPlayer == llh.getMyId();
-        currentTooltip = new AirportTooltipWindow(skin, airport, selectionState, canSelectGroup, passengerSelectionListener);
+        boolean canSelectGroup =
+            gameData.currentState == GameData.State.FLIGHTS &&
+            gameData.currentPlayer == llh.getMyId() &&
+            flightController.canSelectPassengerGroups(airport);
+        currentTooltip = new AirportTooltipWindow(skin, airport, selectionState, canSelectGroup, passengerSelectionListener, flightController);
         anchoredWorldPosition = airportPosition(airport);
         uiStageHUD.addActor(currentTooltip.asWindow());
         updateTooltipPosition();

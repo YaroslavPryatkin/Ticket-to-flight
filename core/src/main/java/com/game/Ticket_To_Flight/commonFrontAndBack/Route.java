@@ -180,14 +180,14 @@ public class Route {
             return "Plane has reached it's maximum amount of stations.";
         if(line.getDistance() + fuelSpent > plane.fuel)
             return "Plane doesn't have enough fuel.";
-        if (!line.type.luxuryRange.contains(plane.luxury))
-            return "Plane luxury doesnt fit in airline luxury range.";
+        /*if (!line.type.luxuryRange.contains(plane.luxury))
+            return "Plane luxury doesnt fit in airline luxury range.";*/
         if (!line.type.capacityRange.contains(plane.capacity))
             return "Plane capacity doesn't fit in airline capacity range.";
-        if (!plane.distRange.contains(line.getDistance()))
-            return "Line distanse doesn't fit in the plane's distanse range.";
-        if (!plane.gateRange.contains(line.type.gateA) || !plane.gateRange.contains(line.type.gateB))
-            return "Amount of gates at one of the ends of the airline does not fit the planes amount of gates range.";
+        /*if (!plane.distRange.contains(line.getDistance()))
+            return "Line distanse doesn't fit in the plane's distanse range.";*/
+        /*if (!plane.gateRange.contains(line.type.gateA) || !plane.gateRange.contains(line.type.gateB))
+            return "Amount of gates at one of the ends of the airline does not fit the planes amount of gates range.";*/
         return null;
     }
 

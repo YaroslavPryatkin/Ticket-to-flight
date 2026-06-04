@@ -33,9 +33,9 @@ public class GameUIManager {
         LowLevelHandlerFront llh = client.getLlh();
 
         this.windowManager = new WindowManager(uiStageWindow, defaultSkin, investSkin, this, gameData, llh);
-        this.tooltipManager = new TooltipManager(uiStageHUD, defaultSkin, this, gameData, llh, selectionState, mapCamera);
         this.hud = new HUDOverlay(uiStageHUD, defaultSkin, gameData, llh);
-        this.flightController = new MainFlightController(uiStageHUD, defaultSkin, gameData, llh, this, hud.getFlightHUD());
+        this.flightController = new MainFlightController(uiStageHUD, defaultSkin, gameData, llh, this, hud.getFlightHUD(), selectionState);
+        this.tooltipManager = new TooltipManager(uiStageHUD, defaultSkin, this, gameData, llh, selectionState, mapCamera, flightController);
         this.airlinesControls = new AirlinesControls(uiStageHUD, defaultSkin, gameData, llh, this);
     }
 
@@ -50,7 +50,9 @@ public class GameUIManager {
     public void showAirportTooltipForFlight(Airport airport, PassengerSelectionListener listener) {
         tooltipManager.showAirportTooltipForFlight(airport, listener);
     }
+
     public void showAirlineTooltip(Airline airline) { tooltipManager.showAirlineTooltip(airline); }
+
     public void removeTooltip() { tooltipManager.removeTooltip(); }
     public void handleFlightAirportClick(Airport airport) { flightController.handleAirportClick(airport); }
     public void handleFlightAirlineClick(Airline airline) { flightController.handleAirlineClick(airline); }

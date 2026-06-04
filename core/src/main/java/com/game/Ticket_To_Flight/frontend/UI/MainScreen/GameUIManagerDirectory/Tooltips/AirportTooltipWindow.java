@@ -7,8 +7,9 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airport;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.PassengerType;
 import com.game.Ticket_To_Flight.commonFrontAndBack.StaticGameData;
+import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.Flights.MainFlightController;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.Flights.PassengerSelectionListener;
-import com.game.Ticket_To_Flight.frontend.components.tables.AirportPassengerTableWidget;
+import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.Tooltips.AirportDirectory.AirportPassengerTableWidget;
 import com.game.Ticket_To_Flight.frontend.components.tables.PassengerTableWidget;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.MapInput.MapSelectionState;
 import com.game.Ticket_To_Flight.frontend.components.buttons.RoundedButton;
@@ -19,16 +20,13 @@ import java.util.Map;
 
 public class AirportTooltipWindow extends Window implements MapTooltipWindow {
 
-    public AirportTooltipWindow(Skin skin, final Airport airport, final MapSelectionState selectionState, boolean canSelectGroup) {
-        this(skin, airport, selectionState, canSelectGroup, null);
-    }
-
     public AirportTooltipWindow(
         Skin skin,
         final Airport airport,
         final MapSelectionState selectionState,
         boolean canSelectGroup,
-        final PassengerSelectionListener passengerSelectionListener
+        final PassengerSelectionListener passengerSelectionListener,
+        MainFlightController mainFlightController
     ) {
         super(airport.getCityName(), skin);
         this.setMovable(false);
@@ -41,7 +39,7 @@ public class AirportTooltipWindow extends Window implements MapTooltipWindow {
         chooseButton.getLabel().setColor(Color.LIGHT_GRAY);
 
         final AirportPassengerTableWidget[] contentTableRef = new AirportPassengerTableWidget[1];
-        final AirportPassengerTableWidget contentTable = new AirportPassengerTableWidget(skin, canSelectGroup, () -> {
+        final AirportPassengerTableWidget contentTable = new AirportPassengerTableWidget(skin, canSelectGroup, mainFlightController.getSelectedPlaneCapacity(), () -> {
             boolean hasSelection = contentTableRef[0] != null && contentTableRef[0].hasSelection();
             chooseButton.setDisabled(!hasSelection);
             chooseButton.getLabel().setColor(hasSelection ? Color.WHITE : Color.LIGHT_GRAY);

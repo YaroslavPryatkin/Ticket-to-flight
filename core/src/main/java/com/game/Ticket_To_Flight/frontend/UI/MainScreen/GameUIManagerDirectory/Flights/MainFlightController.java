@@ -14,6 +14,7 @@ import com.game.Ticket_To_Flight.frontend.LowLevelHandlerFront;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManager;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.Flights.FlightDirectory.PlaneSelectionWindow;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.HUD.HUDDirectory.FlightHUD;
+import com.game.Ticket_To_Flight.frontend.UI.MainScreen.MapInput.MapSelectionState;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -44,6 +45,7 @@ public class MainFlightController {
     private final LowLevelHandlerFront llh;
     private final GameUIManager uiManager;
     private final FlightHUD flightHUD;
+    private final MapSelectionState selectionState;
 
     private final Deque<Runnable> undoStack = new ArrayDeque<>();
     private final List<ChosenGroup> chosenGroups = new ArrayList<>();
@@ -51,15 +53,25 @@ public class MainFlightController {
     private Step step = Step.SELECT_PLANE;
     private Route route;
     private PlaneType selectedPlane;
+    private Airport activeFlightAirport;
     private Table planeWindow;
     private boolean wasActive = false;
 
-    public MainFlightController(Stage stage, Skin skin, GameData gameData, LowLevelHandlerFront llh, GameUIManager uiManager, FlightHUD flightHUD) {
+    public MainFlightController(
+        Stage stage,
+        Skin skin,
+        GameData gameData,
+        LowLevelHandlerFront llh,
+        GameUIManager uiManager,
+        FlightHUD flightHUD,
+        MapSelectionState selectionState
+    ) {
         this.stage = stage;
         this.skin = skin;
         this.gameData = gameData;
         this.llh = llh;
         this.uiManager = uiManager;
+        this.selectionState = selectionState;
 
         this.flightHUD = flightHUD;
         this.flightHUD.setCallbacks(this::resetAll, this::goBack, this::finishRoute);
@@ -94,6 +106,10 @@ public class MainFlightController {
         flightHUD.setVisible(false);
     }
 
+    public Integer getSelectedPlaneCapacity() {
+        return selectedPlane == null ? Integer.MAX_VALUE : selectedPlane.capacity;
+    }
+
     private void selectPlane(PlaneType plane) {
         selectedPlane = plane;
         step = Step.CHOOSE_AIRPORT_GROUP;
@@ -113,13 +129,14 @@ public class MainFlightController {
     public void handleAirportClick(Airport airport) {
         if (!isActive()) return;
         if (step != Step.CHOOSE_AIRPORT_GROUP) {
-            uiManager.showSuccessWindow("Choose an airline first.");
+            uiManager.showAirportTooltipForFlight(airport, this::selectPassengerGroup);
             return;
         }
-        if (route != null && !airport.equals(route.getCurrentAirport())) {
-            uiManager.showSuccessWindow("Choose the current route airport: " + route.getCurrentAirport().getCityName());
-            return;
+
+        if (activeFlightAirport == null) {
+            setActiveFlightAirport(airport);
         }
+
         uiManager.showAirportTooltipForFlight(airport, this::selectPassengerGroup);
     }
 
@@ -130,16 +147,33 @@ public class MainFlightController {
             return;
         }
 
+        if (activeFlightAirport == null || airline.getAnotherEnd(activeFlightAirport) == null) {
+            uiManager.showSuccessWindow("Choose an airline connected to current airport.");
+            return;
+        }
+
         Map<Integer, String> errors = route.makeFlight(airline);
         if (errors != null) {
             uiManager.showSuccessWindow(errors.values().iterator().next());
             return;
         }
 
-        undoStack.push(() -> route.undoFlight());
+        undoStack.push(() -> {
+            route.undoFlight();
+            setActiveFlightAirport(route.getCurrentAirport());
+        });
+        setActiveFlightAirport(route.getCurrentAirport());
         step = Step.CHOOSE_AIRPORT_GROUP;
         uiManager.removeTooltip();
         uiManager.showSuccessWindow("Airline selected. Choose the next airport and group.");
+    }
+
+    public boolean canSelectPassengerGroups(Airport airport) {
+        return isActive() &&
+            step == Step.CHOOSE_AIRPORT_GROUP &&
+            activeFlightAirport != null &&
+            airport != null &&
+            airport.equals(activeFlightAirport);
     }
 
     private boolean isActive() {
@@ -147,6 +181,11 @@ public class MainFlightController {
     }
 
     private void selectPassengerGroup(Airport airport, PassengerType passengerType) {
+        if (!canSelectPassengerGroups(airport)) {
+            uiManager.showSuccessWindow("You can choose groups only in current airport.");
+            return;
+        }
+
         final boolean createdRoute = route == null;
         if (createdRoute) {
             route = new Route(selectedPlane, gameData, airport);
@@ -214,7 +253,13 @@ public class MainFlightController {
         chosenGroups.clear();
         route = null;
         selectedPlane = null;
+        setActiveFlightAirport(null);
         step = Step.SELECT_PLANE;
+    }
+
+    private void setActiveFlightAirport(Airport airport) {
+        activeFlightAirport = airport;
+        selectionState.setActiveFlightAirport(airport);
     }
 
     private void positionPlaneWindow() {

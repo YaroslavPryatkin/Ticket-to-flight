@@ -8,6 +8,7 @@ public class MapSelectionState {
     private Integer selectedAirportId;
     private Integer selectedAirlineId;
     private Integer selectedPassengerTypeId;
+    private Integer activeFlightAirportId;
 
     public void selectAirport(Airport airport) {
         Integer nextAirportId = airport == null ? null : airport.getId();
@@ -30,6 +31,7 @@ public class MapSelectionState {
         selectedAirportId = null;
         selectedAirlineId = null;
         selectedPassengerTypeId = null;
+        activeFlightAirportId = null;
     }
 
     public Integer getSelectedAirportId() {
@@ -45,7 +47,17 @@ public class MapSelectionState {
     }
 
     public boolean isAirportSelected(Airport airport) {
-        return airport != null && selectedAirportId != null && selectedAirportId.equals(airport.getId());
+        return airport != null &&
+            ((selectedAirportId != null && selectedAirportId.equals(airport.getId())) ||
+                (activeFlightAirportId != null && activeFlightAirportId.equals(airport.getId())));
+    }
+
+    public void setActiveFlightAirport(Airport airport) {
+        activeFlightAirportId = airport == null ? null : airport.getId();
+    }
+
+    public boolean isActiveFlightAirport(Airport airport) {
+        return airport != null && activeFlightAirportId != null && activeFlightAirportId.equals(airport.getId());
     }
 
     public boolean isAirlineSelected(Airline airline) {
