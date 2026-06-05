@@ -145,8 +145,8 @@ public class Network {
     }
 
     public static class PlayerRouteChoiceResponse extends GameMessage {
-        public RouteDTO dto;
-        public FinishStatus finishStatus;
+        public final RouteDTO dto;
+        public final FinishStatus finishStatus;
         public PlayerRouteChoiceResponse(RouteDTO route, boolean isFinish){
             this.dto = route;
             if(isFinish)
@@ -154,12 +154,12 @@ public class Network {
             else
                 finishStatus = FinishStatus.NOT_FINISHED;
         }
-        public PlayerRouteChoiceResponse(){finishStatus = FinishStatus.PASS;}
+        public PlayerRouteChoiceResponse(){finishStatus = FinishStatus.PASS; dto = null;}
     }
 
     public static class PlayerAirlineChoiceResponse extends GameMessage{
-        public int line = 0;
-        public FinishStatus finishStatus;
+        public final int line;
+        public final FinishStatus finishStatus;
         public PlayerAirlineChoiceResponse(int line, boolean isFinish){
             this.line = line;
             if(isFinish)
@@ -167,7 +167,7 @@ public class Network {
             else
                 finishStatus = FinishStatus.NOT_FINISHED;
         }
-        public PlayerAirlineChoiceResponse(){finishStatus = FinishStatus.PASS;}
+        public PlayerAirlineChoiceResponse(){finishStatus = FinishStatus.PASS; line = 0;}
     }
 
     public static class PlayerPlaneChoiceResponse extends GameMessage{

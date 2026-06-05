@@ -80,6 +80,7 @@ public class Route {
     private double fuelSpent = 0;
     private final List<BoarderPassenger> passengers = new ArrayList<>();
     private final MapHolder<Airport, MapHolder<PassengerType, Integer>> boardedPerPort = new MapHolder<>();
+    private final SetHolder<Airport> usedPorts = new SetHolder<>();
     private final MapHolder<Player, Integer> incomeChange = new MapHolder<>();
     private final List<Airline> lines = new ArrayList<>();
     private final GameData gameData;
@@ -89,7 +90,9 @@ public class Route {
         this.gameData = gameData;
         this.current = startAirport;
         this.startingPort = startAirport;
+        usedPorts.add(startAirport);
     }
+
 
     /**
      * @return error string if error occurred, else null
@@ -185,6 +188,11 @@ public class Route {
             res.put(-1, "New line is not connected to current airport.");
             return res;
         }
+        if(usedPorts.contains(next)){
+            Map<Integer, String> res = new HashMap<>();
+            res.put(-1, "Next airport was already used.");
+            return res;
+        }
         String error = checkAddLine(line);
         if (error != null) {
             Map<Integer, String> res = new HashMap<>();
@@ -199,6 +207,8 @@ public class Route {
      * @return error string if error occurred
      */
     private String checkAddLine(Airline line) {
+        if(lines.contains(line))
+            return "This line is already a part of the route";
         if(lines.size() >= plane.stations + 2)
             return "Plane has reached it's maximum amount of stations.";
         if(line.getDistance() + fuelSpent > plane.fuel)
@@ -270,6 +280,7 @@ public class Route {
         if (error != null)
             return error;
         Airport next = line.getAnotherEnd(current);
+        usedPorts.add(next);
         flyToTheNextPortPassengers(next, line);
         current = next;
         fuelSpent += line.getDistance();
@@ -285,6 +296,7 @@ public class Route {
         Airline lineBack = lines.getLast();
         lines.removeLast();
         // 'current' is still pointing to the destination port here, which is correct for rollback logic
+        usedPorts.remove(current);
         returnToPreviousAirportPassengers(lineBack);
         current = lineBack.getAnotherEnd(current);
         fuelSpent -= lineBack.getDistance();
@@ -347,4 +359,10 @@ public class Route {
         }
         return res;
     }
+
+    public MapHolder<Airport, MapHolder<PassengerType, Integer>> getBoardedPerPort(){
+        return boardedPerPort;
+    }
+
+    public MapHolder<Player, Integer> getIncomeChange(){return incomeChange;}
 }

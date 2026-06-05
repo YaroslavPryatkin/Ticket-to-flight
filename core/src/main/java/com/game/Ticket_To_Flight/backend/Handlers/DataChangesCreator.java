@@ -1,9 +1,12 @@
 package com.game.Ticket_To_Flight.backend.Handlers;
 
 import com.badlogic.gdx.math.Vector2;
+import com.game.Ticket_To_Flight.Utilities.MapHolder;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airline;
+import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airport;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Player;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.AbilityType;
+import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.PassengerType;
 import com.game.Ticket_To_Flight.commonFrontAndBack.DTO.AirlineDTO;
 import com.game.Ticket_To_Flight.commonFrontAndBack.DTO.AirportDTO;
 import com.game.Ticket_To_Flight.commonFrontAndBack.DTO.PlayerDTO;
@@ -138,6 +141,19 @@ public class DataChangesCreator {
 
     }
 
+    public void removePassengers(MapHolder<Airport, MapHolder<PassengerType, Integer>> changes){
+        if(dataChanges.airportPassengersChange == null) dataChanges.airportPassengersChange = new HashMap<>();
+
+        for(Map.Entry<Integer, MapHolder<PassengerType, Integer>> e : changes.entrySet()){
+            e.getValue().forEach(
+                (type,amount)-> dataChanges.airportPassengersChange.get(e.getKey()).merge(
+                        type, -amount, Integer::sum
+                )
+            );
+
+        }
+    }
+
     void addAvailablePlanes(Integer type, Integer amount){
         if(dataChanges.availablePlanesChange == null) dataChanges.availablePlanesChange = new HashMap<>();
         dataChanges.availablePlanesChange.compute(type, (k,v) -> (v==null) ? amount : v + amount );
@@ -146,11 +162,22 @@ public class DataChangesCreator {
     public boolean sellPlane(Integer plane){
         if(gameData.availablePlanes.containsKey(plane)) {
             if (dataChanges.availablePlanesChange == null) dataChanges.availablePlanesChange = new HashMap<>();
-            if (dataChanges.playerPlanesToAdd == null) dataChanges.playerPlanesToAdd = new HashMap<>();
+            if (dataChanges.playerPlanesChange == null) dataChanges.playerPlanesChange = new HashMap<>();
             dataChanges.availablePlanesChange.compute(plane, (k,v) -> v==null ? -1 : v-1);
-            dataChanges.playerPlanesToAdd.computeIfAbsent(gameData.currentPlayer, k -> new HashMap<>());
-            dataChanges.playerPlanesToAdd.get(gameData.currentPlayer)
+            dataChanges.playerPlanesChange.computeIfAbsent(gameData.currentPlayer, k -> new HashMap<>());
+            dataChanges.playerPlanesChange.get(gameData.currentPlayer)
                 .compute(plane, (k,v)->(v==null) ? 1 : v + 1);
+            return true;
+        }
+        return false;
+    }
+
+    boolean takePlane(Integer plane){
+        if(gameData.players.get(gameData.currentPlayer).planes.getOrDefault(plane, 0) > 0){
+            if (dataChanges.playerPlanesChange == null) dataChanges.playerPlanesChange = new HashMap<>();
+            dataChanges.playerPlanesChange.computeIfAbsent(gameData.currentPlayer, k -> new HashMap<>());
+            dataChanges.playerPlanesChange.get(gameData.currentPlayer)
+                .compute(plane, (k,v)->(v==null) ? -1 : v - 1);
             return true;
         }
         return false;
@@ -305,11 +332,21 @@ public class DataChangesCreator {
             -incomeLoss : v - incomeLoss);
     }
 
+    void incomeLossForMultiplePlayers(MapHolder<Player, Integer> changes){
+        if(dataChanges.playerIncomeChange == null) dataChanges.playerIncomeChange=new HashMap<>();
+        changes.forEach((player, amount)->
+            dataChanges.playerIncomeChange.compute(player, (k,v) -> (v==null) ?
+                -amount : v - amount
+            )
+        );
+    }
+
+
     public void addIncomeToMoneyForEveryPlayer(){
         if(dataChanges.playerMoneyChange == null) dataChanges.playerMoneyChange=new HashMap<>();
         for(Player pl : gameData.players){
             dataChanges.playerMoneyChange.compute(pl.getId(), (k,v) -> (v==null) ?
-                -pl.income : v - pl.income);
+                pl.income : v + pl.income);
         }
     }
 

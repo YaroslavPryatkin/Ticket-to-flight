@@ -99,8 +99,7 @@ public class GameData {
 
         public  Map<Integer, Set<Integer>> playerAirlinesToAdd= null;
         public  Map<Integer, Set<Integer>> playerAirlinesToRemove= null;
-        public  Map<Integer, Map<Integer, Integer>> playerPlanesToAdd= null;
-        public  Map<Integer, Map<Integer, Integer>> playerPlanesToRemove= null;
+        public  Map<Integer, Map<Integer, Integer>> playerPlanesChange = null;
 
         public DataChanges(){super(idGenerator.incrementAndGet());}
 
@@ -166,15 +165,11 @@ public class GameData {
                 SetHolder::merge
             );
 
-            this.playerPlanesToAdd = MapHolder.merge(
-                this.playerPlanesToAdd, other.playerPlanesToAdd, v->v,
+            this.playerPlanesChange = MapHolder.merge(
+                this.playerPlanesChange, other.playerPlanesChange, v->v,
                 (f,s)->MapHolder.merge(f,s,v->v, Integer::sum)
             );
 
-            this.playerPlanesToRemove = MapHolder.merge(
-                this.playerPlanesToRemove, other.playerPlanesToRemove, v->v,
-                (f,s)->MapHolder.merge(f,s,v->v, Integer::sum)
-            );
             return this;
         }
 
@@ -251,12 +246,8 @@ public class GameData {
             cur.airlines.retainAll(airlines);
         });
         players.changeAsStruct((pl) -> pl.planes,
-            Arrays.asList(changes.playerPlanesToAdd, changes.playerPlanesToRemove),
-            (f, s)-> f.merge(s,
-                (params)-> {int res = params.get(0) - params.get(1); return res == 0 ? null : res;},
-                (old, params)->{int res = old+params.get(0) - params.get(1); return res == 0 ? null : res;},
-                (i)->0
-            )
+            changes.playerPlanesChange,
+            (f, s)-> f.merge(s, v->v, DataChanges::sumIntOrNull)
         );
 
         airports.changeAsStruct(pl->pl.passengers, changes.airportPassengersChange,
@@ -313,12 +304,11 @@ public class GameData {
             playersTmp.containsAllKeys(changes.playerAbilityChoice) &&
             StaticGameData.abilityTypes.containsAllValues(changes.playerAbilityChoice) &&
             playersTmp.checkChangeAsStruct((pl) -> pl.planes,
-                Arrays.asList(changes.playerPlanesToAdd, changes.playerPlanesToRemove),
+                changes.playerPlanesChange,
                 (f, s) -> f.checkMergeElements(s,
-                    (params) -> params.get(0) - params.get(1) >= 0,
-                    (old, params) -> old + params.get(0) - params.get(1) >= 0,
-                    (i) -> 0
-                ) && StaticGameData.planeTypes.containsAll(s.get(0).keySet())
+                    v-> v>= 0,
+                    (o,n)-> o+n>=0
+                ) && StaticGameData.planeTypes.containsAll(s.keySet())
             ) &&
             airportsTmp.checkChangeAsStruct((port) -> port.passengers,
                 changes.airportPassengersChange,
@@ -427,12 +417,11 @@ public class GameData {
             return false;
         }
         if (!playersTmp.checkChangeAsStruct((pl) -> pl.planes,
-            Arrays.asList(changes.playerPlanesToAdd, changes.playerPlanesToRemove),
+            changes.playerPlanesChange,
             (f, s) -> f.checkMergeElements(s,
-                (params) -> params.get(0) - params.get(1) >= 0,
-                (old, params) -> old + params.get(0) - params.get(1) >= 0,
-                (i) -> 0
-            ) && StaticGameData.planeTypes.containsAll(s.get(0).keySet()))) {
+                v -> v >= 0,
+                (o, n) -> o + n >= 0
+            ) && StaticGameData.planeTypes.containsAll(s.keySet()))) {
             System.err.println("Validation failed: player planes change validation or plane type validation failed.");
             return false;
         }

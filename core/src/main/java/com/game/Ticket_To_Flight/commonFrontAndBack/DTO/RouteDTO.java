@@ -26,4 +26,9 @@ public class RouteDTO extends Identifiable {
             lines.add(line.getId());
         passengers = route.passengersForDTO();
     }
+
+    public Integer getPlane(){return plane;}
+    public Integer getStartingPort(){return startingPort;}
+    public List<Integer> getLines(){return lines;}
+    public Map<Integer, Map<Integer, Integer>> getPassengers(){return passengers;}
 }

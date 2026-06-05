@@ -2,11 +2,13 @@ package com.game.Ticket_To_Flight.backend;
 
 import com.game.Ticket_To_Flight.PresetPaths;
 import com.game.Ticket_To_Flight.backend.Handlers.AuctionHandler;
+import com.game.Ticket_To_Flight.backend.Handlers.RouteChecker;
 import com.game.Ticket_To_Flight.backend.Handlers.WorldMapUpdater;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airline;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Player;
 import com.game.Ticket_To_Flight.backend.server.MainLoopBack;
 import com.game.Ticket_To_Flight.backend.Handlers.LowLevelHandlerBack.Flags;
+import com.game.Ticket_To_Flight.commonFrontAndBack.DTO.RouteDTO;
 import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
 import com.game.Ticket_To_Flight.commonFrontAndBack.StaticGameData;
 import com.game.Ticket_To_Flight.network.Network;
@@ -37,6 +39,7 @@ public class MainLogic extends MainLoopBack {
     private final AuctionHandler auctionHandler = new AuctionHandler(gameData, llh.dataChangesCreator);
     private final WorldMapUpdater worldMapUpdater = new WorldMapUpdater(
         PresetPaths.presetPaths.get(1), gameData, llh.dataChangesCreator);
+    private final RouteChecker routeChecker = new RouteChecker(gameData, llh.dataChangesCreator);
 
 
     @Override
@@ -206,8 +209,34 @@ public class MainLogic extends MainLoopBack {
             if(gameData.currentState != GameData.State.FLIGHTS)
                 llh.sendWrongStateError();
             else {
-                // Flight resolution is not implemented yet, but accepting the response prevents the turn from soft-locking.
-                llh.playerFinished();
+                if(resp.finishStatus == PASS){
+                    llh.playerFinished();
+                }
+                else {
+                    Player pl = gameData.players.get(gameData.currentPlayer);
+                    if (pl.actionPoints > 0) {
+                        if(resp.dto != null){
+                            routeChecker.clearRT();
+                            if(routeChecker.downloadAndCheckDTO(resp.dto)){
+                                llh.dataChangesCreator.takeActionPoint();
+                                routeChecker.applyRT();
+                                if (resp.finishStatus == FINISHED) {
+                                    llh.playerFinished();
+                                } else {
+                                    llh.playerNotFinished();
+                                }
+                            }
+                            else{
+                                llh.sendError("Invalid route.");
+                            }
+                        }
+                        else{
+                            llh.sendError("Route is null.");
+                        }
+                    } else {
+                        llh.sendError("Not enough action points.");
+                    }
+                }
             }
         }
         else{
