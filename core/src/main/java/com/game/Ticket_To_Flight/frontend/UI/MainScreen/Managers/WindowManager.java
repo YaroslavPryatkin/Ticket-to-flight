@@ -1,12 +1,17 @@
 package com.game.Ticket_To_Flight.frontend.UI.MainScreen.Managers;
 
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
 import com.game.Ticket_To_Flight.frontend.LowLevelHandlerFront;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManager;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.GameStageWindows.SubWindows.*;
+import com.game.Ticket_To_Flight.frontend.components.BaseGameWindow;
 
 public class WindowManager {
     private final Stage uiStageWindow;
@@ -18,6 +23,7 @@ public class WindowManager {
 
     private Window currentWindow;
     private boolean isWindowOpen = false;
+    private final Actor inputBlocker;
 
     public WindowManager(Stage uiStageWindow, Skin defaultSkin, Skin investSkin, GameUIManager facade, GameData gameData, LowLevelHandlerFront llh) {
         this.uiStageWindow = uiStageWindow;
@@ -26,6 +32,7 @@ public class WindowManager {
         this.facade = facade;
         this.gameData = gameData;
         this.llh = llh;
+        this.inputBlocker = createInputBlocker();
     }
 
     private void closeCurrentWindow() {
@@ -33,6 +40,8 @@ public class WindowManager {
             currentWindow.remove();
             currentWindow = null;
         }
+        inputBlocker.remove();
+        uiStageWindow.setScrollFocus(null);
         isWindowOpen = false;
     }
 
@@ -42,6 +51,10 @@ public class WindowManager {
                 (uiStageWindow.getWidth() - currentWindow.getWidth()) / 2f,
                 (uiStageWindow.getHeight() - currentWindow.getHeight()) / 2f
             );
+            updateInputBlockerBounds();
+            if (currentWindow instanceof BaseGameWindow) {
+                ((BaseGameWindow) currentWindow).updateScrollFocusUnderMouse();
+            }
         }
     }
 
@@ -84,12 +97,46 @@ public class WindowManager {
     }
 
     private void openWindow(Window window) {
+        showInputBlocker();
         uiStageWindow.addActor(window);
         centerCurrentWindow();
         isWindowOpen = true;
     }
 
     public void setWindowOpen(boolean windowOpen) {
+        if (!windowOpen) {
+            closeCurrentWindow();
+            return;
+        }
         this.isWindowOpen = windowOpen;
+    }
+
+    private Actor createInputBlocker() {
+        Actor blocker = new Actor();
+        blocker.setTouchable(Touchable.enabled);
+        blocker.addListener(new InputListener() {
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                return true;
+            }
+
+            @Override
+            public boolean scrolled(InputEvent event, float x, float y, float amountX, float amountY) {
+                return true;
+            }
+        });
+        return blocker;
+    }
+
+    private void showInputBlocker() {
+        updateInputBlockerBounds();
+        if (inputBlocker.getStage() == null) {
+            uiStageWindow.addActor(inputBlocker);
+        }
+        inputBlocker.toBack();
+    }
+
+    private void updateInputBlockerBounds() {
+        inputBlocker.setBounds(0, 0, uiStageWindow.getWidth(), uiStageWindow.getHeight());
     }
 }

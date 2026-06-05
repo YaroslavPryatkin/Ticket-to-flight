@@ -63,8 +63,12 @@ public class MapInputController extends InputAdapter {
     }
 
     private Airport getClickedAirport(float worldX, float worldY) {
+        float hitTolerance = 20f * camera.zoom;
+
         for (Airport airport : gameData.airports) {
-            if (Vector2.dst(airport.getX(), airport.getY(), worldX, worldY) <= airport.getRadius()) {
+            float effectiveRadius = airport.getRadius() + hitTolerance;
+
+            if (Vector2.dst(airport.getX(), airport.getY(), worldX, worldY) <= effectiveRadius) {
                 return airport;
             }
         }

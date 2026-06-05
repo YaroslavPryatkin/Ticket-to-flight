@@ -77,7 +77,7 @@ public class MapDrawer {
     private void addAirportsOnTheMap(GameData gameData) {
         for (Airport airport : gameData.airports) {
             batch.setColor(airport.getColor());
-            float currentRadius = airport.getRadius();
+            float currentRadius = 15f;
 
             if (selectionState.isAirportSelected(airport)) {
                 currentRadius *= 1.8f;

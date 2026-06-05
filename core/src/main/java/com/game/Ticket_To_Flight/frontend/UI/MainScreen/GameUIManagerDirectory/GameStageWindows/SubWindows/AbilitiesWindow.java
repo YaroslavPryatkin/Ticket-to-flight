@@ -52,6 +52,7 @@ public class AbilitiesWindow extends BaseGameWindow {
         ScrollPane scrollPane = new ScrollPane(innerTable, skin);
         scrollPane.setScrollingDisabled(true, false);
         scrollPane.setFadeScrollBars(false);
+        registerScrollFocus(scrollPane);
 
         this.add(scrollPane).expandY().fillY().padTop(30).padBottom(40).row();
 

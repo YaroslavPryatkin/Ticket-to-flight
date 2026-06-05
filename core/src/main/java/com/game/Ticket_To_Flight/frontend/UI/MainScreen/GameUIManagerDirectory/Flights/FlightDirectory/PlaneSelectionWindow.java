@@ -51,6 +51,7 @@ public class PlaneSelectionWindow extends BaseGameWindow {
 
         ScrollPane scrollPane = new ScrollPane(planesTable, skin);
         scrollPane.setFadeScrollBars(false);
+        registerScrollFocus(scrollPane);
 
         this.add(scrollPane).width(1000).height(500);
         this.pack();

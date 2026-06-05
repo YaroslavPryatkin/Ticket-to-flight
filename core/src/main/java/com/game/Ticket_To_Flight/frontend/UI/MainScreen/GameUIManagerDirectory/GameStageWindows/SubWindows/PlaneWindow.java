@@ -96,6 +96,7 @@ public class PlaneWindow extends BaseGameWindow {
         ScrollPane scrollPane = new ScrollPane(planesTable, skin);
         scrollPane.setScrollingDisabled(false, true);
         scrollPane.setFadeScrollBars(false);
+        registerScrollFocus(scrollPane);
         this.add(scrollPane).expandX().fillX().padBottom(40).row();
 
         final Table actionTable = new Table();
