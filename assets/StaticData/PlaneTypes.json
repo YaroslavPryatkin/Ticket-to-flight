@@ -8,7 +8,7 @@
     "minGate": 4,
     "maxGate": 4,
     "minDist": 500.0,
-    "maxDist": 3500.0,
+    "maxDist": 350000.0,
     "price": 300,
     "description": "cool plane"
   },
@@ -16,7 +16,7 @@
     "id": 2,
     "fuel": 50000000,
     "stations": 10,
-    "luxury": 1,
+    "luxury": 4,
     "capacity": 180,
     "minGate": 4,
     "maxGate": 4,

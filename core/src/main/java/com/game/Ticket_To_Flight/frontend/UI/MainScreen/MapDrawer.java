@@ -78,9 +78,15 @@ public class MapDrawer {
         for (Airport airport : gameData.airports) {
             batch.setColor(airport.getColor());
             float currentRadius = airport.getRadius();
+
             if (selectionState.isAirportSelected(airport)) {
                 currentRadius *= 1.8f;
             }
+
+            if (selectionState.isAirportFirst(airport)) {
+                batch.setColor(Color.ROYAL);
+            }
+
             float diameter = currentRadius * 2f;
             float drawX = airport.getX() - currentRadius;
             float drawY = airport.getY() - currentRadius;
@@ -98,7 +104,7 @@ public class MapDrawer {
             } else {
                 airlineColor = Color.LIGHT_GRAY;
             }
-            if (selectionState.isAirlineSelected(airline)) {
+            if (selectionState.isAirlineSelected(airline) || selectionState.isAirlineInRoute(airline)) {
                 airlineColor = new Color(airlineColor.r, airlineColor.g, airlineColor.b, 0.4f);
             }
             batch.setColor(airlineColor);

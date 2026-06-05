@@ -54,6 +54,7 @@ public class MainFlightController {
     private Route route;
     private PlaneType selectedPlane;
     private Airport activeFlightAirport;
+    private Airport firstFlightAirport;
     private Table planeWindow;
     private boolean wasActive = false;
 
@@ -118,8 +119,10 @@ public class MainFlightController {
         undoStack.push(() -> {
             selectedPlane = null;
             route = null;
+            selectionState.setCurrentRoute(null);
             chosenGroups.clear();
             setActiveFlightAirport(null);
+            setFirstFlightAirport(null);
         });
 
         uiManager.showSuccessWindow("Plane was selected successfully. Choose the first airport and the group.");
@@ -138,9 +141,11 @@ public class MainFlightController {
 
         if (chosenGroups.isEmpty() && step == Step.CHOOSE_AIRPORT_GROUP) {
             setActiveFlightAirport(airport);
+            setFirstFlightAirport(airport);
 
             if (this.selectedPlane != null) {
                 this.route = new Route(this.selectedPlane, this.gameData, airport);
+                selectionState.setCurrentRoute(this.route);
             }
         }
 
@@ -195,6 +200,7 @@ public class MainFlightController {
 
         if (route == null) {
             route = new Route(selectedPlane, gameData, airport);
+            selectionState.setCurrentRoute(route);
         }
 
         String error = route.addPassenger(passengerType);
@@ -216,6 +222,7 @@ public class MainFlightController {
             if (chosenGroups.isEmpty()) {
                 route = null;
                 setActiveFlightAirport(null);
+                setFirstFlightAirport(null);
             }
         });
 
@@ -277,10 +284,11 @@ public class MainFlightController {
         chosenGroups.clear();
 
         route = null;
-
+        selectionState.setCurrentRoute(null);
         selectedPlane = null;
 
         setActiveFlightAirport(null);
+        setFirstFlightAirport(null);
 
         step = Step.SELECT_PLANE;
     }
@@ -288,6 +296,11 @@ public class MainFlightController {
     private void setActiveFlightAirport(Airport airport) {
         activeFlightAirport = airport;
         selectionState.setActiveFlightAirport(airport);
+    }
+
+    private void setFirstFlightAirport(Airport airport) {
+        firstFlightAirport = airport;
+        selectionState.setFirstFlightAirport(airport);
     }
 
     private void positionPlaneWindow() {

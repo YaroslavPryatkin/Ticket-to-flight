@@ -11,24 +11,38 @@
     },
     {
       "id": 2,
-      "type": 102,
+      "type": 101,
       "x": 2073,
       "y": 896,
       "name": "Moscow"
     },
     {
       "id": 3,
-      "type": 103,
+      "type": 101,
       "x": 917,
       "y": 726,
       "name": "London"
     },
     {
       "id": 4,
-      "type": 104,
+      "type": 101,
       "x": 1849,
       "y": 280,
       "name": "Istanbul"
+    },
+    {
+      "id": 5,
+      "type": 101,
+      "x": 1466,
+      "y": 1122,
+      "name": "Stokholm"
+    },
+    {
+      "id": 6,
+      "type": 101,
+      "x": 1061,
+      "y": 503,
+      "name": "Paris"
     }
   ],
 
@@ -39,14 +53,29 @@
       "portB": 2
     },
     {
-      "type": 202,
+      "type": 201,
       "portA": 2,
       "portB": 3
     },
     {
-      "type": 203,
+      "type": 201,
       "portA": 1,
       "portB": 4
+    },
+    {
+      "type": 201,
+      "portA": 3,
+      "portB": 5
+    },
+    {
+      "type": 201,
+      "portA": 3,
+      "portB": 6
+    },
+    {
+      "type": 201,
+      "portA": 5,
+      "portB": 2
     }
   ],
 
