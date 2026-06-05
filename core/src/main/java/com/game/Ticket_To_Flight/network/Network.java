@@ -4,6 +4,7 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.EndPoint;
 import com.game.Ticket_To_Flight.commonFrontAndBack.DTO.RouteDTO;
 import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
+import com.game.Ticket_To_Flight.commonFrontAndBack.RatingRecord;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -58,6 +59,7 @@ public class Network {
         GameData.State.class,
         ErrorMessage.class,
         PlayerAuctionChoiceResponse.class,
+        GameFinishedMessage.class,
         Arrays.asList().getClass(),
         Collections.emptyList().getClass(),
         Collections.emptyMap().getClass(),
@@ -136,6 +138,12 @@ public class Network {
 
     public static class GameMessage{
         public GameMessage(){}
+    }
+
+    public static class GameFinishedMessage extends GameMessage{
+        public final List<RatingRecord> playerRating;
+        private GameFinishedMessage(){playerRating = null;}
+        public GameFinishedMessage(List<RatingRecord> playerRating){this.playerRating = playerRating;}
     }
 
     public enum FinishStatus{

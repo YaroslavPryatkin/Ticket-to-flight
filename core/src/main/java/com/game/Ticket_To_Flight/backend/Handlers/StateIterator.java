@@ -71,8 +71,11 @@ public class StateIterator {
             playerStateToNonPlayerState(State.INCOME_AND_TAXES);
         }
         else if (gameData.currentState == GameData.State.INCOME_AND_TAXES) {
-            nonPlayerStateToNonPlayerState(State.WORLD_UPDATE);
             ++round;
+            if(round<=StaticGameData.amountOfRounds)
+                nonPlayerStateToNonPlayerState(State.WORLD_UPDATE);
+            else
+                nonPlayerStateToNonPlayerState(State.GAME_FINISHED);
             dataChangesCreator.resetAllAbilities();
             dataChangesCreator.resetActionPoints();
             dataChangesCreator.setCurrentRound(round);
@@ -95,7 +98,7 @@ public class StateIterator {
             dataChangesCreator.setCurrentPLayer(nextPlayer);
         }
         else { // everybody passed
-            System.out.println("Changing state player to player");
+           // System.out.println("Changing state player to player");
             dataChangesCreator.removeAllPassed();
             dataChangesCreator.setCurrentState(nextState);
             turnOrderIterator.reset(ability);
@@ -111,7 +114,7 @@ public class StateIterator {
             flags.currentPlayerState = LowLevelHandlerBack.Flags.CurrentPlayerState.WAITING_FOR_RESPONSE;
         }
         else {
-            System.out.println("Changing state player to non player");
+            //System.out.println("Changing state player to non player");
             dataChangesCreator.removeAllPassed();
             dataChangesCreator.setCurrentState(nextState);
             dataChangesCreator.setCurrentPLayer(-1);
@@ -120,7 +123,7 @@ public class StateIterator {
     }
 
     private void nonPlayerStateToPlayerState(State nextState, Integer ability){
-        System.out.println("Changing state non player to player");
+        //System.out.println("Changing state non player to player");
         dataChangesCreator.setCurrentState(nextState);
         turnOrderIterator.reset(ability);
         dataChangesCreator.setCurrentPLayer(turnOrderIterator.getFirstId());
@@ -128,7 +131,7 @@ public class StateIterator {
     }
 
     private void nonPlayerStateToNonPlayerState(State nextState){
-        System.out.println("Changing state non player to non player");
+        //System.out.println("Changing state non player to non player");
         dataChangesCreator.setCurrentState(nextState);
         dataChangesCreator.setCurrentPLayer(-1);
     }

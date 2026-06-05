@@ -7,9 +7,11 @@ import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.PlaneType;
 import com.game.Ticket_To_Flight.commonFrontAndBack.DTO.RouteDTO;
 import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
 import com.game.Ticket_To_Flight.commonFrontAndBack.LowLevelHandler;
+import com.game.Ticket_To_Flight.commonFrontAndBack.RatingRecord;
 import com.game.Ticket_To_Flight.commonFrontAndBack.Route;
 import com.game.Ticket_To_Flight.network.Network;
 
+import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
@@ -40,10 +42,12 @@ public class LowLevelHandlerFront extends LowLevelHandler {
             WAITING_FOR_PLAYER_CHOICE,
             WAITING_FOR_SERVER_RESPONSE,
             RECEIVED_ERROR_MESSAGE,
-            SERVER_DISCONNECTED
+            SERVER_DISCONNECTED,
+            GAME_FINISHED
         }
         public volatile CurrentStateState currentStateState = CurrentStateState.NOT_IN_GAME;
         public volatile String errorMessage = null;
+        public volatile List<RatingRecord> gameFinishRating = null;
     }
 
     private Flags flags = new Flags();
@@ -58,6 +62,7 @@ public class LowLevelHandlerFront extends LowLevelHandler {
     public Network.JoinGameResponse.Response getJoinGameResponse(){
         return flags.joinGameResponse;
     }
+    public List<RatingRecord> getGameFinishRating(){return flags.gameFinishRating;}
 
     public void truncateJoinGameResponse(){
         flags.joinGameResponse = null;
@@ -101,7 +106,7 @@ public class LowLevelHandlerFront extends LowLevelHandler {
                 changeFlagDependingOnNewState(dataChanges.currentState);
                 mainClient.gameDataWasUpdated();
                 //System.out.println("Resetting game data");
-                showGameData();
+                //showGameData();
             }
         } catch (Exception e) {
             System.err.println("Error during game data reload. Error " + e.getMessage());
@@ -125,7 +130,7 @@ public class LowLevelHandlerFront extends LowLevelHandler {
                 changeFlagDependingOnNewState(checkedChanges.currentState);
                 mainClient.gameDataWasUpdated();
                 checkedChanges = null;
-                showGameData();
+                //showGameData();
             }
             catch (Exception e){
                 System.err.println("Error during data changing. Error " + e.getMessage());
@@ -201,7 +206,9 @@ public class LowLevelHandlerFront extends LowLevelHandler {
     private void changeFlagDependingOnNewState(GameData.State st){
         if(st == null) st = gameData.currentState;
         Flags.CurrentStateState res;
-        if(st == GameData.State.WORLD_UPDATE ||
+        if(st == GameData.State.GAME_FINISHED)
+            res = Flags.CurrentStateState.GAME_FINISHED;
+        else if(st == GameData.State.WORLD_UPDATE ||
             st == GameData.State.INCOME_AND_TAXES ||
             st == GameData.State.EVENT
         )
@@ -275,7 +282,7 @@ public class LowLevelHandlerFront extends LowLevelHandler {
             myId = ((Network.StartGameMessage) message).myId;
             mainClient.changeScreenToRunning();
             flags.gamePreparationsState = Flags.GamePreparationsState.RUNNING;
-            System.out.println("game is running");
+            //System.out.println("game is running");
         }
         else if(message instanceof Network.ReloadGameDataResponse){
             Network.ReloadGameDataResponse resp = (Network.ReloadGameDataResponse) message;
@@ -284,6 +291,11 @@ public class LowLevelHandlerFront extends LowLevelHandler {
         else if(message instanceof Network.ErrorMessage){
             flags.currentStateState = Flags.CurrentStateState.RECEIVED_ERROR_MESSAGE;
             flags.errorMessage = ((Network.ErrorMessage) message).getMessage();
+        }
+        else if(message instanceof Network.GameFinishedMessage){
+            flags.currentStateState = Flags.CurrentStateState.GAME_FINISHED;
+            flags.gameFinishRating = ((Network.GameFinishedMessage) message).playerRating;
+            //System.out.println("Received game finished message");
         }
         else throw new IllegalArgumentException("Unknown message");
     }

@@ -1,10 +1,12 @@
 package com.game.Ticket_To_Flight.backend.Handlers;
 
 import com.esotericsoftware.kryonet.Connection;
+import com.game.Ticket_To_Flight.backend.gameLogicEntities.Player;
 import com.game.Ticket_To_Flight.backend.server.GameServer;
 import com.game.Ticket_To_Flight.backend.server.MainLoopBack;
 import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
 import com.game.Ticket_To_Flight.commonFrontAndBack.LowLevelHandler;
+import com.game.Ticket_To_Flight.commonFrontAndBack.RatingRecord;
 import com.game.Ticket_To_Flight.network.Network;
 
 import java.util.*;
@@ -79,7 +81,7 @@ public class LowLevelHandlerBack extends LowLevelHandler {
             addMessage(con ,  gameStarter.handleJoinGameRequest(con, req.playerName));
         }
         else if(message instanceof Network.ReloadGameDataRequest){
-            if(con2int.containsKey(con)){
+            if(con2int.containsKey(con) && gameData.currentState != GameData.State.GAME_FINISHED){
                 GameData.DataChanges reloadDC = gameData.createDataChangesFromThis();
                 addMessage(con, new Network.ReloadGameDataResponse(reloadDC));
             }
@@ -169,8 +171,9 @@ public class LowLevelHandlerBack extends LowLevelHandler {
     }
 
     public void finishTurnSuccessfully(){
-        if(!stateIterator.nextState())
-            System.out.println("Game finished");
+        if(!stateIterator.nextState()){
+            sendToAllPlayers(new Network.GameFinishedMessage(GameFinisher.getRating(gameData)));
+        }
     }
 
     public void sendError(String error){

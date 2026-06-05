@@ -51,6 +51,9 @@ public class MainLogic extends MainLoopBack {
             if(gameData.players.isEmpty()){
                 stopServer();
             }
+            else if(gameData.currentState == GameData.State.GAME_FINISHED){
+                //do nothing
+            }
             else if(llh.getCurrentPlayerState() == Flags.CurrentPlayerState.NO_PLAYER_STAGE) {
                 if (gameData.currentState == GameData.State.WORLD_UPDATE) {
                     worldMapUpdater.loadRound();

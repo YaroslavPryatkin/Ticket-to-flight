@@ -33,10 +33,18 @@ public class MainClient {
         gameData.releaseReadLock();
     }
 
+    boolean wroteGameFinished = false;
     private void mainCycle(float delta){
         if(llh.getGamePreparationState() == Flags.GamePreparationsState.RUNNING) {
             if(llh.getCurrentStateState() == Flags.CurrentStateState.SERVER_DISCONNECTED){
                 //stop game and return to connecting screen
+            }
+            else if(gameData.currentState == GameData.State.GAME_FINISHED && llh.getCurrentStateState() == Flags.CurrentStateState.GAME_FINISHED){
+                //do something with llh.getGameFinishRating();
+                if(!wroteGameFinished) {
+                    System.out.println("Game is finished");
+                    wroteGameFinished = true;
+                }
             }
             else if (gameData.currentState == GameData.State.WORLD_UPDATE) {
                 this.myGame.setScreen(this.worldMapRenderer);

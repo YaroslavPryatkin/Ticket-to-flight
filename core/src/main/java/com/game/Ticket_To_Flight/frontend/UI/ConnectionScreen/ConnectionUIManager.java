@@ -61,7 +61,7 @@ public class ConnectionUIManager extends Table {
                 String nickname = nicknameField.getText().trim();
 
                 if (!nickname.isEmpty()) {
-                    System.out.println("Nickname submitted: " + nickname);
+                    //System.out.println("Nickname submitted: " + nickname);
                     llh.sendJoinRequest(nickname);
                 }
             }
@@ -74,7 +74,7 @@ public class ConnectionUIManager extends Table {
                     String nickname = nicknameField.getText().trim();
 
                     if (!nickname.isEmpty()) {
-                        System.out.println("Nickname submitted via Enter: " + nickname);
+                        //System.out.println("Nickname submitted via Enter: " + nickname);
                         llh.sendJoinRequest(nickname);
                         shouldShowNicknameInput=true;
                     }

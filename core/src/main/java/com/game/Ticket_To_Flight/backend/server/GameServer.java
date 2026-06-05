@@ -39,7 +39,7 @@ public class GameServer {
         try {
             server.bind(Network.TCP_PORT, Network.UDP_PORT);
             server.start();
-            System.out.println("Server launched!");
+            //System.out.println("Server launched!");
         } catch (IOException e) {
             System.err.println("FATAL: Failed to start server: " + e.getMessage());
             throw new RuntimeException("Server startup failed", e);

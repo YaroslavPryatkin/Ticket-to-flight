@@ -35,7 +35,7 @@ public class MainMenuUI {
         createServerBtn.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                System.out.println("Create server clicked");
+                //System.out.println("Create server clicked");
                 if (mainMenuClient.createMainLogic()) {
                     MainMenuMessageDialog dialog = new MainMenuMessageDialog("Server", "Server was created succesfully", skin);
                     dialog.show(mainTable.getStage());

@@ -27,7 +27,7 @@ public class GameStarter {
 
     public void addAllPayersToAdd(){
         while(!playersToAdd.isEmpty()){
-            System.out.println("Adding player");
+            //System.out.println("Adding player");
             playersBeforeGame.putIfAbsent(playersToAdd.poll(), null);
         }
     }

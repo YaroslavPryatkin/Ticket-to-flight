@@ -46,7 +46,8 @@ public class GameData {
         AIRLINES,
         EVENT,
         FLIGHTS,
-        INCOME_AND_TAXES
+        INCOME_AND_TAXES,
+        GAME_FINISHED
     }
     public Integer roundNumber = 0;
     public State currentState = State.NO_STATE;
