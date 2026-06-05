@@ -54,7 +54,6 @@ public class PlayersListHUD extends Table {
         scrollPane.setFadeScrollBars(false);
         scrollPane.setScrollingDisabled(true, false);
 
-        // Стандартный лисенер оставляем на всякий случай
         scrollPane.addListener(new InputListener() {
             @Override
             public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {

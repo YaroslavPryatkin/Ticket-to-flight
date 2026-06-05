@@ -1,5 +1,7 @@
 package com.game.Ticket_To_Flight.frontend.UI.MainScreen.Managers;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
@@ -104,5 +106,15 @@ public class WindowManager {
 
     public boolean isWindowOpen() {
         return isWindowOpen;
+    }
+
+    public boolean isPointerOverCurrentWindow() {
+        if (currentWindow == null) return false;
+
+        Vector2 stageCoords = uiStageWindow.screenToStageCoordinates(new Vector2(Gdx.input.getX(), Gdx.input.getY()));
+        return stageCoords.x >= currentWindow.getX() &&
+            stageCoords.x <= currentWindow.getX() + currentWindow.getWidth() &&
+            stageCoords.y >= currentWindow.getY() &&
+            stageCoords.y <= currentWindow.getY() + currentWindow.getHeight();
     }
 }

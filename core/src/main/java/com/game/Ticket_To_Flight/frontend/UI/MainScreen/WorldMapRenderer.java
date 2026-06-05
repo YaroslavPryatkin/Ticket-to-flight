@@ -77,6 +77,7 @@ public class WorldMapRenderer extends ScreenAdapter {
 
     public void renderNoLogic(float delta) {
         inputCtrl.updateCurrentStrategy();
+        inputCtrl.updateWindowClickTooltip();
 
         Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 

@@ -13,12 +13,14 @@ import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.T
 import com.game.Ticket_To_Flight.frontend.components.tables.passenger.PassengerTableWidget;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.MapInput.MapSelectionState;
 import com.game.Ticket_To_Flight.frontend.components.buttons.RoundedButton;
+import com.game.Ticket_To_Flight.frontend.components.subsidiary.ComponentHover;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 public class AirportTooltipWindow extends Window implements MapTooltipWindow {
+    private final ScrollPane scrollPane;
 
     public AirportTooltipWindow(
         Skin skin,
@@ -67,7 +69,7 @@ public class AirportTooltipWindow extends Window implements MapTooltipWindow {
 
         contentTable.setRows(rows);
 
-        ScrollPane scrollPane = new ScrollPane(contentTable, skin);
+        scrollPane = new ScrollPane(contentTable, skin);
         scrollPane.setFadeScrollBars(false);
         scrollPane.setScrollingDisabled(false, false);
         scrollPane.setForceScroll(true, true);
@@ -105,5 +107,17 @@ public class AirportTooltipWindow extends Window implements MapTooltipWindow {
     @Override
     public Window asWindow() {
         return this;
+    }
+
+    @Override
+    public void act(float delta) {
+        super.act(delta);
+        if (getStage() == null) return;
+
+        if (ComponentHover.isMouseOver(this)) {
+            getStage().setScrollFocus(scrollPane);
+        } else if (getStage().getScrollFocus() == scrollPane) {
+            getStage().setScrollFocus(null);
+        }
     }
 }

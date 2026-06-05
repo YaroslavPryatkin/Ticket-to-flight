@@ -1,5 +1,6 @@
 package com.game.Ticket_To_Flight.frontend.UI.MainScreen.MapInput;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector2;
@@ -25,6 +26,7 @@ public class MapInputController extends InputAdapter {
     private final MapInteractionStrategy flightStrategy;
 
     private MapInteractionStrategy currentStrategy;
+    private boolean touchDownHandledThisFrame = false;
 
     public MapInputController(OrthographicCamera camera, GameData gameData, GameUIManager uiManager, MainClient client, MapSelectionState selectionState, MainFlightController flightController) {
         this.camera = camera;
@@ -64,7 +66,7 @@ public class MapInputController extends InputAdapter {
         return (float) Math.sqrt(dx * dx + dy * dy);
     }
 
-    private Airport getClickedAirport(float worldX, float worldY) {
+    public Airport findAirportAt(float worldX, float worldY) {
         float hitTolerance = 20f * camera.zoom;
 
         for (Airport airport : gameData.airports) {
@@ -77,7 +79,7 @@ public class MapInputController extends InputAdapter {
         return null;
     }
 
-    private Airline getClickedAirline(float worldX, float worldY) {
+    public Airline findAirlineAt(float worldX, float worldY) {
         for (Airline airline : gameData.airlines) {
             float dist = distanceToSegment(worldX, worldY, airline.getPortA().getX(), airline.getPortA().getY(), airline.getPortB().getX(), airline.getPortB().getY());
             if (dist <= clickTolerance) return airline;
@@ -89,24 +91,46 @@ public class MapInputController extends InputAdapter {
         currentStrategy = gameData.currentState == GameData.State.FLIGHTS ? flightStrategy : defaultStrategy;
     }
 
+    public void updateWindowClickTooltip() {
+        if (!uiManager.isWindowOpen() || !Gdx.input.justTouched()) {
+            touchDownHandledThisFrame = false;
+            return;
+        }
+
+        if (touchDownHandledThisFrame || uiManager.isPointerOverWindow() || uiManager.isPointerOverHudActor()) {
+            touchDownHandledThisFrame = false;
+            return;
+        }
+
+        Vector3 worldClick = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
+        camera.unproject(worldClick);
+        showTooltipOnly(worldClick.x, worldClick.y);
+        touchDownHandledThisFrame = false;
+    }
+
     public void setCurrentStrategy(MapInteractionStrategy currentStrategy) {
         this.currentStrategy = currentStrategy;
     }
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        if (uiManager.isWindowOpen()) return true;
+        touchDownHandledThisFrame = true;
 
         Vector3 worldClick = new Vector3(screenX, screenY, 0);
         camera.unproject(worldClick);
 
-        Airport clickedAirport = getClickedAirport(worldClick.x, worldClick.y);
+        if (uiManager.isWindowOpen()) {
+            showTooltipOnly(worldClick.x, worldClick.y);
+            return true;
+        }
+
+        Airport clickedAirport = findAirportAt(worldClick.x, worldClick.y);
         if (clickedAirport != null) {
             currentStrategy.onAirportClicked(clickedAirport);
             return true;
         }
 
-        Airline clickedAirline = getClickedAirline(worldClick.x, worldClick.y);
+        Airline clickedAirline = findAirlineAt(worldClick.x, worldClick.y);
         if (clickedAirline != null) {
             currentStrategy.onAirlineClicked(clickedAirline);
             return true;
@@ -115,6 +139,22 @@ public class MapInputController extends InputAdapter {
         currentStrategy.onEmptyMapClicked(worldClick.x, worldClick.y);
         lastMousePos.set(screenX, screenY, 0);
         return true;
+    }
+
+    private void showTooltipOnly(float worldX, float worldY) {
+        Airport clickedAirport = findAirportAt(worldX, worldY);
+        if (clickedAirport != null) {
+            uiManager.showAirportTooltip(clickedAirport);
+            return;
+        }
+
+        Airline clickedAirline = findAirlineAt(worldX, worldY);
+        if (clickedAirline != null) {
+            uiManager.showAirlineTooltip(clickedAirline);
+            return;
+        }
+
+        uiManager.removeTooltip();
     }
 
     @Override
@@ -132,6 +172,7 @@ public class MapInputController extends InputAdapter {
     @Override
     public boolean scrolled(float amountX, float amountY) {
         if (uiManager.isWindowOpen()) return true;
+        if (uiManager.isPointerOverTooltip() || uiManager.isPointerOverHudActor()) return true;
 
         camera.zoom += amountY * 0.1f;
         return true;

@@ -1,6 +1,9 @@
 package com.game.Ticket_To_Flight.frontend.UI.MainScreen;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airline;
@@ -24,8 +27,11 @@ public class GameUIManager {
     private final HUDOverlay hud;
     private final MainFlightController flightController;
     private final AirlinesControls airlinesControls;
+    private final Stage uiStageHUD;
 
     public GameUIManager(Stage uiStageWindow, Stage uiStageHUD, MainClient client, MapSelectionState selectionState, OrthographicCamera mapCamera) {
+        this.uiStageHUD = uiStageHUD;
+
         WorldMapStyleFactory styleFactory = new WorldMapStyleFactory();
         Skin defaultSkin = styleFactory.createBasicWindow();
         Skin investSkin = styleFactory.createInvestWindow();
@@ -46,6 +52,7 @@ public class GameUIManager {
     public boolean showPlaneWindow() { return windowManager.showPlaneWindow(); }
     public void setWindowOpen(boolean windowOpen) { windowManager.setWindowOpen(windowOpen); }
     public boolean isWindowOpen() { return windowManager.isWindowOpen(); }
+    public boolean isPointerOverWindow() { return windowManager.isPointerOverCurrentWindow(); }
 
     public void showAirportTooltip(Airport airport) { tooltipManager.showAirportTooltip(airport); }
     public void showAirportTooltipForFlight(Airport airport, PassengerSelectionListener listener) {
@@ -55,10 +62,20 @@ public class GameUIManager {
     public void showAirlineTooltip(Airline airline) { tooltipManager.showAirlineTooltip(airline); }
 
     public void removeTooltip() { tooltipManager.removeTooltip(); }
+    public boolean isPointerOverTooltip() { return tooltipManager.isPointerOverTooltip(); }
+    public boolean isPointerOverHudActor() {
+        Vector2 stageCoords = uiStageHUD.screenToStageCoordinates(new Vector2(Gdx.input.getX(), Gdx.input.getY()));
+        Actor hitActor = uiStageHUD.hit(stageCoords.x, stageCoords.y, true);
+        while (hitActor != null && hitActor != uiStageHUD.getRoot()) {
+            if (hitActor.getListeners().size > 0 || hitActor.getCaptureListeners().size > 0) {
+                return true;
+            }
+            hitActor = hitActor.getParent();
+        }
+        return false;
+    }
     public void handleFlightAirportClick(Airport airport) { flightController.handleAirportClick(airport); }
     public void handleFlightAirlineClick(Airline airline) { flightController.handleAirlineClick(airline); }
-    public boolean shouldFinishAirlinesAfterPurchase() { return airlinesControls.shouldFinishAfterPurchase(); }
-    public void resetAirlinesFinishChoice() { airlinesControls.resetFinishChoice(); }
 
     public void updateHUDData() { hud.updateStandardHUD(null); }
 

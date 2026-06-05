@@ -18,8 +18,6 @@ public class AirlinesControls {
     private final GameUIManager uiManager;
 
     private TextButton passButton;
-    private TextButton finishButton;
-    private boolean finishAfterPurchase = false;
 
     public AirlinesControls(Stage stage, Skin skin, GameData gameData, LowLevelHandlerFront llh, GameUIManager uiManager) {
         this.stage = stage;
@@ -32,7 +30,6 @@ public class AirlinesControls {
     public void update() {
         if (!canChooseAirline()) {
             remove();
-            resetFinishChoice();
             return;
         }
 
@@ -41,28 +38,14 @@ public class AirlinesControls {
     }
 
     public void position() {
-        if (passButton == null || finishButton == null) return;
+        if (passButton == null) return;
 
         float width = 360;
         float height = 80;
         float margin = 40;
-        float gap = 20;
 
         passButton.setSize(width, height);
-        finishButton.setSize(width, height);
         passButton.setPosition(stage.getWidth() - width - margin, margin);
-        finishButton.setPosition(stage.getWidth() - width - margin, margin + height + gap);
-    }
-
-    public boolean shouldFinishAfterPurchase() {
-        return finishAfterPurchase;
-    }
-
-    public void resetFinishChoice() {
-        finishAfterPurchase = false;
-        if (finishButton != null) {
-            finishButton.setChecked(false);
-        }
     }
 
     private boolean canChooseAirline() {
@@ -76,10 +59,6 @@ public class AirlinesControls {
             passButton = createPassButton();
             stage.addActor(passButton);
         }
-        if (finishButton == null) {
-            finishButton = createFinishButton();
-            stage.addActor(finishButton);
-        }
     }
 
     private TextButton createPassButton() {
@@ -88,21 +67,8 @@ public class AirlinesControls {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 llh.sendAirlinePass();
-                resetFinishChoice();
                 uiManager.removeTooltip();
                 uiManager.showSuccessWindow("Airlines stage is finished for you.");
-            }
-        });
-        return button;
-    }
-
-    private TextButton createFinishButton() {
-        TextButton button = new RoundedButton("Finish this stage", skin, "default");
-        button.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                finishAfterPurchase = !finishAfterPurchase;
-                finishButton.setChecked(finishAfterPurchase);
             }
         });
         return button;
@@ -112,10 +78,6 @@ public class AirlinesControls {
         if (passButton != null) {
             passButton.remove();
             passButton = null;
-        }
-        if (finishButton != null) {
-            finishButton.remove();
-            finishButton = null;
         }
     }
 }
