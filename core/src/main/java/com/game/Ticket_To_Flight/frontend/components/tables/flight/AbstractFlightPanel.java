@@ -1,6 +1,7 @@
 package com.game.Ticket_To_Flight.frontend.components.tables.flight;
 
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -23,6 +24,17 @@ public abstract class AbstractFlightPanel extends Table {
         top().right();
         pad(20);
         setBackground(skin.getDrawable("flight-panel-bg"));
+        addListener(new InputListener() {
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                return true;
+            }
+
+            @Override
+            public boolean scrolled(InputEvent event, float x, float y, float amountX, float amountY) {
+                return true;
+            }
+        });
     }
 
     public void setOnToggle(Runnable onToggle) {

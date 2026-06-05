@@ -78,6 +78,8 @@ public class AirportHoverTooltip extends Window {
             addRow(passengerContent, skin, "Persons", passengerWidget.persons());
             addRow(passengerContent, skin, "Reward", passengerWidget.reward());
 
+            addExtraPassengerUI(passengerContent, passenger, skin);
+
             passengerList.setCallbacks(
                 () -> {
                     for (ExpandableListWidget other : activeLists) {
@@ -115,4 +117,6 @@ public class AirportHoverTooltip extends Window {
             getStage().setScrollFocus(null);
         }
     }
+
+    protected void addExtraPassengerUI(Table passengerContent, PassengerType passenger, Skin skin) {}
 }

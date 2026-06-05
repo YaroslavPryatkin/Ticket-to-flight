@@ -67,16 +67,22 @@ public class StandardHUD extends Table {
         summaryTable.pack();
         summaryTable.setPosition(width - summaryTable.getWidth() - 20, height - summaryTable.getHeight() - 20);
 
-        float buttonWidth = 340;
+        float buttonWidth = 280;
         float buttonHeight = 80;
-        float margin = 40;
+        float marginBottom = 40;
+        float spacing = 30;
+
         backButton.setSize(buttonWidth, buttonHeight);
         finishButton.setSize(buttonWidth, buttonHeight);
         resetButton.setSize(buttonWidth, buttonHeight);
 
-        backButton.setPosition(margin, margin);
-        finishButton.setPosition((width - buttonWidth) / 2f, margin);
-        resetButton.setPosition(width - buttonWidth - margin, margin);
+        float totalButtonsWidth = (buttonWidth * 3) + (spacing * 2);
+
+        float startX = (width - totalButtonsWidth) / 2f;
+
+        backButton.setPosition(startX, marginBottom);
+        finishButton.setPosition(startX + buttonWidth + spacing, marginBottom);
+        resetButton.setPosition(startX + (buttonWidth * 2) + (spacing * 2), marginBottom);
     }
 
     public float getSummaryBottomY() {

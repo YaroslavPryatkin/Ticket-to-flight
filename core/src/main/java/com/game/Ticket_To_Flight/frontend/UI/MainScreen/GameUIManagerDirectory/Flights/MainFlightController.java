@@ -76,6 +76,12 @@ public class MainFlightController {
 
         this.flightHUD = flightHUD;
         this.flightHUD.setCallbacks(this::resetAll, this::goBack, this::finishRoute);
+        this.flightHUD.setPassengerCallbacks(passengerType -> {
+            Airport airport = route != null ? route.getCurrentAirport() : activeFlightAirport;
+            if (airport != null) {
+                selectPassengerGroup(airport, passengerType);
+            }
+        });
     }
 
     public void update() {
@@ -153,7 +159,7 @@ public class MainFlightController {
             }
         }
 
-        uiManager.showAirportTooltipForFlight(airport, this::selectPassengerGroup);
+        uiManager.showAirportTooltip(airport);
     }
 
     public void handleAirlineClick(Airline airline) {
@@ -161,11 +167,6 @@ public class MainFlightController {
 
         if (route == null) {
             uiManager.showSuccessWindow("Choose the starting airport and group first.");
-            return;
-        }
-
-        if (route.getLines().isEmpty() && chosenGroups.isEmpty()) {
-            uiManager.showSuccessWindow("You must choose at least one group at the starting airport.");
             return;
         }
 
@@ -190,20 +191,20 @@ public class MainFlightController {
                 step = Step.CHOOSE_AIRPORT_GROUP;
             }
 
-            uiManager.showAirportTooltipForFlight(route.getCurrentAirport(), this::selectPassengerGroup);
+            uiManager.showAirportTooltip(route.getCurrentAirport());
         });
 
         setActiveFlightAirport(route.getCurrentAirport());
         step = Step.CHOOSE_AIRPORT_GROUP;
 
-        uiManager.showAirportTooltipForFlight(route.getCurrentAirport(), this::selectPassengerGroup);
+        uiManager.showAirportTooltip(route.getCurrentAirport());
     }
 
     public void handleEmptyMapClick() {
         if (!isActive()) return;
 
         if (route != null && !route.getLines().isEmpty() && activeFlightAirport != null) {
-            uiManager.showAirportTooltipForFlight(activeFlightAirport, this::selectPassengerGroup);
+            uiManager.showAirportTooltip(activeFlightAirport);
         } else {
             uiManager.removeTooltip();
         }

@@ -43,7 +43,10 @@ public class MapSelectionState {
         selectedAirportId = null;
         selectedAirlineId = null;
         selectedPassengerTypeId = null;
-        activeFlightAirportId = null;
+        if (activeFlightAirportId == firstFlightAirport) {
+            firstFlightAirport = null;
+            activeFlightAirportId = null;
+        }
     }
 
     public Integer getSelectedAirportId() {

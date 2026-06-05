@@ -14,7 +14,9 @@ import com.game.Ticket_To_Flight.frontend.MainClient;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.Airlines.AirlinesControls;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.Flights.MainFlightController;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.Flights.PassengerSelectionListener;
+import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.HUD.HUDDirectory.StandardHUDDirectory.PlayersListHUD;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.HUD.HUDOverlay;
+import com.game.Ticket_To_Flight.frontend.components.tables.flight.AbstractFlightPanel;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.Skins.WorldMapStyleFactory;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.Managers.TooltipManager;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.Managers.WindowManager;
@@ -55,9 +57,6 @@ public class GameUIManager {
     public boolean isPointerOverWindow() { return windowManager.isPointerOverCurrentWindow(); }
 
     public void showAirportTooltip(Airport airport) { tooltipManager.showAirportTooltip(airport); }
-    public void showAirportTooltipForFlight(Airport airport, PassengerSelectionListener listener) {
-        tooltipManager.showAirportTooltipForFlight(airport, listener);
-    }
 
     public void showAirlineTooltip(Airline airline) { tooltipManager.showAirlineTooltip(airline); }
 
@@ -67,6 +66,9 @@ public class GameUIManager {
         Vector2 stageCoords = uiStageHUD.screenToStageCoordinates(new Vector2(Gdx.input.getX(), Gdx.input.getY()));
         Actor hitActor = uiStageHUD.hit(stageCoords.x, stageCoords.y, true);
         while (hitActor != null && hitActor != uiStageHUD.getRoot()) {
+            if (hitActor instanceof AbstractFlightPanel || hitActor instanceof PlayersListHUD) {
+                return true;
+            }
             if (hitActor.getListeners().size > 0 || hitActor.getCaptureListeners().size > 0) {
                 return true;
             }

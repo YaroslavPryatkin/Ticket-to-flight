@@ -26,16 +26,25 @@ public class MapInputController extends InputAdapter {
     private final MapInteractionStrategy flightStrategy;
 
     private MapInteractionStrategy currentStrategy;
+    private MapSelectionState selectionState;
     private boolean touchDownHandledThisFrame = false;
 
     public MapInputController(OrthographicCamera camera, GameData gameData, GameUIManager uiManager, MainClient client, MapSelectionState selectionState, MainFlightController flightController) {
         this.camera = camera;
         this.gameData = gameData;
         this.uiManager = uiManager;
+        this.selectionState = selectionState;
         LowLevelHandlerFront llh = client.getLlh();
         this.defaultStrategy = new DefaultInteractionStrategy(uiManager);
         this.flightStrategy = new FlightInteractionStrategy(gameData, uiManager, llh, selectionState, flightController);
         this.currentStrategy = defaultStrategy;
+    }
+
+    public void reset() {
+        if (selectionState != null) {
+            selectionState.clearFlightSelection();
+        }
+        uiManager.removeTooltip();
     }
 
     private float distanceToSegment(float px, float py, float x1, float y1, float x2, float y2) {
@@ -116,6 +125,10 @@ public class MapInputController extends InputAdapter {
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         touchDownHandledThisFrame = true;
 
+        if (uiManager.isPointerOverHudActor() || uiManager.isPointerOverTooltip()) {
+            return true;
+        }
+
         Vector3 worldClick = new Vector3(screenX, screenY, 0);
         camera.unproject(worldClick);
 
@@ -137,6 +150,7 @@ public class MapInputController extends InputAdapter {
         }
 
         currentStrategy.onEmptyMapClicked(worldClick.x, worldClick.y);
+        reset();
         lastMousePos.set(screenX, screenY, 0);
         return true;
     }
@@ -159,7 +173,9 @@ public class MapInputController extends InputAdapter {
 
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
-        if (uiManager.isWindowOpen()) return true;
+        if (uiManager.isWindowOpen() || uiManager.isPointerOverHudActor() || uiManager.isPointerOverTooltip()) {
+            return true;
+        }
 
         float deltaX = lastMousePos.x - screenX;
         float deltaY = screenY - lastMousePos.y;
