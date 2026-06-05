@@ -9,8 +9,8 @@ import com.game.Ticket_To_Flight.backend.gameLogicEntities.Player;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.PlaneType;
 import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
 import com.game.Ticket_To_Flight.frontend.LowLevelHandlerFront;
+import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.HUD.HUDDirectory.StandardHUDDirectory.PlayersListHUD;
 import com.game.Ticket_To_Flight.frontend.components.texts.SingleLineText;
-import com.game.Ticket_To_Flight.frontend.components.background.SolidRectangleBackground;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -18,16 +18,15 @@ import java.util.Map;
 public class StandardHUD extends Table {
     private final GameData gameData;
     private final LowLevelHandlerFront llh;
-    private final Skin skin;
 
     private final Label roundLabel, stageLabel, timeLabel;
     private final Label moneyLabel, incomeLabel, currentBetLabel, planesLabel;
-    private final Table playersTable;
+
+    private final PlayersListHUD playersListHUD;
 
     public StandardHUD(Skin skin, GameData gameData, LowLevelHandlerFront llh) {
         this.gameData = gameData;
         this.llh = llh;
-        this.skin = skin;
 
         this.setFillParent(true);
         this.top();
@@ -46,13 +45,14 @@ public class StandardHUD extends Table {
         planesLabel = new SingleLineText("Planes: None", skin);
         planesLabel.setColor(Color.CYAN);
 
-        playersTable = new Table();
+        playersListHUD = new PlayersListHUD(gameData, llh, skin);
 
         Table leftStats = new Table();
         leftStats.add(roundLabel).left().row();
         leftStats.add(stageLabel).left().padTop(15).row();
         leftStats.add(timeLabel).left().padTop(15).row();
-        leftStats.add(playersTable).left().padTop(30).expandX().fillX().row();
+
+        leftStats.add(playersListHUD).left().padTop(30).expandY().fillY().row();
 
         Table rightStats = new Table();
         rightStats.add(moneyLabel).right().row();
@@ -60,7 +60,7 @@ public class StandardHUD extends Table {
         rightStats.add(planesLabel).right().padTop(15).row();
         rightStats.add(currentBetLabel).right().padTop(15).row();
 
-        this.add(leftStats).expandX().left().top();
+        this.add(leftStats).expandY().fillY().left().top();
         this.add(rightStats).expandX().right().top();
     }
 
@@ -70,7 +70,8 @@ public class StandardHUD extends Table {
 
         updateGlobalGameStats(currentStage);
         updatePlayerStats(activePlayer, currentStage);
-        updatePlayersListTable();
+
+        playersListHUD.updateData();
     }
 
     private void updateGlobalGameStats(String stage) {
@@ -109,34 +110,6 @@ public class StandardHUD extends Table {
         if (hasPlanes) planesText.setLength(planesText.length() - 2);
         else planesText.append("None");
         return planesText.toString();
-    }
-
-    private void updatePlayersListTable() {
-        playersTable.clearChildren();
-        for (Player p : gameData.players) {
-            if (p == null) continue;
-            playersTable.add(createPlayerRow(p)).width(400).padBottom(5).left().row();
-        }
-    }
-
-    private Table createPlayerRow(Player p) {
-        boolean isCurrentTurn = (p.getId() == gameData.currentPlayer);
-        Table playerRow = new SolidRectangleBackground(0, 0, 400, 0,
-            isCurrentTurn ? new Color(0.2f, 0.4f, 0.8f, 0.9f) : new Color(0.15f, 0.15f, 0.15f, 0.8f),
-            new Color(0.25f, 0.45f, 0.85f, 0.9f),
-            new Color(0.2f, 0.4f, 0.8f, 0.9f)
-        );
-        playerRow.left().pad(8, 15, 8, 15);
-
-        Label nameLabel = new SingleLineText(p.getName(), skin);
-        if (p.getColor() != null) nameLabel.setColor(p.getColor());
-
-        Label statsLabel = new SingleLineText("  $" + p.getMoney() + " (" + formatIncome(p.getIncome()) + ")", skin);
-        statsLabel.setColor(Color.WHITE);
-
-        playerRow.add(nameLabel).left().row();
-        playerRow.add(statsLabel).left();
-        return playerRow;
     }
 
     private String formatIncome(Integer income) {

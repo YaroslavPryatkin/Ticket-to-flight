@@ -199,7 +199,7 @@ public class Route {
      * @return error string if error occurred
      */
     private String checkAddLine(Airline line) {
-        /*if(lines.size() >= plane.stations + 2)
+        if(lines.size() >= plane.stations + 2)
             return "Plane has reached it's maximum amount of stations.";
         if(line.getDistance() + fuelSpent > plane.fuel)
             return "Plane doesn't have enough fuel.";
@@ -208,9 +208,9 @@ public class Route {
         if (!line.type.capacityRange.contains(plane.capacity))
             return "Plane capacity doesn't fit in airline capacity range.";
         if (!plane.distRange.contains(line.getDistance()))
-            return "Line distanse doesn't fit in the plane's distanse range.";
+            return "Line distanse doesn't fit in the plane's distanse range = " + line.getDistance();
         if (!plane.gateRange.contains(line.type.gateA) || !plane.gateRange.contains(line.type.gateB))
-            return "Amount of gates at one of the ends of the airline does not fit the planes amount of gates range.";*/
+            return "Amount of gates at one of the ends of the airline does not fit the planes amount of gates range.";
         return null;
     }
 
@@ -319,7 +319,9 @@ public class Route {
         for(Map.Entry<Integer,Integer> e : current.passengers.entrySet()){
             int takenAmount = boardedPerPort.getOrDefault(current.getId(),new MapHolder<>()).getOrDefault(e.getKey(), 0);
             if(e.getValue() - takenAmount > 0){
-                res.add(StaticGameData.passengerTypes.get(e.getKey()));
+                PassengerType type =StaticGameData.passengerTypes.get(e.getKey());
+                if(checkPassengerAdding(type)!=null)
+                    res.add(type);
             }
         }
         return res;

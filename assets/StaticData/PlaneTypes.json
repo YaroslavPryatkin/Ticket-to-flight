@@ -2,13 +2,13 @@
   {
     "id": 1,
     "fuel": 1000000000,
-    "stations": 0,
+    "stations": 10,
     "luxury": 1,
     "capacity": 180,
-    "minGate": 4,
-    "maxGate": 4,
-    "minDist": 500.0,
-    "maxDist": 350000.0,
+    "minGate": null,
+    "maxGate": null,
+    "minDist": null,
+    "maxDist": null,
     "price": 300,
     "description": "cool plane"
   },

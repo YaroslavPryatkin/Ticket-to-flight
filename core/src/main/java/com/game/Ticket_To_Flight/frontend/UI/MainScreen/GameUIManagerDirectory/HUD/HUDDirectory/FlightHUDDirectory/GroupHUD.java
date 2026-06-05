@@ -6,13 +6,10 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.Flights.MainFlightController;
-import com.game.Ticket_To_Flight.frontend.components.buttons.RoundedButton;
+import com.game.Ticket_To_Flight.frontend.components.ExpandableListWidget;
 import com.game.Ticket_To_Flight.frontend.components.tables.FlightPassengerTableWidget;
 import com.game.Ticket_To_Flight.frontend.components.tables.PassengerTableWidget;
-import com.game.Ticket_To_Flight.frontend.components.texts.SingleLineText;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,12 +23,13 @@ public class GroupHUD extends Table {
     private float screenHeight = 0;
     private float currentTopY = 0;
 
-    private boolean isCollapsed = false;
     private List<MainFlightController.ChosenGroup> currentGroups;
     private Runnable onToggle;
 
     private int lastGroupCount = -1;
     private boolean isInitialized = false;
+
+    private final ExpandableListWidget expandList;
 
     public GroupHUD(Skin skin) {
         this.skin = skin;
@@ -46,22 +44,27 @@ public class GroupHUD extends Table {
         scrollPane.addListener(new InputListener() {
             @Override
             public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
-                if (event.getStage() != null) {
-                    event.getStage().setScrollFocus(scrollPane);
-                }
+                if (event.getStage() != null) event.getStage().setScrollFocus(scrollPane);
             }
 
             @Override
             public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
-                if (event.getStage() != null) {
-                    event.getStage().setScrollFocus(null);
-                }
+                if (event.getStage() != null) event.getStage().setScrollFocus(null);
             }
         });
+
+        expandList = new ExpandableListWidget("Chosen Passengers", skin);
+        add(expandList).fillX().expandX().row();
+
+        expandList.expand(); // Открыт по умолчанию
     }
 
     public void setOnToggle(Runnable onToggle) {
         this.onToggle = onToggle;
+        expandList.setCallbacks(null, () -> {
+            if (screenWidth > 0 && currentTopY > 0) recalculatePosition();
+            if (this.onToggle != null) this.onToggle.run();
+        });
     }
 
     public void updateData(List<MainFlightController.ChosenGroup> chosenGroups) {
@@ -78,33 +81,18 @@ public class GroupHUD extends Table {
     }
 
     private void renderContent() {
-        clearChildren();
+        Table content = expandList.getContentTable();
+        content.clearChildren();
 
-        Table header = new Table();
-        header.add(new SingleLineText("Chosen Passengers", skin)).expandX().left();
-
-        TextButton toggleBtn = new RoundedButton(isCollapsed ? "Expand" : "Collapse", skin);
-        toggleBtn.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                isCollapsed = !isCollapsed;
-                renderContent(); // При клике перерисовываем принудительно
-                if (onToggle != null) onToggle.run();
+        List<PassengerTableWidget> rows = new ArrayList<>();
+        if (currentGroups != null) {
+            for (MainFlightController.ChosenGroup group : currentGroups) {
+                rows.add(new PassengerTableWidget(group.passengerType));
             }
-        });
-        header.add(toggleBtn).right().width(200).height(70);
-        add(header).fillX().expandX().row();
-
-        if (!isCollapsed) {
-            List<PassengerTableWidget> rows = new ArrayList<>();
-            if (currentGroups != null) {
-                for (MainFlightController.ChosenGroup group : currentGroups) {
-                    rows.add(new PassengerTableWidget(group.passengerType));
-                }
-            }
-            passengerTable.setRows(rows);
-            add(scrollPane).width(760).height(260).padTop(10).row();
         }
+        passengerTable.setRows(rows);
+
+        content.add(scrollPane).width(760).height(260).padTop(10).row();
 
         if (screenWidth > 0 && currentTopY > 0) {
             recalculatePosition();

@@ -93,7 +93,7 @@ public class TooltipManager {
             stageCoords = new Vector2(screenCoords.x, Gdx.graphics.getHeight() - screenCoords.y);
         }
         uiStageHUD.screenToStageCoordinates(stageCoords);
-        currentTooltip.asWindow().setPosition(550, 1200);
+        currentTooltip.asWindow().setPosition(stageCoords.x + 15, stageCoords.y + 15);
     }
 
     private Vector2 airportPosition(Airport airport) {
