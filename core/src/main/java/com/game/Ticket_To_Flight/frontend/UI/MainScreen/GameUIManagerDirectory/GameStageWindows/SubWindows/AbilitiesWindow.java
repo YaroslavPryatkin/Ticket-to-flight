@@ -12,7 +12,7 @@ import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.AbilityType
 import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
 import com.game.Ticket_To_Flight.frontend.LowLevelHandlerFront;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManager;
-import com.game.Ticket_To_Flight.frontend.components.BaseGameWindow;
+import com.game.Ticket_To_Flight.frontend.components.windows.BaseGameWindow;
 import com.game.Ticket_To_Flight.frontend.components.buttons.RoundedButton;
 
 public class AbilitiesWindow extends BaseGameWindow {

@@ -2,9 +2,8 @@ package com.game.Ticket_To_Flight.frontend.components.background;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.game.Ticket_To_Flight.frontend.components.Background;
-import com.game.Ticket_To_Flight.frontend.components.ComponentHover;
-import com.game.Ticket_To_Flight.frontend.components.ComponentTextures;
+import com.game.Ticket_To_Flight.frontend.components.subsidiary.ComponentHover;
+import com.game.Ticket_To_Flight.frontend.components.subsidiary.ComponentTextures;
 
 public class SolidRectangleBackground extends Background {
     private final Color normalColor;

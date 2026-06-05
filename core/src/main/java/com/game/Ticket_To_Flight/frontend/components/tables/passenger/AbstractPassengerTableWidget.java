@@ -1,9 +1,8 @@
-package com.game.Ticket_To_Flight.frontend.components;
+package com.game.Ticket_To_Flight.frontend.components.tables.passenger;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.game.Ticket_To_Flight.frontend.components.tables.PassengerTableWidget;
 import com.game.Ticket_To_Flight.frontend.components.texts.SingleLineText;
 
 import java.util.List;

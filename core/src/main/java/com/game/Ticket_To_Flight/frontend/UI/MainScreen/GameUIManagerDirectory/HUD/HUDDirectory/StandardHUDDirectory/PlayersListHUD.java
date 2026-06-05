@@ -14,8 +14,9 @@ import com.game.Ticket_To_Flight.backend.gameLogicEntities.Player;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.PlaneType;
 import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
 import com.game.Ticket_To_Flight.frontend.LowLevelHandlerFront;
+import com.game.Ticket_To_Flight.frontend.components.subsidiary.ComponentHover;
 import com.game.Ticket_To_Flight.frontend.components.background.SolidRectangleBackground;
-import com.game.Ticket_To_Flight.frontend.components.ExpandableListWidget;
+import com.game.Ticket_To_Flight.frontend.components.tables.expandable.ExpandableListWidget;
 import com.game.Ticket_To_Flight.frontend.components.texts.SingleLineText;
 
 import java.util.ArrayList;
@@ -53,6 +54,7 @@ public class PlayersListHUD extends Table {
         scrollPane.setFadeScrollBars(false);
         scrollPane.setScrollingDisabled(true, false);
 
+        // Стандартный лисенер оставляем на всякий случай
         scrollPane.addListener(new InputListener() {
             @Override
             public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
@@ -235,5 +237,15 @@ public class PlayersListHUD extends Table {
         String left = from == null ? "-inf" : from.toString();
         String right = to == null ? "+inf" : to.toString();
         return "[" + left + ", " + right + "]";
+    }
+
+    @Override
+    public void act(float delta) {
+        super.act(delta);
+        if (getStage() != null) {
+            if (ComponentHover.isMouseOver(this)) {
+                getStage().setScrollFocus(scrollPane);
+            }
+        }
     }
 }

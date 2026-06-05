@@ -1,4 +1,4 @@
-package com.game.Ticket_To_Flight.frontend.components.tables;
+package com.game.Ticket_To_Flight.frontend.components.tables.passenger;
 
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.PassengerType;
 

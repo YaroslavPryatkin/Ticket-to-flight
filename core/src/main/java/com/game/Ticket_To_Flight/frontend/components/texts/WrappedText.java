@@ -2,7 +2,6 @@ package com.game.Ticket_To_Flight.frontend.components.texts;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.game.Ticket_To_Flight.frontend.components.Text;
 
 public class WrappedText extends Text {
     private final float maxWidth;

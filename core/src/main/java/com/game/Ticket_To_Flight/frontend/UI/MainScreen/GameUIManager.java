@@ -45,6 +45,7 @@ public class GameUIManager {
     public boolean showAbilitiesWindow() { return windowManager.showAbilitiesWindow(); }
     public boolean showPlaneWindow() { return windowManager.showPlaneWindow(); }
     public void setWindowOpen(boolean windowOpen) { windowManager.setWindowOpen(windowOpen); }
+    public boolean isWindowOpen() { return windowManager.isWindowOpen(); }
 
     public void showAirportTooltip(Airport airport) { tooltipManager.showAirportTooltip(airport); }
     public void showAirportTooltipForFlight(Airport airport, PassengerSelectionListener listener) {

@@ -1,4 +1,4 @@
-package com.game.Ticket_To_Flight.frontend.components;
+package com.game.Ticket_To_Flight.frontend.components.subsidiary;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;

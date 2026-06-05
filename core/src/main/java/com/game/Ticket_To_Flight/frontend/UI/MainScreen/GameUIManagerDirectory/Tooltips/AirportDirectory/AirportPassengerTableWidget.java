@@ -8,9 +8,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.PassengerType;
 import com.game.Ticket_To_Flight.commonFrontAndBack.Route;
-import com.game.Ticket_To_Flight.frontend.components.AbstractPassengerTableWidget;
+import com.game.Ticket_To_Flight.frontend.components.tables.passenger.AbstractPassengerTableWidget;
 import com.game.Ticket_To_Flight.frontend.components.buttons.RoundedButton;
-import com.game.Ticket_To_Flight.frontend.components.tables.PassengerTableWidget;
+import com.game.Ticket_To_Flight.frontend.components.tables.passenger.PassengerTableWidget;
 
 import java.util.ArrayList;
 import java.util.Collections;

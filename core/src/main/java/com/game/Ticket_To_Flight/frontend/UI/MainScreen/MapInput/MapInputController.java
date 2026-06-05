@@ -18,6 +18,7 @@ import com.game.Ticket_To_Flight.frontend.UI.MainScreen.MapStrategies.MapInterac
 public class MapInputController extends InputAdapter {
     private final OrthographicCamera camera;
     private final GameData gameData;
+    private final GameUIManager uiManager;
     private final Vector3 lastMousePos = new Vector3();
     private final float clickTolerance = 10f;
     private final MapInteractionStrategy defaultStrategy;
@@ -28,6 +29,7 @@ public class MapInputController extends InputAdapter {
     public MapInputController(OrthographicCamera camera, GameData gameData, GameUIManager uiManager, MainClient client, MapSelectionState selectionState, MainFlightController flightController) {
         this.camera = camera;
         this.gameData = gameData;
+        this.uiManager = uiManager;
         LowLevelHandlerFront llh = client.getLlh();
         this.defaultStrategy = new DefaultInteractionStrategy(uiManager);
         this.flightStrategy = new FlightInteractionStrategy(gameData, uiManager, llh, selectionState, flightController);
@@ -93,6 +95,8 @@ public class MapInputController extends InputAdapter {
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+        if (uiManager.isWindowOpen()) return true;
+
         Vector3 worldClick = new Vector3(screenX, screenY, 0);
         camera.unproject(worldClick);
 
@@ -115,6 +119,8 @@ public class MapInputController extends InputAdapter {
 
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
+        if (uiManager.isWindowOpen()) return true;
+
         float deltaX = lastMousePos.x - screenX;
         float deltaY = screenY - lastMousePos.y;
 
@@ -125,6 +131,8 @@ public class MapInputController extends InputAdapter {
 
     @Override
     public boolean scrolled(float amountX, float amountY) {
+        if (uiManager.isWindowOpen()) return true;
+
         camera.zoom += amountY * 0.1f;
         return true;
     }

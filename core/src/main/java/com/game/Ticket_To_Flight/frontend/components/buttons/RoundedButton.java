@@ -1,8 +1,7 @@
 package com.game.Ticket_To_Flight.frontend.components.buttons;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.game.Ticket_To_Flight.frontend.components.Button;
-import com.game.Ticket_To_Flight.frontend.components.ComponentHover;
+import com.game.Ticket_To_Flight.frontend.components.subsidiary.ComponentHover;
 
 public class RoundedButton extends Button {
     public RoundedButton(String text, Skin skin) {

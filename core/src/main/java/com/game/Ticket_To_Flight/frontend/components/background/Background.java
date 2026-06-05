@@ -1,4 +1,4 @@
-package com.game.Ticket_To_Flight.frontend.components;
+package com.game.Ticket_To_Flight.frontend.components.background;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;

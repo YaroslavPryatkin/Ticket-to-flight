@@ -10,7 +10,7 @@ import com.game.Ticket_To_Flight.commonFrontAndBack.StaticGameData;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.Flights.MainFlightController;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.Flights.PassengerSelectionListener;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.Tooltips.AirportDirectory.AirportPassengerTableWidget;
-import com.game.Ticket_To_Flight.frontend.components.tables.PassengerTableWidget;
+import com.game.Ticket_To_Flight.frontend.components.tables.passenger.PassengerTableWidget;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.MapInput.MapSelectionState;
 import com.game.Ticket_To_Flight.frontend.components.buttons.RoundedButton;
 
