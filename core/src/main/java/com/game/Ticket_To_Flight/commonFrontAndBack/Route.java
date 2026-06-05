@@ -157,9 +157,11 @@ public class Route {
     }
 
     private void flyToTheNextPortPassengers(Airport next, Airline line) {
-        incomeChange.compute(line.player.getId(), (k, v) -> v == null ?
-            (int) Math.round(currentSolvency * line.type.yield * plane.luxury) :
-            v + (int) Math.round(currentSolvency * line.type.yield * plane.luxury));
+        if (line.player != null) {
+            incomeChange.compute(line.player.getId(), (k, v) -> v == null ?
+                (int) Math.round(currentSolvency * line.type.yield * plane.luxury) :
+                v + (int) Math.round(currentSolvency * line.type.yield * plane.luxury));
+        }
 
         for (BoarderPassenger psg : passengers) {
             psg.flyToTheNextPort(next);
@@ -222,9 +224,11 @@ public class Route {
             }
         }
 
-        incomeChange.compute(linetoBack.player.getId(), (k, v) -> v == null ?
-            - (int) Math.round(currentSolvency * linetoBack.type.yield * plane.luxury) :
-            v - (int) Math.round(currentSolvency * linetoBack.type.yield * plane.luxury));
+        if (linetoBack.player != null) {
+            incomeChange.compute(linetoBack.player.getId(), (k, v) -> v == null ?
+                - (int) Math.round(currentSolvency * linetoBack.type.yield * plane.luxury) :
+                v - (int) Math.round(currentSolvency * linetoBack.type.yield * plane.luxury));
+        }
     }
 
     // -- interface--

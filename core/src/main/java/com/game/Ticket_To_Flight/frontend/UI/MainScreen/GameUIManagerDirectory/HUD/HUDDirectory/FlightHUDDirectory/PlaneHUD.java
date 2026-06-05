@@ -57,7 +57,7 @@ public class PlaneHUD extends Table {
                 if (onToggle != null) onToggle.run();
             }
         });
-        header.add(toggleBtn).right().width(120).height(40);
+        header.add(toggleBtn).right().width(200).height(70);
         add(header).fillX().expandX().row();
 
         if (!isCollapsed) {
