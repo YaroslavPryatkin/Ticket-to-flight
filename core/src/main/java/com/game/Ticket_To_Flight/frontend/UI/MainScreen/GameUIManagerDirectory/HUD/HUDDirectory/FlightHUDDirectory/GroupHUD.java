@@ -22,7 +22,7 @@ public class GroupHUD extends AbstractFlightPanel {
     private int lastGroupCount = -1;
 
     public GroupHUD(Skin skin) {
-        super(skin); // Вызов конструктора родителя
+        super(skin);
 
         passengerTable = new FlightPassengerTableWidget(skin);
         scrollPane = new ScrollPane(passengerTable, skin);

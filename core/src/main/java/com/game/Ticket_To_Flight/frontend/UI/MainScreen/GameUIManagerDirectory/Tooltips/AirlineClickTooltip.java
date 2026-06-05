@@ -21,6 +21,7 @@ public class AirlineClickTooltip extends BaseGameWindow implements MapTooltipWin
         final GameUIManager uiManager,
         final Airline airline,
         final double playerMoney,
+        final boolean playerAP,
         boolean canBuyDuringCurrentStage,
         final LowLevelHandlerFront llh
     ) {
@@ -41,7 +42,7 @@ public class AirlineClickTooltip extends BaseGameWindow implements MapTooltipWin
         if (airline.getPlayer() != null) {
             table.add(new SingleLineText("Owned by: " + airline.getPlayer().getName(), skin)).colspan(2).row();
         } else {
-            boolean canAfford = playerMoney >= airline.getPrice();
+            boolean canAfford = playerMoney >= airline.getPrice() && playerAP;
             boolean canBuyNow = canBuyDuringCurrentStage && canAfford;
 
             TextButton buyButton = new RoundedButton("Buy", skin, "default");

@@ -94,10 +94,22 @@ public class PlayersListHUD extends Table {
             header.add(new SingleLineText("AP: " + p.getActionPoints(), skin)).right();
             playerRow.add(header).fillX().expandX().row();
 
+            Table moneyRow = new Table();
             String incomeStr = p.getIncome() >= 0 ? "+$" + p.getIncome() : "-$" + Math.abs(p.getIncome());
             Label moneyLabel = new SingleLineText("$" + p.getMoney() + " (" + incomeStr + ")", skin);
             moneyLabel.setColor(Color.WHITE);
-            playerRow.add(moneyLabel).left().padTop(8).row();
+            moneyRow.add(moneyLabel).left().expandX(); // Деньги прижимаем влево
+
+            if (gameData.currentState == GameData.State.AUCTION) {
+                boolean isPass = gameData.players.get(gameData.currentPlayer).hasPassed;
+
+                String betText = isPass ? "Pass" : "Bet: $" + p.getAuctionBet();
+                Label betLabel = new SingleLineText(betText, skin);
+
+                betLabel.setColor(isPass ? Color.GRAY : Color.ORANGE);
+                moneyRow.add(betLabel).right();
+            }
+            playerRow.add(moneyRow).fillX().expandX().padTop(8).row();
 
             String abilityStr = p.getAbility() != null ? p.getAbility().description : "None";
             Label abilityLabel = new SingleLineText("Ability: " + abilityStr, skin);
@@ -185,7 +197,14 @@ public class PlayersListHUD extends Table {
             measureText(player.getName()) + HEADER_NAME_RIGHT_PADDING + measureText("AP: " + player.getActionPoints()));
 
         String incomeStr = player.getIncome() >= 0 ? "+$" + player.getIncome() : "-$" + Math.abs(player.getIncome());
-        contentWidth = Math.max(contentWidth, measureText("$" + player.getMoney() + " (" + incomeStr + ")"));
+
+        float moneyRowWidth = measureText("$" + player.getMoney() + " (" + incomeStr + ")");
+        if (gameData.currentState == GameData.State.AUCTION) {
+            boolean isPass = player.getAuctionBet() < 0;
+            String betText = isPass ? "Pass" : "Bet: $" + player.getAuctionBet();
+            moneyRowWidth += measureText(betText) + 50f;
+        }
+        contentWidth = Math.max(contentWidth, moneyRowWidth);
 
         String abilityStr = player.getAbility() != null ? player.getAbility().description : "None";
         contentWidth = Math.max(contentWidth, measureText("Ability: " + abilityStr));

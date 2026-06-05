@@ -84,6 +84,10 @@ public class MainFlightController {
             clearUi();
             resetState();
             wasActive = false;
+            Player player = gameData.players.get(gameData.currentPlayer);
+            /*if (player != null && player.actionPoints == 0) {
+                uiManager.showSuccessWindow("You have not got enough AP");
+            }*/
             return;
         }
 
@@ -214,7 +218,8 @@ public class MainFlightController {
     }
 
     private boolean isActive() {
-        return gameData.currentState == GameData.State.FLIGHTS && gameData.currentPlayer == llh.getMyId();
+        return gameData.currentState == GameData.State.FLIGHTS && gameData.currentPlayer == llh.getMyId()
+            && gameData.players.get(gameData.currentPlayer).actionPoints > 0;
     }
 
     private void selectPassengerGroup(Airport airport, PassengerType passengerType) {

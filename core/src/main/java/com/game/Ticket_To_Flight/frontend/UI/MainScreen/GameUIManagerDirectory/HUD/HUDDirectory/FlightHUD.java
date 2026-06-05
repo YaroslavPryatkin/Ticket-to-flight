@@ -61,7 +61,7 @@ public class FlightHUD extends Table {
         standardHUD.setBounds(0, 0, width, height);
         standardHUD.layoutFor(width, height);
 
-        planeHUD.layoutFor(width, height);
+        planeHUD.layoutFor(width, height, standardHUD.getSummaryBottomY());
         groupHUD.layoutFor(width, height, planeHUD.getY());
     }
 }

@@ -65,7 +65,7 @@ public class StandardHUD extends Table {
 
     public void layoutFor(float width, float height) {
         summaryTable.pack();
-        summaryTable.setPosition(width - summaryTable.getWidth() - 20, height - summaryTable.getHeight() - 230);
+        summaryTable.setPosition(width - summaryTable.getWidth() - 20, height - summaryTable.getHeight() - 20);
 
         float buttonWidth = 340;
         float buttonHeight = 80;
@@ -77,6 +77,10 @@ public class StandardHUD extends Table {
         backButton.setPosition(margin, margin);
         finishButton.setPosition((width - buttonWidth) / 2f, margin);
         resetButton.setPosition(width - buttonWidth - margin, margin);
+    }
+
+    public float getSummaryBottomY() {
+        return summaryTable.getY();
     }
 
     private String formatPossibleIncome(Route route) {

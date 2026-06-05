@@ -8,6 +8,7 @@ import com.game.Ticket_To_Flight.frontend.components.texts.SingleLineText;
 
 public class PlaneHUD extends AbstractFlightPanel {
     private PlaneType currentPlane;
+    private float currentTopY = 0;
 
     public PlaneHUD(Skin skin) {
         super(skin);
@@ -48,9 +49,10 @@ public class PlaneHUD extends AbstractFlightPanel {
         if (screenWidth > 0 && screenHeight > 0) recalculatePosition();
     }
 
-    public void layoutFor(float width, float height) {
+    public void layoutFor(float width, float height, float topY) {
         this.screenWidth = width;
         this.screenHeight = height;
+        this.currentTopY = topY;
         recalculatePosition();
     }
 
@@ -58,7 +60,7 @@ public class PlaneHUD extends AbstractFlightPanel {
     protected void recalculatePosition() {
         pack();
         setWidth(Math.max(getWidth(), 520));
-        setPosition(screenWidth - getWidth() - 20, screenHeight - getHeight() - 360);
+        setPosition(screenWidth - getWidth() - 20, currentTopY - getHeight() - 14);
     }
 
     private void addRow(Table table, String label, String value) {
