@@ -18,12 +18,14 @@ public class AirportDTO extends Identifiable {
         position = null;
         passengers = null;
         name = null;
+        takenGates=0;
     }
 
     private final Integer type;
     private final Vector2 position;
     private final Map<Integer, Integer> passengers;
     private final String name;
+    private final int takenGates;
 
     public AirportDTO(Airport port) {
         super(port.getId());
@@ -32,18 +34,7 @@ public class AirportDTO extends Identifiable {
         this.passengers = new HashMap<>();
         this.passengers.putAll(port.passengers);
         this.name = port.airportName;
-    }
-
-    /**
-     * Should not be called anywhere except Low Level Handler
-     */
-    public AirportDTO(int id, AirportType type, Vector2 position, String AirportName) {
-        super(id);
-        if (type == null || position == null) throw new IllegalArgumentException("Null arguments in constructor.");
-        this.type = type.getId();
-        this.position = position;
-        this.name = AirportName;
-        this.passengers = new HashMap<>();
+        this.takenGates = port.getTakenGates();
     }
 
     /**
@@ -57,6 +48,7 @@ public class AirportDTO extends Identifiable {
         this.position = position;
         this.name = AirportName;
         this.passengers = new HashMap<>();
+        this.takenGates = 0;
     }
 
     public Airport restore() {
@@ -68,6 +60,6 @@ public class AirportDTO extends Identifiable {
         } catch (Exception e) {
             return null;
         }
-        return new Airport(this.getId(), type, this.position, this.name, passengers);
+        return new Airport(this.getId(), type, this.position, this.name, passengers, this.takenGates);
     }
 }

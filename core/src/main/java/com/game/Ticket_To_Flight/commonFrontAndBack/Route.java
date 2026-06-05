@@ -314,14 +314,14 @@ public class Route {
     /**
      * @return passengers that can be picked in current airport
      */
-    public SetHolder<PassengerType> getSuitablePassengers(){
-        SetHolder<PassengerType> res = new SetHolder<>();
+    public MapHolder<PassengerType, Integer> getSuitablePassengers(){
+        MapHolder<PassengerType, Integer> res = new MapHolder<>(StaticGameData.passengerTypes);
         for(Map.Entry<Integer,Integer> e : current.passengers.entrySet()){
             int takenAmount = boardedPerPort.getOrDefault(current.getId(),new MapHolder<>()).getOrDefault(e.getKey(), 0);
             if(e.getValue() - takenAmount > 0){
-                PassengerType type =StaticGameData.passengerTypes.get(e.getKey());
+                PassengerType type = StaticGameData.passengerTypes.get(e.getKey());
                 if(checkPassengerAdding(type)!=null)
-                    res.add(type);
+                    res.put(type,e.getValue() - takenAmount );
             }
         }
         return res;
@@ -338,7 +338,6 @@ public class Route {
         }
         return true;
     }
-
 
     public Map<Integer, Map<Integer,Integer>> passengersForDTO(){
         Map<Integer, Map<Integer,Integer>> res = new HashMap<>();

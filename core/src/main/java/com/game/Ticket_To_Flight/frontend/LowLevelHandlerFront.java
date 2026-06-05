@@ -202,8 +202,7 @@ public class LowLevelHandlerFront extends LowLevelHandler {
         if(st == null) st = gameData.currentState;
         Flags.CurrentStateState res;
         if(st == GameData.State.WORLD_UPDATE ||
-            st == GameData.State.INCOME||
-            st == GameData.State.TAXES ||
+            st == GameData.State.INCOME_AND_TAXES ||
             st == GameData.State.EVENT
         )
              res = Flags.CurrentStateState.NO_PLAYER_STAGE;

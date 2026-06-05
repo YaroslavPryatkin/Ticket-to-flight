@@ -108,6 +108,16 @@ public class DataChangesCreator {
         return false;
     }
 
+    public boolean takeGates(Integer port, int amount){
+        if(gameData.airports.contains(port)){
+            if(dataChanges.airportTakenGateChange == null)
+                dataChanges.airportTakenGateChange = new HashMap<>();
+            dataChanges.airportTakenGateChange.compute(port, (k,v)-> v == null ? amount : v + amount);
+            return true;
+        }
+        return false;
+    }
+
     void addPassenger(Integer airport, Integer type){
         if(dataChanges.airportPassengersChange == null){
             dataChanges.airportPassengersChange = new HashMap<>();
@@ -294,5 +304,28 @@ public class DataChangesCreator {
         dataChanges.playerIncomeChange.compute(gameData.currentPlayer, (k,v) -> (v==null) ?
             -incomeLoss : v - incomeLoss);
     }
+
+    public void addIncomeToMoneyForEveryPlayer(){
+        if(dataChanges.playerMoneyChange == null) dataChanges.playerMoneyChange=new HashMap<>();
+        for(Player pl : gameData.players){
+            dataChanges.playerMoneyChange.compute(pl.getId(), (k,v) -> (v==null) ?
+                -pl.income : v - pl.income);
+        }
+    }
+
+    public void takeTaxesFromIncomeForEveryPlayer(){
+        if(dataChanges.playerIncomeChange == null) dataChanges.playerIncomeChange=new HashMap<>();
+        for(Player pl : gameData.players){
+            int toLoss = progressiveTaxationFunction(pl.income);
+            dataChanges.playerIncomeChange.compute(gameData.currentPlayer, (k,v) -> (v==null) ?
+                -toLoss : v - toLoss);
+        }
+    }
+
+    private int progressiveTaxationFunction(int income){
+        int frac = income/20;
+        return frac*2;
+    }
+
 
 }

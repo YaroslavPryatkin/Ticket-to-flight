@@ -7,9 +7,7 @@ import com.game.Ticket_To_Flight.commonFrontAndBack.GameData.State;
 import com.game.Ticket_To_Flight.commonFrontAndBack.StaticGameData;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class StateIterator {
     private final GameData gameData;
@@ -70,12 +68,9 @@ public class StateIterator {
              nonPlayerStateToPlayerState(State.FLIGHTS, 3);
         }
         else if (gameData.currentState == GameData.State.FLIGHTS) {
-            playerStateToNonPlayerState(State.INCOME);
+            playerStateToNonPlayerState(State.INCOME_AND_TAXES);
         }
-        else if (gameData.currentState == GameData.State.INCOME) {
-            nonPlayerStateToNonPlayerState(State.TAXES);
-        }
-        else if (gameData.currentState == GameData.State.TAXES) {
+        else if (gameData.currentState == GameData.State.INCOME_AND_TAXES) {
             nonPlayerStateToNonPlayerState(State.WORLD_UPDATE);
             ++round;
             dataChangesCreator.resetAllAbilities();

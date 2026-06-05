@@ -46,8 +46,7 @@ public class GameData {
         AIRLINES,
         EVENT,
         FLIGHTS,
-        INCOME,
-        TAXES
+        INCOME_AND_TAXES
     }
     public Integer roundNumber = 0;
     public State currentState = State.NO_STATE;
@@ -88,6 +87,7 @@ public class GameData {
         public  Map<Integer, Integer> availablePlanesChange= null;
         public  Map<Integer, Map<Integer, Integer>> airportPassengersChange= null;
 
+        public Map<Integer, Integer> airportTakenGateChange = null;
 
         public  Map<Integer, Boolean> playerHasPassedSet = null;
         public  Map<Integer, Integer> playerMoneyChange= null;
@@ -128,6 +128,9 @@ public class GameData {
                 this.airportPassengersChange, other.airportPassengersChange, v->v,
                 (f,s)->MapHolder.merge(f,s,v->v, DataChanges::sumIntOrNull)
             );
+
+            this.airportTakenGateChange = MapHolder.merge(
+                this.airportTakenGateChange, other.airportTakenGateChange, v -> v, DataChanges::sumIntOrNull);
 
             this.availablePlanesChange = MapHolder.merge(
                 this.availablePlanesChange, other.availablePlanesChange, v -> v, DataChanges::sumIntOrNull);
@@ -219,6 +222,9 @@ public class GameData {
 
         availablePlanes.merge(changes.availablePlanesChange, v->v, DataChanges::sumIntOrNull);
 
+        airports.changeAsStructWithSetter(Airport::setTakenGates, Airport::getTakenGates,
+            changes.airportTakenGateChange, Integer::sum);
+
         players.changeAsStructWithSetter(Player::setHasPassed, Player::getHasPassed, changes.playerHasPassedSet,
             (f,s) -> (s==null) ? f : s);
 
@@ -288,6 +294,9 @@ public class GameData {
                 v->v>=0,
                 (f,s)->f+s>=0
             ) &&
+            airlinesTmp.containsAllKeys(changes.airportTakenGateChange) &&
+            airportsTmp.checkChangeAsStruct(Airport::getTakenGates, changes.airportTakenGateChange,
+                (current, change) -> current + change >= 0 )&&
             playersTmp.containsAllKeys(changes.playerHasPassedSet) &&
             playersTmp.checkChangeAsStruct(Player::getMoney, changes.playerMoneyChange,
                 (current, change) -> current + change >= 0) &&

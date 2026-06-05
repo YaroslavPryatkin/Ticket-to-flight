@@ -76,10 +76,8 @@ public class MainClient {
                 if (llh.getCurrentStateState() == Flags.CurrentStateState.PLAYER_STAGE) {
                     llh.setWaitingForPlayerChoiceFlag();
                 }
-            } else if (gameData.currentState == GameData.State.INCOME && llh.getMyId() == gameData.currentPlayer) {
+            } else if (gameData.currentState == GameData.State.INCOME_AND_TAXES && llh.getMyId() == gameData.currentPlayer) {
                 // change Income
-            } else if (gameData.currentState == GameData.State.TAXES && llh.getMyId() == gameData.currentPlayer) {
-                // Taxes
             }
         }
         worldMapRenderer.renderNoLogic(delta);

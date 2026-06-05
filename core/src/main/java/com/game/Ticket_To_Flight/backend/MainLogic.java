@@ -1,6 +1,5 @@
 package com.game.Ticket_To_Flight.backend;
 
-import com.badlogic.gdx.math.Vector2;
 import com.game.Ticket_To_Flight.PresetPaths;
 import com.game.Ticket_To_Flight.backend.Handlers.AuctionHandler;
 import com.game.Ticket_To_Flight.backend.Handlers.WorldMapUpdater;
@@ -52,6 +51,10 @@ public class MainLogic extends MainLoopBack {
             else if(llh.getCurrentPlayerState() == Flags.CurrentPlayerState.NO_PLAYER_STAGE) {
                 if (gameData.currentState == GameData.State.WORLD_UPDATE) {
                     worldMapUpdater.loadRound();
+                }
+                else if(gameData.currentState == GameData.State.INCOME_AND_TAXES){
+                    llh.dataChangesCreator.addIncomeToMoneyForEveryPlayer();
+                    llh.dataChangesCreator.takeTaxesFromIncomeForEveryPlayer();
                 }
                 llh.finishTurnSuccessfully();
             }
@@ -171,18 +174,24 @@ public class MainLogic extends MainLoopBack {
                     if (pl.actionPoints > 0) {
                         Airline line = gameData.availableAirlines.get(resp.line);
                         if (line != null) {
-                            if(pl.money >= line.getPrice()) {
-                                llh.dataChangesCreator.moneyLoss(line.getPrice());
-                                llh.dataChangesCreator.takeActionPoint();
-                                llh.dataChangesCreator.sellAirline(resp.line);
-                                if (resp.finishStatus == FINISHED) {
-                                    llh.playerFinished();
+                            if(line.portA.getFreeGates()>=line.type.gateA && line.portB.getFreeGates() >= line.type.gateB) {
+                                if (pl.money >= line.getPrice()) {
+                                    llh.dataChangesCreator.moneyLoss(line.getPrice());
+                                    llh.dataChangesCreator.takeActionPoint();
+                                    llh.dataChangesCreator.sellAirline(resp.line);
+                                    llh.dataChangesCreator.takeGates(line.portA.getId(), line.type.gateA);
+                                    llh.dataChangesCreator.takeGates(line.portB.getId(), line.type.gateB);
+                                    if (resp.finishStatus == FINISHED) {
+                                        llh.playerFinished();
+                                    } else {
+                                        llh.playerNotFinished();
+                                    }
                                 } else {
-                                    llh.playerNotFinished();
+                                    llh.sendError("Doesn't have enough money.");
                                 }
                             }
                             else{
-                                llh.sendError("Doesn't have enough money.");
+                                llh.sendError("An airport at the end of the line can not have more lines connected to it.");
                             }
                         } else {
                             llh.sendError("This airline is unavailable");
