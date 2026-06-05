@@ -37,8 +37,7 @@ public class FlightInteractionStrategy implements MapInteractionStrategy {
 
     @Override
     public void onEmptyMapClicked(float worldX, float worldY) {
-        uiManager.removeTooltip();
-        selectionState.clearFlightSelection();
+        flightController.handleEmptyMapClick();
     }
 
     private boolean canChooseFlight() {

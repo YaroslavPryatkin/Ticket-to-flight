@@ -34,6 +34,8 @@ public class AirportTooltipWindow extends Window implements MapTooltipWindow {
         this.pad(30);
         this.padTop(60);
 
+        this.getColor().a = 0.8f;
+
         final TextButton chooseButton = new RoundedButton("Choose groups", skin);
         chooseButton.setDisabled(true);
         chooseButton.getLabel().setColor(Color.LIGHT_GRAY);

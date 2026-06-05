@@ -6,14 +6,19 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.Flights.MainFlightController;
+import com.game.Ticket_To_Flight.frontend.components.buttons.RoundedButton;
 import com.game.Ticket_To_Flight.frontend.components.tables.FlightPassengerTableWidget;
 import com.game.Ticket_To_Flight.frontend.components.tables.PassengerTableWidget;
+import com.game.Ticket_To_Flight.frontend.components.texts.SingleLineText;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class GroupHUD extends Table {
+    private final Skin skin;
     private final FlightPassengerTableWidget passengerTable;
     private final ScrollPane scrollPane;
 
@@ -21,7 +26,15 @@ public class GroupHUD extends Table {
     private float screenHeight = 0;
     private float currentTopY = 0;
 
+    private boolean isCollapsed = false;
+    private List<MainFlightController.ChosenGroup> currentGroups;
+    private Runnable onToggle;
+
+    private int lastGroupCount = -1;
+    private boolean isInitialized = false;
+
     public GroupHUD(Skin skin) {
+        this.skin = skin;
         top().right();
         pad(20);
         setBackground(skin.getDrawable("flight-panel-bg"));
@@ -45,18 +58,53 @@ public class GroupHUD extends Table {
                 }
             }
         });
+    }
 
-        add(scrollPane).width(760).height(260);
+    public void setOnToggle(Runnable onToggle) {
+        this.onToggle = onToggle;
     }
 
     public void updateData(List<MainFlightController.ChosenGroup> chosenGroups) {
-        List<PassengerTableWidget> rows = new ArrayList<>();
-        if (chosenGroups != null) {
-            for (MainFlightController.ChosenGroup group : chosenGroups) {
-                rows.add(new PassengerTableWidget(group.passengerType));
-            }
+        this.currentGroups = chosenGroups;
+        int currentSize = (chosenGroups == null) ? 0 : chosenGroups.size();
+
+        if (lastGroupCount == currentSize && isInitialized) {
+            return;
         }
-        passengerTable.setRows(rows);
+
+        this.lastGroupCount = currentSize;
+        this.isInitialized = true;
+        renderContent();
+    }
+
+    private void renderContent() {
+        clearChildren();
+
+        Table header = new Table();
+        header.add(new SingleLineText("Chosen Passengers", skin)).expandX().left();
+
+        TextButton toggleBtn = new RoundedButton(isCollapsed ? "Expand" : "Collapse", skin);
+        toggleBtn.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                isCollapsed = !isCollapsed;
+                renderContent(); // При клике перерисовываем принудительно
+                if (onToggle != null) onToggle.run();
+            }
+        });
+        header.add(toggleBtn).right().width(120).height(40);
+        add(header).fillX().expandX().row();
+
+        if (!isCollapsed) {
+            List<PassengerTableWidget> rows = new ArrayList<>();
+            if (currentGroups != null) {
+                for (MainFlightController.ChosenGroup group : currentGroups) {
+                    rows.add(new PassengerTableWidget(group.passengerType));
+                }
+            }
+            passengerTable.setRows(rows);
+            add(scrollPane).width(760).height(260).padTop(10).row();
+        }
 
         if (screenWidth > 0 && currentTopY > 0) {
             recalculatePosition();
@@ -73,7 +121,6 @@ public class GroupHUD extends Table {
     private void recalculatePosition() {
         pack();
         setWidth(Math.max(getWidth(), 820));
-
         setPosition(screenWidth - getWidth() - 20, currentTopY - getHeight() - 14);
     }
 }
