@@ -127,6 +127,8 @@ public class MainLogic extends MainLoopBack {
                 if (StaticGameData.abilityTypes.contains(resp.ability)) {
                     if (resp.ability != 0 && gameData.availableAbilities.contains(resp.ability)) {
                         llh.dataChangesCreator.giveAbility(resp.ability);
+                        if(resp.ability == 4)
+                            llh.dataChangesCreator.giveActionPointsAbility();
                         llh.playerFinished();
                     } else
                         llh.sendError("The chosen ability is unavailable");
@@ -213,6 +215,7 @@ public class MainLogic extends MainLoopBack {
                 llh.sendWrongStateError();
             else {
                 if(resp.finishStatus == PASS){
+                    System.out.println("Passed");
                     llh.playerFinished();
                 }
                 else {

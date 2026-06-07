@@ -29,6 +29,9 @@ public class StaticGameData {
     public static Integer plusMoneyPerShare = 300;
     public static Integer minusIncomePerShare = 100;
 
+    public static Integer abilityActionPointsIncrease = 2;
+    public static Double abilityIncomeMultiplier = 1.2;
+
     private StaticGameData(){}
 
     private static boolean jsonDownloaded = false;

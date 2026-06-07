@@ -172,7 +172,7 @@ public class LowLevelHandlerFront extends LowLevelHandler {
                     }
                 }
 
-                isValid = gameData.checkChangesDebug(change);
+                isValid = gameData.checkChanges(change);
 
                 if (interruptValidator.compareAndSet(true, false)) {
                     return;

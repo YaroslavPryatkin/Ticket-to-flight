@@ -294,6 +294,13 @@ public class DataChangesCreator {
         }
     }
 
+
+    public void giveActionPointsAbility(){
+        if(dataChanges.playerActionPointsChange == null) dataChanges.playerActionPointsChange = new HashMap<>();
+        dataChanges.playerActionPointsChange.compute(gameData.currentPlayer,
+            (k,v) -> (v==null) ? StaticGameData.abilityActionPointsIncrease : v+StaticGameData.abilityActionPointsIncrease);
+    }
+
     public void takeActionPoint(){
         if(dataChanges.playerActionPointsChange == null) dataChanges.playerActionPointsChange = new HashMap<>();
         dataChanges.playerActionPointsChange.compute(gameData.currentPlayer,
@@ -332,12 +339,14 @@ public class DataChangesCreator {
             -incomeLoss : v - incomeLoss);
     }
 
-    void incomeLossForMultiplePlayers(MapHolder<Player, Integer> changes){
+    void incomeGainFromRoute(MapHolder<Player, Integer> changes){
         if(dataChanges.playerIncomeChange == null) dataChanges.playerIncomeChange=new HashMap<>();
-        changes.forEach((player, amount)->
-            dataChanges.playerIncomeChange.compute(player, (k,v) -> (v==null) ?
-                -amount : v - amount
-            )
+        changes.forEach((player, amount)-> {
+                int delta = gameData.players.get(player).getAbility().getId() == 5 ? amount : (int) Math.round(amount * StaticGameData.abilityIncomeMultiplier);
+                dataChanges.playerIncomeChange.compute(player, (k, v) -> (v == null) ?
+                                                                         delta : v + delta
+                );
+            }
         );
     }
 

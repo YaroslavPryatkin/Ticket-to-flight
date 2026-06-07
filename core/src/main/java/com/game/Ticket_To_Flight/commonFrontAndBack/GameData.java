@@ -297,7 +297,7 @@ public class GameData {
             playersTmp.checkChangeAsStruct(Player::getAmountOfShares, changes.playerAmountOfSharesChange,
                 (o, n) -> o + n >= 0 && o + n <= StaticGameData.maxAmountOfShares) &&
             playersTmp.checkChangeAsStruct(Player::getActionPoints, changes.playerActionPointsChange,
-                (o, n) -> o + n >= 0 && o + n <= StaticGameData.maxActionsPerTurn) &&
+                (o, n) -> o + n >= 0 && o + n <= StaticGameData.maxActionsPerTurn + StaticGameData.abilityActionPointsIncrease) &&
             playersTmp.checkChangeAsStruct((pl) -> pl.airlines,
                 Arrays.asList(changes.playerAirlinesToAdd, changes.playerAirlinesToRemove),
                 (f, s) -> f.checkChangeSetIILookUp(s.get(0), s.get(1), airlinesTmp)
@@ -320,127 +320,127 @@ public class GameData {
             );
     }
 
-    public boolean checkChangesDebug(DataChanges changes) {
-        // 1. Initial integrity checks
-        if (!StaticGameData.worldEventTypes.containsAll(changes.newWorldEvents)) {
-            System.err.println("Validation failed: newWorldEvents contain invalid event types.");
-            return false;
-        }
-        if (!players.checkChangeSetTI(changes.playersToAdd, changes.playersToRemove)) {
-            System.err.println("Validation failed: players change set (playersToAdd/playersToRemove) is invalid.");
-            return false;
-        }
-        if (!airports.checkChangeSetTI(changes.airportsToAdd, changes.airportsToRemove)) {
-            System.err.println("Validation failed: airports change set (airportsToAdd/airportsToRemove) is invalid.");
-            return false;
-        }
-        if (!airlines.checkChangeSetTI(changes.airlinesToAdd, changes.airlinesToRemove)) {
-            System.err.println("Validation failed: airlines change set (airlinesToAdd/airlinesToRemove) is invalid.");
-            return false;
-        }
-
-        // Generating temporary sets for deep validation
-        SetHolder<Airport> airportsTmp = TemporarySetHolder.generateTemporarySetHolder(
-            airports, changes.airportsToAdd, changes.airportsToRemove,
-            AirportDTO::restore);
-        SetHolder<Airline> airlinesTmp = TemporarySetHolder.generateTemporarySetHolder(
-            airlines, changes.airlinesToAdd, changes.airlinesToRemove,
-            (dto) -> dto.restore(airportsTmp, this.players));
-        SetHolder<Player> playersTmp = TemporarySetHolder.generateTemporarySetHolder(
-            players, changes.playersToAdd, changes.playersToRemove,
-            (dto) -> dto.restore(airlinesTmp));
-
-        // 2. Turn and player presence checks
-        if (changes.currentPlayer != null && changes.currentPlayer != -1 && !playersTmp.contains(changes.currentPlayer)) {
-            System.err.println("Validation failed: currentPlayer is not present in the temporary player set. Current player = " + changes.currentPlayer + " tmpPlayerSet.size() = " + playersTmp.size());
-            return false;
-        }
-        if (!playersTmp.containsAll(changes.turnOrder)) {
-            System.err.println("Validation failed: turnOrder contains players not present in the temporary player set.");
-            return false;
-        }
-
-        // 3. Market and global availability checks
-        if (!availableAirlines.checkChangeSetIILookUp(changes.availableAirlinesToAdd, changes.availableAirlinesToRemove, airlinesTmp)) {
-            System.err.println("Validation failed: availableAirlines changes are invalid relative to airlinesTmp.");
-            return false;
-        }
-        if (!availableAbilities.checkChangeSetIILookUp(changes.availableAbilitiesToAdd, changes.availableAbilitiesToRemove, StaticGameData.abilityTypes)) {
-            System.err.println("Validation failed: availableAbilities changes are invalid relative to StaticGameData.abilityTypes.");
-            return false;
-        }
-        if (!StaticGameData.planeTypes.containsAllKeys(changes.availablePlanesChange)) {
-            System.err.println("Validation failed: availablePlanesChange contains keys missing from StaticGameData.planeTypes.");
-            return false;
-        }
-        if (!availablePlanes.checkMergeElements(changes.availablePlanesChange, v -> v >= 0, (f, s) -> f + s >= 0)) {
-            System.err.println("Validation failed: availablePlanes merge check failed (negative values or invalid state).");
-            return false;
-        }
-
-        // 4. Player state modification checks
-        if (!playersTmp.containsAllKeys(changes.playerHasPassedSet)) {
-            System.err.println("Validation failed: playerHasPassedSet contains keys missing from playersTmp.");
-            return false;
-        }
-        if (!playersTmp.checkChangeAsStruct(Player::getMoney, changes.playerMoneyChange, (current, change) -> current + change >= 0)) {
-            System.err.println("Validation failed: playerMoneyChange resulted in negative balance for a player.");
-            return false;
-        }
-        if (!playersTmp.checkChangeAsStruct(Player::getAuctionBet, changes.playerAuctionBetChanges, (current, change) -> current + change >= 0)) {
-            System.err.println("Validation failed: playerAuctionBetChanges resulted in negative auction bet.");
-            return false;
-        }
-        if (!playersTmp.checkChangeAsStruct(Player::getAmountOfShares, changes.playerAmountOfSharesChange,
-            (o, n) -> o + n >= 0 && o + n <= StaticGameData.maxAmountOfShares)) {
-            System.err.println("Validation failed: playerAmountOfSharesChange went out of bounds [0, maxAmountOfShares].");
-            return false;
-        }
-        if (!playersTmp.checkChangeAsStruct(Player::getActionPoints, changes.playerActionPointsChange,
-            (o, n) -> o + n >= 0 && o + n <= StaticGameData.maxActionsPerTurn)) {
-            System.err.println("Validation failed: playerActionPointsChange went out of bounds [0, maxActionsPerTurn].");
-            return false;
-        }
-
-        // 5. Player sub-entities checks (Airlines, Abilities, Planes)
-        if (!playersTmp.checkChangeAsStruct((pl) -> pl.airlines,
-            Arrays.asList(changes.playerAirlinesToAdd, changes.playerAirlinesToRemove),
-            (f, s) -> f.checkChangeSetIILookUp(s.get(0), s.get(1), airlinesTmp))) {
-            System.err.println("Validation failed: player airlines change validation failed against airlinesTmp.");
-            return false;
-        }
-        if (!playersTmp.containsAllKeys(changes.playerAbilityChoice)) {
-            System.err.println("Validation failed: playerAbilityChoice contains player keys missing from playersTmp.");
-            return false;
-        }
-        if (!StaticGameData.abilityTypes.containsAllValues(changes.playerAbilityChoice)) {
-            System.err.println("Validation failed: playerAbilityChoice contains values missing from StaticGameData.abilityTypes.");
-            return false;
-        }
-        if (!playersTmp.checkChangeAsStruct((pl) -> pl.planes,
-            changes.playerPlanesChange,
-            (f, s) -> f.checkMergeElements(s,
-                v -> v >= 0,
-                (o, n) -> o + n >= 0
-            ) && StaticGameData.planeTypes.containsAll(s.keySet()))) {
-            System.err.println("Validation failed: player planes change validation or plane type validation failed.");
-            return false;
-        }
-
-        // 6. Airport passengers checks
-        if (!airportsTmp.checkChangeAsStruct((port) -> port.passengers,
-            changes.airportPassengersChange,
-            (f, s) -> f.checkMergeElements(s,
-                v -> v >= 0,
-                (o, n) -> o + n >= 0
-            ) && StaticGameData.passengerTypes.containsAll(s.keySet()))) {
-            System.err.println("Validation failed: airportPassengersChange validation or passenger type validation failed.");
-            return false;
-        }
-
-        // All checks passed successfully
-        return true;
-    }
+//    public boolean checkChangesDebug(DataChanges changes) {
+//        // 1. Initial integrity checks
+//        if (!StaticGameData.worldEventTypes.containsAll(changes.newWorldEvents)) {
+//            System.err.println("Validation failed: newWorldEvents contain invalid event types.");
+//            return false;
+//        }
+//        if (!players.checkChangeSetTI(changes.playersToAdd, changes.playersToRemove)) {
+//            System.err.println("Validation failed: players change set (playersToAdd/playersToRemove) is invalid.");
+//            return false;
+//        }
+//        if (!airports.checkChangeSetTI(changes.airportsToAdd, changes.airportsToRemove)) {
+//            System.err.println("Validation failed: airports change set (airportsToAdd/airportsToRemove) is invalid.");
+//            return false;
+//        }
+//        if (!airlines.checkChangeSetTI(changes.airlinesToAdd, changes.airlinesToRemove)) {
+//            System.err.println("Validation failed: airlines change set (airlinesToAdd/airlinesToRemove) is invalid.");
+//            return false;
+//        }
+//
+//        // Generating temporary sets for deep validation
+//        SetHolder<Airport> airportsTmp = TemporarySetHolder.generateTemporarySetHolder(
+//            airports, changes.airportsToAdd, changes.airportsToRemove,
+//            AirportDTO::restore);
+//        SetHolder<Airline> airlinesTmp = TemporarySetHolder.generateTemporarySetHolder(
+//            airlines, changes.airlinesToAdd, changes.airlinesToRemove,
+//            (dto) -> dto.restore(airportsTmp, this.players));
+//        SetHolder<Player> playersTmp = TemporarySetHolder.generateTemporarySetHolder(
+//            players, changes.playersToAdd, changes.playersToRemove,
+//            (dto) -> dto.restore(airlinesTmp));
+//
+//        // 2. Turn and player presence checks
+//        if (changes.currentPlayer != null && changes.currentPlayer != -1 && !playersTmp.contains(changes.currentPlayer)) {
+//            System.err.println("Validation failed: currentPlayer is not present in the temporary player set. Current player = " + changes.currentPlayer + " tmpPlayerSet.size() = " + playersTmp.size());
+//            return false;
+//        }
+//        if (!playersTmp.containsAll(changes.turnOrder)) {
+//            System.err.println("Validation failed: turnOrder contains players not present in the temporary player set.");
+//            return false;
+//        }
+//
+//        // 3. Market and global availability checks
+//        if (!availableAirlines.checkChangeSetIILookUp(changes.availableAirlinesToAdd, changes.availableAirlinesToRemove, airlinesTmp)) {
+//            System.err.println("Validation failed: availableAirlines changes are invalid relative to airlinesTmp.");
+//            return false;
+//        }
+//        if (!availableAbilities.checkChangeSetIILookUp(changes.availableAbilitiesToAdd, changes.availableAbilitiesToRemove, StaticGameData.abilityTypes)) {
+//            System.err.println("Validation failed: availableAbilities changes are invalid relative to StaticGameData.abilityTypes.");
+//            return false;
+//        }
+//        if (!StaticGameData.planeTypes.containsAllKeys(changes.availablePlanesChange)) {
+//            System.err.println("Validation failed: availablePlanesChange contains keys missing from StaticGameData.planeTypes.");
+//            return false;
+//        }
+//        if (!availablePlanes.checkMergeElements(changes.availablePlanesChange, v -> v >= 0, (f, s) -> f + s >= 0)) {
+//            System.err.println("Validation failed: availablePlanes merge check failed (negative values or invalid state).");
+//            return false;
+//        }
+//
+//        // 4. Player state modification checks
+//        if (!playersTmp.containsAllKeys(changes.playerHasPassedSet)) {
+//            System.err.println("Validation failed: playerHasPassedSet contains keys missing from playersTmp.");
+//            return false;
+//        }
+//        if (!playersTmp.checkChangeAsStruct(Player::getMoney, changes.playerMoneyChange, (current, change) -> current + change >= 0)) {
+//            System.err.println("Validation failed: playerMoneyChange resulted in negative balance for a player.");
+//            return false;
+//        }
+//        if (!playersTmp.checkChangeAsStruct(Player::getAuctionBet, changes.playerAuctionBetChanges, (current, change) -> current + change >= 0)) {
+//            System.err.println("Validation failed: playerAuctionBetChanges resulted in negative auction bet.");
+//            return false;
+//        }
+//        if (!playersTmp.checkChangeAsStruct(Player::getAmountOfShares, changes.playerAmountOfSharesChange,
+//            (o, n) -> o + n >= 0 && o + n <= StaticGameData.maxAmountOfShares)) {
+//            System.err.println("Validation failed: playerAmountOfSharesChange went out of bounds [0, maxAmountOfShares].");
+//            return false;
+//        }
+//        if (!playersTmp.checkChangeAsStruct(Player::getActionPoints, changes.playerActionPointsChange,
+//            (o, n) -> o + n >= 0 && o + n <= StaticGameData.maxActionsPerTurn)) {
+//            System.err.println("Validation failed: playerActionPointsChange went out of bounds [0, maxActionsPerTurn].");
+//            return false;
+//        }
+//
+//        // 5. Player sub-entities checks (Airlines, Abilities, Planes)
+//        if (!playersTmp.checkChangeAsStruct((pl) -> pl.airlines,
+//            Arrays.asList(changes.playerAirlinesToAdd, changes.playerAirlinesToRemove),
+//            (f, s) -> f.checkChangeSetIILookUp(s.get(0), s.get(1), airlinesTmp))) {
+//            System.err.println("Validation failed: player airlines change validation failed against airlinesTmp.");
+//            return false;
+//        }
+//        if (!playersTmp.containsAllKeys(changes.playerAbilityChoice)) {
+//            System.err.println("Validation failed: playerAbilityChoice contains player keys missing from playersTmp.");
+//            return false;
+//        }
+//        if (!StaticGameData.abilityTypes.containsAllValues(changes.playerAbilityChoice)) {
+//            System.err.println("Validation failed: playerAbilityChoice contains values missing from StaticGameData.abilityTypes.");
+//            return false;
+//        }
+//        if (!playersTmp.checkChangeAsStruct((pl) -> pl.planes,
+//            changes.playerPlanesChange,
+//            (f, s) -> f.checkMergeElements(s,
+//                v -> v >= 0,
+//                (o, n) -> o + n >= 0
+//            ) && StaticGameData.planeTypes.containsAll(s.keySet()))) {
+//            System.err.println("Validation failed: player planes change validation or plane type validation failed.");
+//            return false;
+//        }
+//
+//        // 6. Airport passengers checks
+//        if (!airportsTmp.checkChangeAsStruct((port) -> port.passengers,
+//            changes.airportPassengersChange,
+//            (f, s) -> f.checkMergeElements(s,
+//                v -> v >= 0,
+//                (o, n) -> o + n >= 0
+//            ) && StaticGameData.passengerTypes.containsAll(s.keySet()))) {
+//            System.err.println("Validation failed: airportPassengersChange validation or passenger type validation failed.");
+//            return false;
+//        }
+//
+//        // All checks passed successfully
+//        return true;
+//    }
 
 
     public void clearGameData(){

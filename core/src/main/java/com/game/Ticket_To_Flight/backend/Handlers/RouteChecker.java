@@ -56,7 +56,7 @@ public class RouteChecker {
         if(rt == null) return;
         dataChangesCreator.takePlane(rt.plane.getId());
         dataChangesCreator.removePassengers(rt.getBoardedPerPort());
-        dataChangesCreator.incomeLossForMultiplePlayers(rt.getIncomeChange());
+        dataChangesCreator.incomeGainFromRoute(rt.getIncomeChange());
         rt = null;
     }
 
