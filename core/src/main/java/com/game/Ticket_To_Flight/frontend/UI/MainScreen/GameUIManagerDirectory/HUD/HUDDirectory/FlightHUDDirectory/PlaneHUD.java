@@ -3,6 +3,7 @@ package com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.PlaneType;
+import com.game.Ticket_To_Flight.commonFrontAndBack.Route;
 import com.game.Ticket_To_Flight.frontend.components.tables.flight.AbstractFlightPanel;
 import com.game.Ticket_To_Flight.frontend.components.texts.SingleLineText;
 
@@ -14,7 +15,7 @@ public class PlaneHUD extends AbstractFlightPanel {
         super(skin);
     }
 
-    public void updateData(PlaneType plane) {
+    public void updateData(PlaneType plane, Route route) {
         if (this.currentPlane == plane && isInitialized) return;
 
         this.currentPlane = plane;
@@ -26,7 +27,6 @@ public class PlaneHUD extends AbstractFlightPanel {
     protected void renderContent() {
         clearChildren();
 
-        // Используем метод родителя для создания шапки
         add(buildHeader("Plane Info")).fillX().expandX().row();
 
         if (!isCollapsed) {

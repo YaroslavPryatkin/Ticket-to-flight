@@ -55,13 +55,12 @@ public class FlightHUD extends Table {
 
     public void updateData(MainFlightController.Step step, PlaneType plane, Route route, List<MainFlightController.ChosenGroup> chosenGroups) {
         standardHUD.updateData(step, route);
-        planeHUD.updateData(plane);
 
-        // ВАЖНО: передаем route сюда
+        planeHUD.updateData(plane, route);
         groupHUD.updateData(chosenGroups, route);
 
         Airport currentAirport = (route != null) ? route.getCurrentAirport() : null;
-        boardingHUD.updateData(currentAirport, route);
+        boardingHUD.updateData(currentAirport, route, chosenGroups);
 
         layoutChildren();
     }

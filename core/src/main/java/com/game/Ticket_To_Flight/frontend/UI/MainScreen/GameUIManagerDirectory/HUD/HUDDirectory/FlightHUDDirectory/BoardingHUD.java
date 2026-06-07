@@ -11,6 +11,7 @@ import com.game.Ticket_To_Flight.Utilities.MapHolder;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airport;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.PassengerType;
 import com.game.Ticket_To_Flight.commonFrontAndBack.Route;
+import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.Flights.MainFlightController;
 import com.game.Ticket_To_Flight.frontend.components.buttons.SelectButton;
 import com.game.Ticket_To_Flight.frontend.components.tables.expandable.ExpandableListWidget;
 import com.game.Ticket_To_Flight.frontend.components.tables.passenger.PassengerTableWidget;
@@ -33,6 +34,7 @@ public class BoardingHUD extends AbstractFlightPanel {
     private float currentTopY = 0;
     private Airport currentAirport;
     private Route currentRoute;
+    private List<MainFlightController.ChosenGroup> currentGroups;
     private Consumer<PassengerType> onPassengerSelected;
 
     public BoardingHUD(Skin skin) {
@@ -62,7 +64,9 @@ public class BoardingHUD extends AbstractFlightPanel {
         this.onPassengerSelected = onPassengerSelected;
     }
 
-    public void updateData(Airport airport, Route route) {
+    public void updateData(Airport airport, Route route, List<MainFlightController.ChosenGroup> chosenGroups) {
+        this.currentGroups = chosenGroups;
+
         if (this.currentAirport == airport && this.currentRoute == route && this.isInitialized) {
             return;
         }
@@ -95,11 +99,24 @@ public class BoardingHUD extends AbstractFlightPanel {
                 Map.Entry<PassengerType, Integer> entry = iterator.next();
                 if (entry == null || entry.getValue() <= 0) continue;
 
-                hasPassengers = true;
                 PassengerType passenger = entry.getKey();
+
+                int takenAmount = 0;
+                if (currentGroups != null) {
+                    for (MainFlightController.ChosenGroup group : currentGroups) {
+                        if (group.airport.equals(currentAirport) && group.passengerType.equals(passenger)) {
+                            takenAmount++;
+                        }
+                    }
+                }
+
+                int remaining = entry.getValue() - takenAmount;
+                if (remaining <= 0) continue;
+
+                hasPassengers = true;
                 PassengerTableWidget passengerWidget = new PassengerTableWidget(passenger);
 
-                ExpandableListWidget passengerList = new ExpandableListWidget(passengerWidget.passengerClass() + " (x" + entry.getValue() + ")", skin);
+                ExpandableListWidget passengerList = new ExpandableListWidget(passengerWidget.passengerClass() + " (x" + remaining + ")", skin);
                 passengerList.setPreferredWidth(CONTENT_WIDTH);
                 activeLists.add(passengerList);
 

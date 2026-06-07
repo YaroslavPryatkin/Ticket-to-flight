@@ -105,7 +105,7 @@ public class MainFlightController {
 
     public void handleAirportClick(Airport airport) {
         if (!isActive()) return;
-        if (chosenGroups.isEmpty() && step == Step.CHOOSE_AIRPORT_GROUP) {
+        if (chosenGroups.isEmpty() && (route == null || route.getLines().isEmpty()) && step == Step.CHOOSE_AIRPORT_GROUP) {
             setActiveFlightAirport(airport); setFirstFlightAirport(airport);
             if (this.selectedPlane != null) {
                 this.route = new Route(this.selectedPlane, this.gameData, airport);
@@ -178,8 +178,9 @@ public class MainFlightController {
     }
 
     private void finishRoute() {
+        if (route == null) llh.sendRoutePass();
         if (route != null && !route.canFinishRoute()) { uiManager.showSuccessWindow("Route is not finished yet. Deliver all passengers or reset!"); return; }
-        llh.sendRoutePass(); uiManager.removeTooltip();
+        llh.sendRouteResponse(route, true); uiManager.removeTooltip();
         if (route == null) uiManager.showSuccessWindow("Flight stage skipped.");
         else uiManager.showSuccessWindow("Flight request was sent to server.");
         clearUi(); resetState();

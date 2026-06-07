@@ -41,6 +41,7 @@ public class MainClient {
             }
             else if(gameData.currentState == GameData.State.GAME_FINISHED && llh.getCurrentStateState() == Flags.CurrentStateState.GAME_FINISHED){
                 //do something with llh.getGameFinishRating();
+                llh.getGameFinishRating();
                 if(!wroteGameFinished) {
                     System.out.println("Game is finished");
                     wroteGameFinished = true;
