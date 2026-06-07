@@ -124,7 +124,7 @@ public class MainFlightController {
         }
         Map<Integer, String> errors = route.makeFlight(airline);
         if (errors != null) { uiManager.showSuccessWindow(errors.values().iterator().next()); return; }
-        setActiveFlightAirport(route.getCurrentAirport()); step = Step.CHOOSING_STARTING_AIRPORT;
+        setActiveFlightAirport(route.getCurrentAirport());
         flightHUD.updateData(step, selectedPlane, route);
         uiManager.showAirportTooltip(route.getCurrentAirport());
     }
@@ -175,6 +175,7 @@ public class MainFlightController {
 
     private void passFlight() {
         llh.sendRoutePass();
+        resetAll();
         uiManager.removeTooltip();
         uiManager.showSuccessWindow("Flight stage skipped.");
         clearUi();
@@ -189,6 +190,7 @@ public class MainFlightController {
         if (route == null) return;
 
         llh.sendRouteResponse(route, finishStage);
+        resetAll();
         uiManager.removeTooltip();
         uiManager.showSuccessWindow("Flight request was sent to server.");
         clearUi();
@@ -200,9 +202,9 @@ public class MainFlightController {
             boolean flightUndone = route.undoFlight();
             if (flightUndone) {
                 setActiveFlightAirport(route.getCurrentAirport());
-                int linesCount = route.getLines().size();
-                if (route.getPassengers().size() > linesCount) step = Step.IN_FLIGHT;
-                else step = Step.CHOOSING_STARTING_AIRPORT;
+                if (route.getCurrentAirport() == firstFlightAirport) {
+                    step = Step.CHOOSING_STARTING_AIRPORT;
+                }
             } else resetAll();
         } else resetAll();
         uiManager.removeTooltip();

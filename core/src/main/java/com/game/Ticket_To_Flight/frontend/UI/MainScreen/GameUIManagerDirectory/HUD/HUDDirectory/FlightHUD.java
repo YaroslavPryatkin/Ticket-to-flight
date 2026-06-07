@@ -54,7 +54,7 @@ public class FlightHUD extends Table {
     public void updateData(MainFlightController.Step step, PlaneType plane, Route route) {
         standardHUD.updateData(step, route);
         planeHUD.updateData(plane, route);
-
+        System.out.println("Updating" + step);
         if(step == MainFlightController.Step.IN_FLIGHT) {
             groupHUD.updateData(route);
             Airport currentAirport = route.getCurrentAirport();

@@ -153,8 +153,8 @@ public class StandardHUD extends Table {
     }
 
     private String getStepText(MainFlightController.Step step) {
-        if (step == MainFlightController.Step.SELECT_PLANE) return "Choose plane";
-        if (step == MainFlightController.Step.CHOOSING_STARTING_AIRPORT) return "Choose airport and group";
-        return "Choose airline";
+        if (step == MainFlightController.Step.SELECT_PLANE) return "Choose the plane";
+        if (step == MainFlightController.Step.CHOOSING_STARTING_AIRPORT) return "Choose the start airport";
+        return "Fly";
     }
 }
