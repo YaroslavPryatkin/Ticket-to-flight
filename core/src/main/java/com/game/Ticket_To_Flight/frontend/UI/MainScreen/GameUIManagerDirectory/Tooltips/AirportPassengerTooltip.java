@@ -32,7 +32,7 @@ public class AirportPassengerTooltip extends AirportHoverTooltip {
             }
         });
 
-        boolean canAdd = (currentRoute.checkPassengerAdding(passenger) == null);
+        boolean canAdd = (currentRoute.checkPassengerAdding(passenger, 1) == null);
         selectBtn.setDisabled(!canAdd);
 
         selectBtn.getLabel().setColor(canAdd ? Color.WHITE : Color.DARK_GRAY);

@@ -7,9 +7,9 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airport;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.PassengerType;
 import com.game.Ticket_To_Flight.commonFrontAndBack.Route;
-import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.Flights.MainFlightController;
 import com.game.Ticket_To_Flight.frontend.components.buttons.SelectButton;
 import com.game.Ticket_To_Flight.frontend.components.tables.expandable.ExpandableListWidget;
 import com.game.Ticket_To_Flight.frontend.components.tables.passenger.PassengerTableWidget;
@@ -27,9 +27,11 @@ public class GroupHUD extends AbstractFlightPanel {
     private final Table contentTable;
 
     private float currentTopY = 0;
-    private List<MainFlightController.ChosenGroup> currentGroups;
     private Route currentRoute;
     private Consumer<PassengerType> onPassengerRemoved;
+
+    private Airport lastAirport;
+    private int lastPassCount = -1;
 
     public GroupHUD(Skin skin) {
         super(skin);
@@ -57,11 +59,20 @@ public class GroupHUD extends AbstractFlightPanel {
         this.onPassengerRemoved = onPassengerRemoved;
     }
 
-    public void updateData(List<MainFlightController.ChosenGroup> chosenGroups, Route route) {
-        if (this.currentGroups == chosenGroups && this.currentRoute == route && isInitialized) return;
+    public void updateData( Route route) {
+        Airport routeAirport = (route != null) ? route.getCurrentAirport() : null;
+        int passCount = route!=null ? (route.getPassengers() != null) ? route.getPassengers().size() : 0 : 0;
 
-        this.currentGroups = chosenGroups;
+        if (this.currentRoute == route &&
+            this.lastAirport == routeAirport &&
+            this.lastPassCount == passCount &&
+            isInitialized) {
+            return;
+        }
+
         this.currentRoute = route;
+        this.lastAirport = routeAirport;
+        this.lastPassCount = passCount;
         this.isInitialized = true;
         renderContent();
     }
@@ -81,14 +92,17 @@ public class GroupHUD extends AbstractFlightPanel {
             Map<PassengerType, Integer> passengerCounts = new LinkedHashMap<>();
             Map<PassengerType, Boolean> canRemoveMap = new HashMap<>();
 
-            // Группируем пассажиров и проверяем, можно ли высадить хоть одну группу этого типа
-            if (currentGroups != null && currentRoute != null) {
+            if (currentRoute != null) {
                 List<Route.BoarderPassenger> routePassengers = currentRoute.getPassengers();
-                for (int i = 0; i < currentGroups.size(); i++) {
-                    PassengerType pt = currentGroups.get(i).passengerType;
-                    passengerCounts.put(pt, passengerCounts.getOrDefault(pt, 0) + 1);
+                for (int i = 0; i < routePassengers.size(); i++) {
+                    Route.BoarderPassenger passenger = routePassengers.get(i);
+                    if (passenger.isFinished()) continue;
 
-                    if (i < routePassengers.size() && routePassengers.get(i).canBeRemoved()) {
+                    PassengerType pt = passenger.getType();
+                    if (pt == null) continue;
+
+                    passengerCounts.put(pt, passengerCounts.getOrDefault(pt, 0) + 1);
+                    if (passenger.canBeRemoved()) {
                         canRemoveMap.put(pt, true);
                     }
                 }
@@ -108,7 +122,6 @@ public class GroupHUD extends AbstractFlightPanel {
                 listWidget.setPreferredWidth(CONTENT_WIDTH);
                 activeLists.add(listWidget);
 
-                // Добавляем кнопку Delete
                 SelectButton deleteBtn = createDeleteButton(pt, canRemove);
                 listWidget.addHeaderActor(deleteBtn, 160f, 55f);
 

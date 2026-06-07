@@ -15,8 +15,6 @@ import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.H
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.HUD.HUDDirectory.FlightHUDDirectory.PlaneHUD;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.HUD.HUDDirectory.FlightHUDDirectory.StandardHUD;
 
-import java.util.List;
-
 public class FlightHUD extends Table {
     private final StandardHUD standardHUD;
     private final PlaneHUD planeHUD;
@@ -39,8 +37,8 @@ public class FlightHUD extends Table {
         setVisible(false);
     }
 
-    public void setCallbacks(Runnable onReset, Runnable onBack, Runnable onFinish) {
-        standardHUD.setCallbacks(onReset, onBack, onFinish);
+    public void setCallbacks(Runnable onReset, Runnable onBack, Runnable onPass, Consumer<Boolean> onFinish) {
+        standardHUD.setCallbacks(onReset, onBack, onPass, onFinish);
     }
 
     public void setPassengerCallbacks(Consumer<PassengerType> onSelect, Consumer<PassengerType> onRemove) {
@@ -53,14 +51,15 @@ public class FlightHUD extends Table {
         groupHUD.forceUpdate();
     }
 
-    public void updateData(MainFlightController.Step step, PlaneType plane, Route route, List<MainFlightController.ChosenGroup> chosenGroups) {
+    public void updateData(MainFlightController.Step step, PlaneType plane, Route route) {
         standardHUD.updateData(step, route);
-
         planeHUD.updateData(plane, route);
-        groupHUD.updateData(chosenGroups, route);
 
-        Airport currentAirport = (route != null) ? route.getCurrentAirport() : null;
-        boardingHUD.updateData(currentAirport, route, chosenGroups);
+        if(step == MainFlightController.Step.IN_FLIGHT) {
+            groupHUD.updateData(route);
+            Airport currentAirport = route.getCurrentAirport();
+            boardingHUD.updateData(currentAirport, route);
+        }
 
         layoutChildren();
     }

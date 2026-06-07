@@ -13,7 +13,7 @@ import java.util.*;
 public class Route {
 
     public class BoarderPassenger {
-        PassengerType type;
+        private PassengerType type;
         int amountOfStations; // actual values + 1
         int myAirportVisited;
         final Airport boardedAt; // Track where the passenger boarded
@@ -70,6 +70,14 @@ public class Route {
             // Can only be removed if they haven't traveled anywhere and we are at the boarding port
             return amountOfStations == 0 && boardedAt.equals(current);
         }
+
+        public PassengerType getType() {
+            return type;
+        }
+
+        public Airport getBoardedAt() {
+            return boardedAt;
+        }
     }
 
     public final Airport startingPort;
@@ -83,55 +91,34 @@ public class Route {
     private final SetHolder<Airport> usedPorts = new SetHolder<>();
     private final MapHolder<Player, Integer> incomeChange = new MapHolder<>();
     private final List<Airline> lines = new ArrayList<>();
-    private final GameData gameData;
+    private boolean hasBeenUpdated = false;
 
     public Route(PlaneType plane, GameData gameData, Airport startAirport) {
         this.plane = plane;
-        this.gameData = gameData;
         this.current = startAirport;
         this.startingPort = startAirport;
         usedPorts.add(startAirport);
+        hasBeenUpdated=true;
     }
 
 
     /**
      * @return error string if error occurred, else null
      */
-    public String checkPassengerAdding(PassengerType type) {
+    public String checkPassengerAdding(PassengerType type, int amount) {
         if (current == null)
             return "Current airport is null";
         if (current.passengers.getOrDefault(type, 0) -
-            boardedPerPort.getOrDefault(current, new MapHolder<>()).getOrDefault(type, 0) <= 0
+            boardedPerPort.getOrDefault(current, new MapHolder<>()).getOrDefault(type, 0) < amount
         )
             return "Current airport does not have that passenger";
-        if (currentAmountOfPassengers + type.size > plane.capacity)
+        if (currentAmountOfPassengers + type.size * amount > plane.capacity)
             return "Passenger's do not fit in the plane capacity.";
         if (!type.luxuryRange.contains(plane.luxury))
             return "Plane luxury does not fit passenger's desired luxury range.";
         if (!type.capacityRange.contains(plane.capacity))
             return "Plane capacity does not fit passenger's desired capacity range.";
         return null;
-    }
-
-    public String checkPassengerAdding(PassengerType candidate, List<PassengerType> currentlySelectedInUI) {
-        if (this.plane == null) {
-            return "Plane is not selected yet.";
-        }
-
-        int totalPersons = 0;
-
-        if (currentlySelectedInUI != null) {
-            for (PassengerType p : currentlySelectedInUI) {
-                totalPersons += p.size;
-            }
-        }
-
-        totalPersons += candidate.size;
-
-        if (totalPersons > this.plane.capacity) {
-            return "Plane capacity doesn't fit for all selected passengers.";
-        }
-        return checkPassengerAdding(candidate);
     }
 
     private void unsafeAddPassenger(PassengerType type) {
@@ -247,9 +234,10 @@ public class Route {
      * @return error string if error occurred, else null and adds the passenger
      */
     public String addPassenger(PassengerType type) {
-        String error = checkPassengerAdding(type);
+        String error = checkPassengerAdding(type, 1);
         if (error == null) {
             unsafeAddPassenger(type);
+            hasBeenUpdated=true;
             return null;
         }
         else return error;
@@ -265,6 +253,7 @@ public class Route {
             currentAmountOfPassengers -= type.size;
             boardedPerPort.get(current).compute(type.getId(), (k, v) -> { if (--v == 0) return null; else return v; });
             passengers.remove(ind);
+            hasBeenUpdated=true;
             return true;
         }
         else return false;
@@ -285,6 +274,7 @@ public class Route {
         current = next;
         fuelSpent += line.getDistance();
         lines.add(line);
+        hasBeenUpdated=true;
         return null;
     }
 
@@ -300,6 +290,7 @@ public class Route {
         returnToPreviousAirportPassengers(lineBack);
         current = lineBack.getAnotherEnd(current);
         fuelSpent -= lineBack.getDistance();
+        hasBeenUpdated=true;
         return true;
     }
 
@@ -329,13 +320,20 @@ public class Route {
     public MapHolder<PassengerType, Integer> getSuitablePassengers(){
         MapHolder<PassengerType, Integer> res = new MapHolder<>(StaticGameData.passengerTypes);
         for(Map.Entry<Integer,Integer> e : current.passengers.entrySet()){
-            int takenAmount = boardedPerPort.getOrDefault(current.getId(),new MapHolder<>()).getOrDefault(e.getKey(), 0);
-            if(e.getValue() - takenAmount > 0){
-                PassengerType type = StaticGameData.passengerTypes.get(e.getKey());
-                if(checkPassengerAdding(type)!=null)
-                    res.put(type,e.getValue() - takenAmount );
+            PassengerType type = StaticGameData.passengerTypes.get(e.getKey());
+            int lastGood = 0;
+            for(int amount = 1;amount <= e.getValue();++amount) {
+                String error = checkPassengerAdding(type, amount);
+                if (error == null)
+                    lastGood = amount;
+                else
+                    break;
+            }
+            if(lastGood!=0){
+                res.put(type, lastGood);
             }
         }
+        //System.out.println("Returning res of size = " + res.size());
         return res;
     }
 
@@ -365,4 +363,12 @@ public class Route {
     }
 
     public MapHolder<Player, Integer> getIncomeChange(){return incomeChange;}
+
+    public boolean renderingUpdate(){
+        if(hasBeenUpdated){
+            hasBeenUpdated=false;
+            return true;
+        }
+        return false;
+    }
 }
