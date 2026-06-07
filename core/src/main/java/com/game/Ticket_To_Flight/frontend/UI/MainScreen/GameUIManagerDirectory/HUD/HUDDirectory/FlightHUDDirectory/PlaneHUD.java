@@ -10,16 +10,37 @@ import com.game.Ticket_To_Flight.frontend.components.texts.SingleLineText;
 public class PlaneHUD extends AbstractFlightPanel {
     private PlaneType currentPlane;
     private float currentTopY = 0;
+    private Route route;
+
+    private double lastFuel = -1;
+    private int lastStations = -1;
+    private int lastCapacity = -1;
 
     public PlaneHUD(Skin skin) {
         super(skin);
     }
 
     public void updateData(PlaneType plane, Route route) {
-        if (this.currentPlane == plane && isInitialized) return;
+        double currentFuel = route != null ? route.getRemainingFuel() : -1;
+        int currentStations = route != null ? route.getRemainingStations() : -1;
+        int currentCapacity = route != null ? route.getRemainingCapacity() : -1;
+
+        if (this.currentPlane == plane &&
+            this.route == route &&
+            this.lastFuel == currentFuel &&
+            this.lastStations == currentStations &&
+            this.lastCapacity == currentCapacity &&
+            this.isInitialized) {
+            return;
+        }
 
         this.currentPlane = plane;
+        this.route = route;
+        this.lastFuel = currentFuel;
+        this.lastStations = currentStations;
+        this.lastCapacity = currentCapacity;
         this.isInitialized = true;
+
         renderContent();
     }
 
@@ -34,14 +55,26 @@ public class PlaneHUD extends AbstractFlightPanel {
             if (currentPlane == null) {
                 content.add(new SingleLineText("No plane selected", skin)).right().row();
             } else {
-                addRow(content, "fuel", String.valueOf(currentPlane.fuel));
-                addRow(content, "stations", String.valueOf(currentPlane.stations));
-                addRow(content, "luxury", String.valueOf(currentPlane.luxury));
-                addRow(content, "capacity", String.valueOf(currentPlane.capacity));
-                addRow(content, "gateRange", formatInterval(currentPlane.gateRange.getFrom(), currentPlane.gateRange.getTo()));
-                addRow(content, "distRange", formatInterval(currentPlane.distRange.getFrom(), currentPlane.distRange.getTo()));
-                addRow(content, "price", "$" + currentPlane.price);
-                addRow(content, "description", currentPlane.description);
+                if(route == null) {
+                    addRow(content, "fuel", String.valueOf(currentPlane.fuel));
+                    addRow(content, "stations", String.valueOf(currentPlane.stations));
+                    addRow(content, "luxury", String.valueOf(currentPlane.luxury));
+                    addRow(content, "capacity", String.valueOf(currentPlane.capacity));
+                    addRow(content, "gateRange", formatInterval(currentPlane.gateRange.getFrom(), currentPlane.gateRange.getTo()));
+                    addRow(content, "distRange", formatInterval(currentPlane.distRange.getFrom(), currentPlane.distRange.getTo()));
+                    addRow(content, "price", "$" + currentPlane.price);
+                    addRow(content, "description", currentPlane.description);
+                }
+                else{
+                    addRow(content, "fuel", route.getRemainingFuel() + "/" + currentPlane.fuel );
+                    addRow(content, "stations", route.getRemainingStations() + "/" + currentPlane.stations);
+                    addRow(content, "luxury", String.valueOf(currentPlane.luxury));
+                    addRow(content, "capacity", route.getRemainingCapacity() + "/" + currentPlane.capacity);
+                    addRow(content, "gateRange", formatInterval(currentPlane.gateRange.getFrom(), currentPlane.gateRange.getTo()));
+                    addRow(content, "distRange", formatInterval(currentPlane.distRange.getFrom(), currentPlane.distRange.getTo()));
+                    addRow(content, "price", "$" + currentPlane.price);
+                    addRow(content, "description", currentPlane.description);
+                }
             }
             add(content).right().padTop(10).row();
         }

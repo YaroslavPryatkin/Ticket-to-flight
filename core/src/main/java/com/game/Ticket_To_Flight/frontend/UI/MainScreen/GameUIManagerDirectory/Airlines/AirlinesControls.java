@@ -1,5 +1,6 @@
 package com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.Airlines;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -30,6 +31,11 @@ public class AirlinesControls {
     public void update() {
         if (!canChooseAirline()) {
             remove();
+            /*Integer num = gameData.players.get(gameData.currentPlayer).actionPoints;
+            if (num != null && num <= 0) {
+                llh.sendAirlinePass();
+                uiManager.showSuccessWindow("You have not got enough AP");
+            }*/
             return;
         }
 
@@ -40,12 +46,12 @@ public class AirlinesControls {
     public void position() {
         if (passButton == null) return;
 
-        float width = 360;
-        float height = 80;
-        float margin = 40;
+        float width = 280f;
+        float height = 80f;
+        float margin = 40f;
 
         passButton.setSize(width, height);
-        passButton.setPosition(stage.getWidth() - width - margin, margin);
+        passButton.setPosition((stage.getWidth() - width) / 2, margin);
     }
 
     private boolean canChooseAirline() {
@@ -63,6 +69,9 @@ public class AirlinesControls {
 
     private TextButton createPassButton() {
         TextButton button = new RoundedButton("Pass", skin, "default");
+
+        button.setColor(Color.RED);
+
         button.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {

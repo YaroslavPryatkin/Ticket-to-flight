@@ -1,7 +1,6 @@
 package com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.HUD.HUDDirectory.StandardHUDDirectory;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
@@ -18,6 +17,8 @@ import com.game.Ticket_To_Flight.frontend.components.subsidiary.ComponentHover;
 import com.game.Ticket_To_Flight.frontend.components.background.SolidRectangleBackground;
 import com.game.Ticket_To_Flight.frontend.components.tables.expandable.ExpandableListWidget;
 import com.game.Ticket_To_Flight.frontend.components.texts.SingleLineText;
+import com.game.Ticket_To_Flight.frontend.components.texts.Text;
+import com.game.Ticket_To_Flight.frontend.components.texts.WrappedText;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -25,16 +26,13 @@ import java.util.List;
 import java.util.Map;
 
 public class PlayersListHUD extends Table {
-    private static final float MIN_PLAYER_ROW_WIDTH = 480f;
-    private static final float PLAYER_ROW_HORIZONTAL_PADDING = 30f;
-    private static final float PLAYER_ROW_EXTRA_WIDTH = 20f;
-    private static final float HEADER_NAME_RIGHT_PADDING = 100f;
+    private static final float FIXED_WIDTH = 650f;
+    private static final float INNER_WIDTH = FIXED_WIDTH - 30f;
     private static final float PLANE_STAT_LEFT_PADDING = 15f;
 
     private final GameData gameData;
     private final LowLevelHandlerFront llh;
     private final Skin skin;
-    private final GlyphLayout glyphLayout = new GlyphLayout();
 
     private final List<ExpandableListWidget> activeExpandLists = new ArrayList<>();
 
@@ -54,6 +52,8 @@ public class PlayersListHUD extends Table {
         scrollPane.setFadeScrollBars(false);
         scrollPane.setScrollingDisabled(true, false);
 
+        scrollPane.setCancelTouchFocus(false);
+
         scrollPane.addListener(new InputListener() {
             @Override
             public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
@@ -65,7 +65,7 @@ public class PlayersListHUD extends Table {
             }
         });
 
-        add(scrollPane).expand().fill().top().left();
+        add(scrollPane).expandY().fillY().width(FIXED_WIDTH).top().left();
     }
 
     public void updateData() {
@@ -76,8 +76,6 @@ public class PlayersListHUD extends Table {
             if (p == null) continue;
 
             boolean isCurrentTurn = (p.getId() == gameData.currentPlayer);
-            float rowWidth = calculatePlayerRowWidth(p);
-            float innerListWidth = rowWidth - PLAYER_ROW_HORIZONTAL_PADDING;
 
             SolidRectangleBackground playerRow = new SolidRectangleBackground(0, 0, 0, 0,
                 isCurrentTurn ? new Color(0.2f, 0.4f, 0.8f, 0.9f) : new Color(0.15f, 0.15f, 0.15f, 0.8f),
@@ -90,15 +88,15 @@ public class PlayersListHUD extends Table {
             Label nameLabel = new SingleLineText(p.getName(), skin);
             if (p.getColor() != null) nameLabel.setColor(p.getColor());
 
-            header.add(nameLabel).left().expandX().padRight(HEADER_NAME_RIGHT_PADDING);
-            header.add(new SingleLineText("AP: " + p.getActionPoints(), skin)).right();
-            playerRow.add(header).fillX().expandX().row();
+            header.add(nameLabel).left().expandX();
+            header.add(new SingleLineText("AP: " + p.getActionPoints(), skin)).right().top();
+            playerRow.add(header).width(INNER_WIDTH).row();
 
             Table moneyRow = new Table();
             String incomeStr = p.getIncome() >= 0 ? "+$" + p.getIncome() : "-$" + Math.abs(p.getIncome());
             Label moneyLabel = new SingleLineText("$" + p.getMoney() + " (" + incomeStr + ")", skin);
             moneyLabel.setColor(Color.WHITE);
-            moneyRow.add(moneyLabel).left().expandX(); // Деньги прижимаем влево
+            moneyRow.add(moneyLabel).left().expandX();
 
             if (gameData.currentState == GameData.State.AUCTION) {
                 boolean isPass = gameData.players.get(gameData.currentPlayer).hasPassed;
@@ -109,16 +107,16 @@ public class PlayersListHUD extends Table {
                 betLabel.setColor(isPass ? Color.GRAY : Color.ORANGE);
                 moneyRow.add(betLabel).right();
             }
-            playerRow.add(moneyRow).fillX().expandX().padTop(8).row();
+            playerRow.add(moneyRow).width(INNER_WIDTH).padTop(8).row();
 
             String abilityStr = p.getAbility() != null ? p.getAbility().description : "None";
-            Label abilityLabel = new SingleLineText("Ability: " + abilityStr, skin);
+            Label abilityLabel = new WrappedText("Ability: " + abilityStr, skin, INNER_WIDTH);
             abilityLabel.setColor(Color.LIGHT_GRAY);
 
-            playerRow.add(abilityLabel).expandX().fillX().left().padTop(5).row();
+            playerRow.add(abilityLabel).width(INNER_WIDTH).left().padTop(5).row();
 
             ExpandableListWidget planesList = new ExpandableListWidget("Planes", skin);
-            planesList.setPreferredWidth(innerListWidth);
+            planesList.setPreferredWidth(INNER_WIDTH);
             activeExpandLists.add(planesList);
             Table innerContent = planesList.getContentTable();
 
@@ -133,7 +131,7 @@ public class PlayersListHUD extends Table {
                     int amount = entry.getValue();
 
                     ExpandableListWidget singlePlaneExpand = new ExpandableListWidget(pt.description + " (x" + amount + ")", skin);
-                    singlePlaneExpand.setPreferredWidth(innerListWidth);
+                    singlePlaneExpand.setPreferredWidth(INNER_WIDTH);
                     nestedPlaneLists.add(singlePlaneExpand);
 
                     Table ptContent = singlePlaneExpand.getContentTable();
@@ -157,7 +155,7 @@ public class PlayersListHUD extends Table {
                         }
                     );
 
-                    innerContent.add(singlePlaneExpand).fillX().expandX().padTop(5).row();
+                    innerContent.add(singlePlaneExpand).width(INNER_WIDTH).padTop(5).row();
                     hasPlanes = true;
                 }
             }
@@ -179,9 +177,9 @@ public class PlayersListHUD extends Table {
                 }
             );
 
-            playerRow.add(planesList).fillX().expandX().padTop(10).row();
+            playerRow.add(planesList).width(INNER_WIDTH).padTop(10).row();
 
-            contentTable.add(playerRow).width(rowWidth).padBottom(10).left().row();
+            contentTable.add(playerRow).width(FIXED_WIDTH).padBottom(10).left().row();
         }
     }
 
@@ -189,66 +187,6 @@ public class PlayersListHUD extends Table {
         Label statLabel = new SingleLineText(label + ": " + value, skin);
         statLabel.setColor(Color.LIGHT_GRAY);
         table.add(statLabel).left().padLeft(PLANE_STAT_LEFT_PADDING).padBottom(3).row();
-    }
-
-    private float calculatePlayerRowWidth(Player player) {
-        float contentWidth = expandableHeaderWidth("Planes");
-        contentWidth = Math.max(contentWidth,
-            measureText(player.getName()) + HEADER_NAME_RIGHT_PADDING + measureText("AP: " + player.getActionPoints()));
-
-        String incomeStr = player.getIncome() >= 0 ? "+$" + player.getIncome() : "-$" + Math.abs(player.getIncome());
-
-        float moneyRowWidth = measureText("$" + player.getMoney() + " (" + incomeStr + ")");
-        if (gameData.currentState == GameData.State.AUCTION) {
-            boolean isPass = player.getAuctionBet() < 0;
-            String betText = isPass ? "Pass" : "Bet: $" + player.getAuctionBet();
-            moneyRowWidth += measureText(betText) + 50f;
-        }
-        contentWidth = Math.max(contentWidth, moneyRowWidth);
-
-        String abilityStr = player.getAbility() != null ? player.getAbility().description : "None";
-        contentWidth = Math.max(contentWidth, measureText("Ability: " + abilityStr));
-
-        Iterator<Map.Entry<PlaneType, Integer>> it = MapHolder.viewAsEntrySet(player.planes);
-        boolean hasPlanes = false;
-        while (it.hasNext()) {
-            Map.Entry<PlaneType, Integer> entry = it.next();
-            if (entry != null && entry.getValue() > 0) {
-                hasPlanes = true;
-                PlaneType pt = entry.getKey();
-                int amount = entry.getValue();
-
-                contentWidth = Math.max(contentWidth, expandableHeaderWidth(pt.description + " (x" + amount + ")"));
-                contentWidth = Math.max(contentWidth, planeStatWidth("Fuel", String.valueOf(pt.fuel)));
-                contentWidth = Math.max(contentWidth, planeStatWidth("Stations", String.valueOf(pt.stations)));
-                contentWidth = Math.max(contentWidth, planeStatWidth("Luxury", String.valueOf(pt.luxury)));
-                contentWidth = Math.max(contentWidth, planeStatWidth("Capacity", String.valueOf(pt.capacity)));
-                contentWidth = Math.max(contentWidth, planeStatWidth("Gate Range", formatInterval(pt.gateRange.getFrom(), pt.gateRange.getTo())));
-                contentWidth = Math.max(contentWidth, planeStatWidth("Dist Range", formatInterval(pt.distRange.getFrom(), pt.distRange.getTo())));
-            }
-        }
-
-        if (!hasPlanes) {
-            contentWidth = Math.max(contentWidth, measureText("No planes yet"));
-        }
-
-        return Math.max(MIN_PLAYER_ROW_WIDTH, contentWidth + PLAYER_ROW_HORIZONTAL_PADDING + PLAYER_ROW_EXTRA_WIDTH);
-    }
-
-    private float expandableHeaderWidth(String title) {
-        return ExpandableListWidget.TOGGLE_BUTTON_WIDTH
-            + ExpandableListWidget.TOGGLE_BUTTON_RIGHT_PADDING
-            + measureText(title);
-    }
-
-    private float planeStatWidth(String label, String value) {
-        return PLANE_STAT_LEFT_PADDING + measureText(label + ": " + value);
-    }
-
-    private float measureText(String text) {
-        Label.LabelStyle labelStyle = skin.get(Label.LabelStyle.class);
-        glyphLayout.setText(labelStyle.font, text);
-        return glyphLayout.width;
     }
 
     private <T> String formatInterval(T from, T to) {

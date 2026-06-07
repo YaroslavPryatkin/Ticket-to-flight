@@ -67,13 +67,19 @@ public class MainFlightController {
             return;
         }
 
-        if (selectedPlane == null && planeWindow == null) {
-            resetState();
-            showPlaneSelection();
+        if (selectedPlane == null && planeWindow == null &&
+            gameData.players.get(gameData.currentPlayer).actionPoints > 0) {
+                resetState();
+                showPlaneSelection();
+        }
+        else if (gameData.players.get(gameData.currentPlayer).actionPoints <= 0){
+            System.out.println("Pass the race");
+            llh.sendRoutePass();
+            uiManager.showSuccessWindow("You have not got enough AP");
         }
 
         flightHUD.setVisible(true);
-        flightHUD.updateData(step, selectedPlane, route);
+        flightHUD.updateData(gameData.currentPlayer, step, selectedPlane, route);
 
         position();
     }
@@ -124,8 +130,8 @@ public class MainFlightController {
         }
         Map<Integer, String> errors = route.makeFlight(airline);
         if (errors != null) { uiManager.showSuccessWindow(errors.values().iterator().next()); return; }
-        setActiveFlightAirport(route.getCurrentAirport()); step = Step.CHOOSING_STARTING_AIRPORT;
-        flightHUD.updateData(step, selectedPlane, route);
+        setActiveFlightAirport(route.getCurrentAirport());
+        flightHUD.updateData(gameData.currentPlayer, step, selectedPlane, route);
         uiManager.showAirportTooltip(route.getCurrentAirport());
     }
 
@@ -155,7 +161,7 @@ public class MainFlightController {
             return;
         }
 
-        flightHUD.updateData(step, selectedPlane, route);
+        flightHUD.updateData(gameData.currentPlayer, step, selectedPlane, route);
     }
 
     public void removePassengerGroup(PassengerType passengerType) {
@@ -166,7 +172,7 @@ public class MainFlightController {
             Route.BoarderPassenger passenger = passengers.get(i);
             if (passenger.getType() == passengerType && passenger.canBeRemoved()) {
                 if (route.removePassenger(i)) {
-                    flightHUD.updateData(step, selectedPlane, route);
+                    flightHUD.updateData(gameData.currentPlayer, step, selectedPlane, route);
                 }
                 break;
             }
@@ -175,6 +181,7 @@ public class MainFlightController {
 
     private void passFlight() {
         llh.sendRoutePass();
+        resetAll();
         uiManager.removeTooltip();
         uiManager.showSuccessWindow("Flight stage skipped.");
         clearUi();
@@ -187,8 +194,8 @@ public class MainFlightController {
             return;
         }
         if (route == null) return;
-
         llh.sendRouteResponse(route, finishStage);
+        resetAll();
         uiManager.removeTooltip();
         uiManager.showSuccessWindow("Flight request was sent to server.");
         clearUi();
@@ -200,9 +207,9 @@ public class MainFlightController {
             boolean flightUndone = route.undoFlight();
             if (flightUndone) {
                 setActiveFlightAirport(route.getCurrentAirport());
-                int linesCount = route.getLines().size();
-                if (route.getPassengers().size() > linesCount) step = Step.IN_FLIGHT;
-                else step = Step.CHOOSING_STARTING_AIRPORT;
+                if (route.getCurrentAirport() == firstFlightAirport) {
+                    step = Step.CHOOSING_STARTING_AIRPORT;
+                }
             } else resetAll();
         } else resetAll();
         uiManager.removeTooltip();

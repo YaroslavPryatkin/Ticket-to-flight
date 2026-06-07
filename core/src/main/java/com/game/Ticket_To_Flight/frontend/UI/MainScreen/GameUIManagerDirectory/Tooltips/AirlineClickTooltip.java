@@ -12,10 +12,12 @@ import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airline;
 import com.game.Ticket_To_Flight.frontend.LowLevelHandlerFront;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManager;
 import com.game.Ticket_To_Flight.frontend.components.buttons.RoundedButton;
+import com.game.Ticket_To_Flight.frontend.components.texts.WrappedText;
 import com.game.Ticket_To_Flight.frontend.components.windows.BaseGameWindow;
-import com.game.Ticket_To_Flight.frontend.components.texts.SingleLineText;
 
 public class AirlineClickTooltip extends BaseGameWindow implements MapTooltipWindow {
+    private static final float CONTENT_WIDTH = 570f;
+
     public AirlineClickTooltip(
         Skin skin,
         final GameUIManager uiManager,
@@ -26,7 +28,7 @@ public class AirlineClickTooltip extends BaseGameWindow implements MapTooltipWin
         boolean canBuyDuringCurrentStage,
         final LowLevelHandlerFront llh
     ) {
-        super("Route Details", skin, 560, 320);
+        super("Route Details", skin, 600, 320);
         pad(35);
         padTop(110);
         defaults().pad(8);
@@ -34,14 +36,16 @@ public class AirlineClickTooltip extends BaseGameWindow implements MapTooltipWin
         Table table = new Table();
         table.defaults().pad(10);
 
-        Label routeLabel = new SingleLineText(routeTitle(airline), skin);
+        Label routeLabel = new WrappedText(routeTitle(airline), skin, CONTENT_WIDTH);
         routeLabel.setColor(Color.CYAN);
-        table.add(routeLabel).colspan(2).padBottom(18).row();
+        table.add(routeLabel).width(CONTENT_WIDTH).colspan(2).padBottom(18).row();
 
-        table.add(new SingleLineText("Price: $" + airline.getPrice(), skin)).colspan(2).row();
+        Label priceLabel = new WrappedText("Price: $" + airline.getPrice(), skin, CONTENT_WIDTH);
+        table.add(priceLabel).width(CONTENT_WIDTH).colspan(2).row();
 
         if (airline.getPlayer() != null) {
-            table.add(new SingleLineText("Owned by: " + airline.getPlayer().getName(), skin)).colspan(2).row();
+            Label ownerLabel = new WrappedText("Owned by: " + airline.getPlayer().getName(), skin, CONTENT_WIDTH);
+            table.add(ownerLabel).width(CONTENT_WIDTH).colspan(2).row();
         } else {
             boolean canAfford = playerMoney >= airline.getPrice() && playerAP && isAvailable;
             boolean canBuyNow = canBuyDuringCurrentStage && canAfford;
@@ -71,7 +75,7 @@ public class AirlineClickTooltip extends BaseGameWindow implements MapTooltipWin
 
         add(table);
         pack();
-        setSize(Math.max(getWidth(), 560), Math.max(getHeight(), 320));
+        setSize(Math.max(getWidth(), 600), Math.max(getHeight(), 320));
     }
 
     private void configureBuyButton(TextButton button, boolean canBuyDuringCurrentStage, boolean canAfford) {
@@ -94,7 +98,7 @@ public class AirlineClickTooltip extends BaseGameWindow implements MapTooltipWin
     }
 
     private String routeTitle(Airline airline) {
-        return airline.getPortA().getCityName() + " -> " + airline.getPortB().getCityName();
+        return airline.getPortA().getCityName() + " - " + airline.getPortB().getCityName();
     }
 
     @Override

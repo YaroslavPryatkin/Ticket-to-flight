@@ -42,7 +42,7 @@ public class Route {
             ++amountOfStations;
             if (next.type.cityType.equals(type.typeTo)) {
                 if(myAirportVisited == 0){
-                    currentAmountOfPassengers-=type.size;
+                    currentTakenCapacity -=type.size;
                     currentSolvency-=type.solvency;
                 }
                 ++myAirportVisited;
@@ -55,7 +55,7 @@ public class Route {
             if (current.type.cityType.equals(type.typeTo)) {
                 --myAirportVisited;
                 if(myAirportVisited == 0){
-                    currentAmountOfPassengers+=type.size;
+                    currentTakenCapacity +=type.size;
                     currentSolvency+=type.solvency;
                 }
             }
@@ -84,7 +84,7 @@ public class Route {
     private Airport current;
     public final PlaneType plane;
     private int currentSolvency = 0;
-    private int currentAmountOfPassengers = 0;
+    private int currentTakenCapacity = 0;
     private double fuelSpent = 0;
     private final List<BoarderPassenger> passengers = new ArrayList<>();
     private final MapHolder<Airport, MapHolder<PassengerType, Integer>> boardedPerPort = new MapHolder<>();
@@ -112,7 +112,7 @@ public class Route {
             boardedPerPort.getOrDefault(current, new MapHolder<>()).getOrDefault(type, 0) < amount
         )
             return "Current airport does not have that passenger";
-        if (currentAmountOfPassengers + type.size * amount > plane.capacity)
+        if (currentTakenCapacity + type.size * amount > plane.capacity)
             return "Passenger's do not fit in the plane capacity.";
         if (!type.luxuryRange.contains(plane.luxury))
             return "Plane luxury does not fit passenger's desired luxury range.";
@@ -123,7 +123,7 @@ public class Route {
 
     private void unsafeAddPassenger(PassengerType type) {
         currentSolvency += type.solvency;
-        currentAmountOfPassengers += type.size;
+        currentTakenCapacity += type.size;
         passengers.add(new BoarderPassenger(type));
         boardedPerPort.computeIfAbsent(current.getId(), (k) -> new MapHolder<>());
         boardedPerPort.get(current).compute(type.getId(), (k, v) -> v == null ? 1 : v + 1);
@@ -250,7 +250,7 @@ public class Route {
         if (ind >= 0 && ind < passengers.size() && passengers.get(ind).canBeRemoved()) {
             PassengerType type = passengers.get(ind).type;
             currentSolvency -= type.solvency;
-            currentAmountOfPassengers -= type.size;
+            currentTakenCapacity -= type.size;
             boardedPerPort.get(current).compute(type.getId(), (k, v) -> { if (--v == 0) return null; else return v; });
             passengers.remove(ind);
             hasBeenUpdated=true;
@@ -370,5 +370,17 @@ public class Route {
             return true;
         }
         return false;
+    }
+
+    public double getRemainingFuel(){
+        return plane.fuel-fuelSpent;
+    }
+
+    public int getRemainingStations(){
+        return plane.stations-(lines.isEmpty() ? 0 : lines.size()-1);
+    }
+
+    public int getRemainingCapacity(){
+        return plane.capacity - currentTakenCapacity;
     }
 }

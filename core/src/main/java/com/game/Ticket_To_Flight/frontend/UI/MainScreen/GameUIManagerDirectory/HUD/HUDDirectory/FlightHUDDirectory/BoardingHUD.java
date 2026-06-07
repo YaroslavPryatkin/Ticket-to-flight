@@ -130,7 +130,7 @@ public class BoardingHUD extends AbstractFlightPanel {
                 contentTable.add(passengerList).width(CONTENT_WIDTH).fillX().expandX().padTop(8).row();
             }
             if (!hasPassengers) {
-                contentTable.add(new SingleLineText("No passenger groups suit all conditions to be boarded.", skin)).left().pad(15).row();
+                contentTable.add(new SingleLineText("No passenger groups here.", skin)).left().pad(15).row();
             }
 
             add(scrollPane).width(CONTENT_WIDTH).height(CONTENT_HEIGHT).padTop(10).row();
