@@ -2,6 +2,7 @@ package com.game.Ticket_To_Flight.backend.Handlers;
 
 import com.badlogic.gdx.math.Vector2;
 import com.game.Ticket_To_Flight.Utilities.MapHolder;
+import com.game.Ticket_To_Flight.Utilities.SetHolder;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airline;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airport;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Player;
@@ -18,8 +19,11 @@ import java.util.*;
 public class DataChangesCreator {
     private GameData.DataChanges dataChanges = new GameData.DataChanges();
     private final GameData gameData;
+    private final SetHolder<Player> bankrupts = new SetHolder<>();
 
     DataChangesCreator(GameData gameData) {this.gameData = gameData;}
+
+    SetHolder<Player> getBankrupts(){return bankrupts;}
 
     GameData.DataChanges takeDataChanges(){
         GameData.DataChanges res = this.dataChanges;
@@ -330,18 +334,6 @@ public class DataChangesCreator {
             -moneyLoss : v - moneyLoss);
     }
 
-    public void incomeGain(int incomeGain){
-        if(dataChanges.playerIncomeChange == null) dataChanges.playerIncomeChange=new HashMap<>();
-        dataChanges.playerIncomeChange.compute(gameData.currentPlayer, (k,v) -> (v==null) ?
-            incomeGain : v + incomeGain);
-    }
-
-    public void incomeLoss(int incomeLoss){
-        if(dataChanges.playerIncomeChange == null) dataChanges.playerIncomeChange=new HashMap<>();
-        dataChanges.playerIncomeChange.compute(gameData.currentPlayer, (k,v) -> (v==null) ?
-            -incomeLoss : v - incomeLoss);
-    }
-
     void incomeGainFromRoute(MapHolder<Player, Integer> changes){
         if(dataChanges.playerIncomeChange == null) dataChanges.playerIncomeChange=new HashMap<>();
         changes.forEach((player, amount)-> {
@@ -362,6 +354,34 @@ public class DataChangesCreator {
         }
     }
 
+
+    public void resetPlayersIfNeeded(){
+        bankrupts.clear();
+        for(Player pl : gameData.players)
+            if(pl.money + dataChanges.playerMoneyChange.getOrDefault(pl.getId(), 0) < 0){
+                resetPlayer(pl);
+                bankrupts.add(pl);
+            }
+    }
+    void resetPlayer(Player pl){
+        if(dataChanges.playerMoneyChange == null) dataChanges.playerMoneyChange=new HashMap<>();
+        if(dataChanges.playerIncomeChange == null) dataChanges.playerIncomeChange=new HashMap<>();
+        if(dataChanges.playerAmountOfSharesChange == null) dataChanges.playerAmountOfSharesChange=new HashMap<>();
+        if(dataChanges.playerPlanesChange == null) dataChanges.playerPlanesChange=new HashMap<>();
+        if(dataChanges.playerAirlinesToRemove == null) dataChanges.playerAirlinesToRemove=new HashMap<>();
+        dataChanges.playerMoneyChange.put(pl.getId(), -pl.money);
+        dataChanges.playerIncomeChange.put(pl.getId(), -pl.income);
+        dataChanges.playerAmountOfSharesChange.put(pl.getId(), -pl.amountOfShares);
+        Map<Integer,Integer> planes = new HashMap<>();
+        for(Map.Entry<Integer, Integer> e : pl.planes.entrySet())
+            planes.put(e.getKey(), -e.getValue());
+        dataChanges.playerPlanesChange.put(pl.getId(), planes);
+        Set<Integer> lines = new HashSet<>();
+        for(Airline line : pl.airlines)
+            lines.add(line.getId());
+        dataChanges.playerAirlinesToRemove.put(pl.getId(), lines);
+    }
+
     public void takeTaxesFromIncomeForEveryPlayer(){
         if(dataChanges.playerIncomeChange == null) dataChanges.playerIncomeChange=new HashMap<>();
         for(Player pl : gameData.players){
@@ -372,6 +392,7 @@ public class DataChangesCreator {
     }
 
     private int progressiveTaxationFunction(int income){
+        if(income <= 0) return 0;
         int frac = income/20;
         return frac*2;
     }

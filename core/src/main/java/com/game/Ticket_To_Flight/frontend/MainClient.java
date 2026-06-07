@@ -106,6 +106,10 @@ public class MainClient {
         worldMapRenderer.renderNoLogic(delta);
     }
 
+    public void bankruptcyMessage(){
+        //show notification
+    }
+
     public void gameDataWasUpdated(){
         worldMapRenderer.updateHUDData();
     }

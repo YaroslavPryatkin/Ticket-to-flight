@@ -96,6 +96,13 @@ public class LowLevelHandlerBack extends LowLevelHandler {
 
     }
 
+    private void sendToPlayer( Player pl, Network.GameMessage message){
+        Connection con = int2con.get(pl.getId());
+        if(con!=null){
+            addMessage(con, message);
+        }
+    }
+
    private boolean sendToAllPlayers(Network.GameMessage message) {
         boolean res = true;
         for (Connection con : int2con.values()) {
@@ -171,7 +178,11 @@ public class LowLevelHandlerBack extends LowLevelHandler {
     }
 
     public void finishTurnSuccessfully(){
-        if(!stateIterator.nextState()){
+        if(stateIterator.nextState()) {
+            for(Player pl : dataChangesCreator.getBankrupts())
+                sendToPlayer(pl, new Network.BankruptcyMessage());
+        }
+        else {
             sendToAllPlayers(new Network.GameFinishedMessage(GameFinisher.getRating(gameData)));
         }
     }

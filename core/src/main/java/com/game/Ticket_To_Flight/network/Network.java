@@ -60,6 +60,7 @@ public class Network {
         ErrorMessage.class,
         PlayerAuctionChoiceResponse.class,
         GameFinishedMessage.class,
+        BankruptcyMessage.class,
         Arrays.asList().getClass(),
         Collections.emptyList().getClass(),
         Collections.emptyMap().getClass(),
@@ -138,6 +139,10 @@ public class Network {
 
     public static class GameMessage{
         public GameMessage(){}
+    }
+
+    public static class BankruptcyMessage extends GameMessage{
+        public BankruptcyMessage(){};
     }
 
     public static class GameFinishedMessage extends GameMessage{

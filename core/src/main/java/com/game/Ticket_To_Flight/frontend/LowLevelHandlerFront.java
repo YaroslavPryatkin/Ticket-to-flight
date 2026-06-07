@@ -312,6 +312,9 @@ public class LowLevelHandlerFront extends LowLevelHandler {
             flags.gameFinishRating = ((Network.GameFinishedMessage) message).playerRating;
             //System.out.println("Received game finished message");
         }
+        else if(message instanceof Network.BankruptcyMessage){
+            mainClient.bankruptcyMessage();
+        }
         else throw new IllegalArgumentException("Unknown message");
     }
 

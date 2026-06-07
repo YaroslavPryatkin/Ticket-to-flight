@@ -18,7 +18,6 @@ import static com.game.Ticket_To_Flight.network.Network.FinishStatus.*;
 public class MainLogic extends MainLoopBack {
     private static MainLogic instance;
 
-
     public static synchronized MainLogic getInstance() {
         if (instance == null) {
             instance = new MainLogic();
@@ -61,6 +60,7 @@ public class MainLogic extends MainLoopBack {
                 else if(gameData.currentState == GameData.State.INCOME_AND_TAXES){
                     llh.dataChangesCreator.addIncomeToMoneyForEveryPlayer();
                     llh.dataChangesCreator.takeTaxesFromIncomeForEveryPlayer();
+                    llh.dataChangesCreator.resetPlayersIfNeeded();
                 }
                 llh.finishTurnSuccessfully();
             }
