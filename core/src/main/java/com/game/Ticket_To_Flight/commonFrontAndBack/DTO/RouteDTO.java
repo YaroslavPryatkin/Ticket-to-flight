@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class RouteDTO extends Identifiable {
+    private RouteDTO(){super(0); plane = null; startingPort = null; lines = null; passengers = null;}
     private static final AtomicInteger idGenerator = new AtomicInteger(0);
 
     private final Integer plane;

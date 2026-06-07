@@ -215,7 +215,6 @@ public class MainLogic extends MainLoopBack {
                 llh.sendWrongStateError();
             else {
                 if(resp.finishStatus == PASS){
-                    System.out.println("Passed");
                     llh.playerFinished();
                 }
                 else {

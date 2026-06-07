@@ -146,9 +146,12 @@ public class DataChangesCreator {
 
         for(Map.Entry<Integer, MapHolder<PassengerType, Integer>> e : changes.entrySet()){
             e.getValue().forEach(
-                (type,amount)-> dataChanges.airportPassengersChange.get(e.getKey()).merge(
+                (type,amount)-> {
+                    dataChanges.airportPassengersChange.computeIfAbsent(e.getKey(), k-> new HashMap<>());
+                    dataChanges.airportPassengersChange.get(e.getKey()).merge(
                         type, -amount, Integer::sum
-                )
+                    );
+                }
             );
 
         }
