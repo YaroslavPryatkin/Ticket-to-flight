@@ -11,6 +11,8 @@ import com.game.Ticket_To_Flight.Utilities.MapHolder;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airport;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.PassengerType;
 import com.game.Ticket_To_Flight.commonFrontAndBack.Route;
+import com.game.Ticket_To_Flight.frontend.components.details.AirportDetailsWidget;
+import com.game.Ticket_To_Flight.frontend.components.details.PassengerDetailsWidget;
 import com.game.Ticket_To_Flight.frontend.components.buttons.SelectButton;
 import com.game.Ticket_To_Flight.frontend.components.tables.expandable.ExpandableListWidget;
 import com.game.Ticket_To_Flight.frontend.components.tables.passenger.PassengerTableWidget;
@@ -18,7 +20,7 @@ import com.game.Ticket_To_Flight.frontend.components.tables.flight.AbstractFligh
 import com.game.Ticket_To_Flight.frontend.components.texts.SingleLineText;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +38,6 @@ public class BoardingHUD extends AbstractFlightPanel {
     private Route currentRoute;
     private MapHolder<PassengerType, Integer> currentGroups;
     private Consumer<PassengerType> onPassengerSelected;
-
 
     public BoardingHUD(Skin skin) {
         super(skin);
@@ -66,9 +67,8 @@ public class BoardingHUD extends AbstractFlightPanel {
     }
 
     public void updateData(Airport airport, Route route) {
-        if(route.renderingUpdate()) {
+        if (route.renderingUpdate()) {
             this.currentGroups = route.getSuitablePassengers();
-            //System.out.println("Updated rendering");
             this.currentAirport = airport;
             this.currentRoute = route;
             this.isInitialized = true;
@@ -90,13 +90,17 @@ public class BoardingHUD extends AbstractFlightPanel {
         add(buildHeader(headerTitle)).fillX().expandX().row();
 
         if (!isCollapsed && currentAirport != null) {
+
             List<ExpandableListWidget> activeLists = new ArrayList<>();
-            //System.out.println("Curret airport = " + (currentAirport ==  null ? "null" : currentAirport.airportName) + " amount of pass = " + currentGroups.size());
+            Map<ExpandableListWidget, PassengerType> passengerByList = new HashMap<>();
+            Table detailsTable = new Table();
+            detailsTable.top().left();
+
             Iterator<Map.Entry<PassengerType, Integer>> iterator = MapHolder.viewAsEntrySet(currentGroups);
             Map.Entry<PassengerType, Integer> e;
             boolean hasPassengers = false;
-            while((e=iterator.next())!=null){
-                hasPassengers=true;
+            while ((e = iterator.next()) != null) {
+                hasPassengers = true;
                 PassengerType type = e.getKey();
                 Integer amount = e.getValue();
 
@@ -106,22 +110,20 @@ public class BoardingHUD extends AbstractFlightPanel {
                     passengerWidget.passengerClass() + " (x" + amount + ")", skin);
                 passengerList.setPreferredWidth(CONTENT_WIDTH);
                 activeLists.add(passengerList);
+                passengerByList.put(passengerList, type);
 
                 SelectButton selectButton = createSelectButton(type);
                 passengerList.addHeaderActor(selectButton, 160f, 55f);
-
-                Table passengerContent = passengerList.getContentTable();
-                addPassengerRow(passengerContent, "To", passengerWidget.cityTo());
-                addPassengerRow(passengerContent, "Persons", passengerWidget.persons());
-                addPassengerRow(passengerContent, "Reward", passengerWidget.reward());
 
                 passengerList.setCallbacks(
                     () -> {
                         for (ExpandableListWidget other : activeLists) {
                             if (other != passengerList) other.collapse();
                         }
+                        refreshPassengerDetails(detailsTable, activeLists, passengerByList);
                     },
                     () -> {
+                        refreshPassengerDetails(detailsTable, activeLists, passengerByList);
                         invalidateHierarchy();
                         contentTable.layout();
                         scrollPane.layout();
@@ -129,14 +131,35 @@ public class BoardingHUD extends AbstractFlightPanel {
                 );
                 contentTable.add(passengerList).width(CONTENT_WIDTH).fillX().expandX().padTop(8).row();
             }
+
             if (!hasPassengers) {
                 contentTable.add(new SingleLineText("No passenger groups here.", skin)).left().pad(15).row();
+            } else {
+                contentTable.add(detailsTable).width(CONTENT_WIDTH).fillX().padTop(12).row();
             }
 
             add(scrollPane).width(CONTENT_WIDTH).height(CONTENT_HEIGHT).padTop(10).row();
         }
 
         if (screenWidth > 0 && currentTopY > 0) recalculatePosition();
+    }
+
+    private void refreshPassengerDetails(
+        Table detailsTable,
+        List<ExpandableListWidget> activeLists,
+        Map<ExpandableListWidget, PassengerType> passengerByList
+    ) {
+        detailsTable.clearChildren();
+
+        for (ExpandableListWidget listWidget : activeLists) {
+            if (listWidget.isExpanded()) {
+                PassengerType type = passengerByList.get(listWidget);
+                if (type != null) {
+                    PassengerDetailsWidget.fill(detailsTable, skin, type);
+                }
+                return;
+            }
+        }
     }
 
     public void layoutFor(float width, float height, float topY) {
@@ -166,11 +189,5 @@ public class BoardingHUD extends AbstractFlightPanel {
         button.setDisabled(!canAdd);
         button.getLabel().setColor(canAdd ? Color.WHITE : Color.DARK_GRAY);
         return button;
-    }
-
-    private void addPassengerRow(Table table, String label, String value) {
-        SingleLineText row = new SingleLineText(label + ": " + value, skin);
-        row.setColor(Color.LIGHT_GRAY);
-        table.add(row).left().padBottom(4).row();
     }
 }

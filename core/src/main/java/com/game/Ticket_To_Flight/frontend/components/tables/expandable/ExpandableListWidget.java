@@ -98,4 +98,8 @@ public class ExpandableListWidget extends Table {
             if (onToggleCallback != null) onToggleCallback.run();
         }
     }
+
+    public boolean isExpanded() {
+        return isExpanded;
+    }
 }

@@ -4,6 +4,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.PlaneType;
 import com.game.Ticket_To_Flight.commonFrontAndBack.Route;
+import com.game.Ticket_To_Flight.frontend.components.details.PlaneDetailsWidget;
 import com.game.Ticket_To_Flight.frontend.components.tables.flight.AbstractFlightPanel;
 import com.game.Ticket_To_Flight.frontend.components.texts.SingleLineText;
 
@@ -55,26 +56,13 @@ public class PlaneHUD extends AbstractFlightPanel {
             if (currentPlane == null) {
                 content.add(new SingleLineText("No plane selected", skin)).right().row();
             } else {
-                if(route == null) {
-                    addRow(content, "fuel", String.valueOf(currentPlane.fuel));
-                    addRow(content, "stations", String.valueOf(currentPlane.stations));
-                    addRow(content, "luxury", String.valueOf(currentPlane.luxury));
-                    addRow(content, "capacity", String.valueOf(currentPlane.capacity));
-                    addRow(content, "gateRange", formatInterval(currentPlane.gateRange.getFrom(), currentPlane.gateRange.getTo()));
-                    addRow(content, "distRange", formatInterval(currentPlane.distRange.getFrom(), currentPlane.distRange.getTo()));
-                    addRow(content, "price", "$" + currentPlane.price);
-                    addRow(content, "description", currentPlane.description);
-                }
-                else{
-                    addRow(content, "fuel", route.getRemainingFuel() + "/" + currentPlane.fuel );
-                    addRow(content, "stations", route.getRemainingStations() + "/" + currentPlane.stations);
-                    addRow(content, "luxury", String.valueOf(currentPlane.luxury));
-                    addRow(content, "capacity", route.getRemainingCapacity() + "/" + currentPlane.capacity);
-                    addRow(content, "gateRange", formatInterval(currentPlane.gateRange.getFrom(), currentPlane.gateRange.getTo()));
-                    addRow(content, "distRange", formatInterval(currentPlane.distRange.getFrom(), currentPlane.distRange.getTo()));
-                    addRow(content, "price", "$" + currentPlane.price);
-                    addRow(content, "description", currentPlane.description);
-                }
+                PlaneDetailsWidget.fill(
+                    content,
+                    skin,
+                    currentPlane,
+                    route,
+                    PlaneDetailsWidget.Align.RIGHT
+                );
             }
             add(content).right().padTop(10).row();
         }
@@ -94,15 +82,5 @@ public class PlaneHUD extends AbstractFlightPanel {
         pack();
         setWidth(Math.max(getWidth(), 520));
         setPosition(screenWidth - getWidth() - 20, currentTopY - getHeight() - 14);
-    }
-
-    private void addRow(Table table, String label, String value) {
-        table.add(new SingleLineText(label + ": " + value, skin)).right().padBottom(8).row();
-    }
-
-    private <T> String formatInterval(T from, T to) {
-        String left = from == null ? "-inf" : from.toString();
-        String right = to == null ? "+inf" : to.toString();
-        return "[" + left + ", " + right + "]";
     }
 }

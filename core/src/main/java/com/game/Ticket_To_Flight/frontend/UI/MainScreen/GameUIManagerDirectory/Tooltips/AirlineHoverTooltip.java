@@ -4,21 +4,16 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airline;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.AirlineType;
 import com.game.Ticket_To_Flight.frontend.components.texts.WrappedText;
+import com.game.Ticket_To_Flight.frontend.components.windows.BaseHoverTooltip;
 
-public class AirlineHoverTooltip extends Window {
+public class AirlineHoverTooltip extends BaseHoverTooltip {
     private static final float CONTENT_WIDTH = 580f;
 
     public AirlineHoverTooltip(Skin skin, Airline airline) {
         super("Airline", skin);
-        top().left();
-        setMovable(false);
-        getColor().a = 0.85f;
-        pad(30);
-        padTop(70);
 
         Table content = new Table();
         content.top().left();

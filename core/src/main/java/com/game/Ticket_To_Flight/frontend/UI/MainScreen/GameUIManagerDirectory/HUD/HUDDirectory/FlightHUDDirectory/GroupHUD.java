@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airport;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.PassengerType;
 import com.game.Ticket_To_Flight.commonFrontAndBack.Route;
+import com.game.Ticket_To_Flight.frontend.components.details.PassengerDetailsWidget;
 import com.game.Ticket_To_Flight.frontend.components.buttons.SelectButton;
 import com.game.Ticket_To_Flight.frontend.components.tables.expandable.ExpandableListWidget;
 import com.game.Ticket_To_Flight.frontend.components.tables.passenger.PassengerTableWidget;
@@ -126,9 +127,7 @@ public class GroupHUD extends AbstractFlightPanel {
                 listWidget.addHeaderActor(deleteBtn, 160f, 55f);
 
                 Table passengerContent = listWidget.getContentTable();
-                addPassengerRow(passengerContent, "To", ptWidget.cityTo());
-                addPassengerRow(passengerContent, "Persons", ptWidget.persons());
-                addPassengerRow(passengerContent, "Reward", ptWidget.reward());
+                PassengerDetailsWidget.fill(passengerContent, skin, pt);
 
                 listWidget.setCallbacks(
                     () -> { for (ExpandableListWidget other : activeLists) if (other != listWidget) other.collapse(); },
@@ -156,12 +155,6 @@ public class GroupHUD extends AbstractFlightPanel {
         button.setDisabled(!canRemove);
         button.getLabel().setColor(canRemove ? new Color(1f, 0.4f, 0.4f, 1f) : Color.DARK_GRAY);
         return button;
-    }
-
-    private void addPassengerRow(Table table, String label, String value) {
-        SingleLineText row = new SingleLineText(label + ": " + value, skin);
-        row.setColor(Color.LIGHT_GRAY);
-        table.add(row).left().padBottom(4).row();
     }
 
     public void layoutFor(float width, float height, float topY) {

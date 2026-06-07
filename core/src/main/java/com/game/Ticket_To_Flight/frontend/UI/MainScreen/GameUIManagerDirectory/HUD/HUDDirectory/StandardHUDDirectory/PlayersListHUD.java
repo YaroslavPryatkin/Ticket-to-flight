@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -13,6 +14,7 @@ import com.game.Ticket_To_Flight.backend.gameLogicEntities.Player;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.PlaneType;
 import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
 import com.game.Ticket_To_Flight.frontend.LowLevelHandlerFront;
+import com.game.Ticket_To_Flight.frontend.components.details.PlaneDetailsWidget;
 import com.game.Ticket_To_Flight.frontend.components.subsidiary.ComponentHover;
 import com.game.Ticket_To_Flight.frontend.components.background.SolidRectangleBackground;
 import com.game.Ticket_To_Flight.frontend.components.tables.expandable.ExpandableListWidget;
@@ -28,7 +30,8 @@ import java.util.Map;
 public class PlayersListHUD extends Table {
     private static final float FIXED_WIDTH = 650f;
     private static final float INNER_WIDTH = FIXED_WIDTH - 30f;
-    private static final float PLANE_STAT_LEFT_PADDING = 15f;
+
+    private static final float MAX_HEIGHT = 550f;
 
     private final GameData gameData;
     private final LowLevelHandlerFront llh;
@@ -65,7 +68,7 @@ public class PlayersListHUD extends Table {
             }
         });
 
-        add(scrollPane).expandY().fillY().width(FIXED_WIDTH).top().left();
+        add(scrollPane).width(FIXED_WIDTH).maxHeight(MAX_HEIGHT).top().left();
     }
 
     public void updateData() {
@@ -83,6 +86,8 @@ public class PlayersListHUD extends Table {
                 new Color(0.2f, 0.4f, 0.8f, 0.9f)
             );
             playerRow.left().pad(15);
+
+            playerRow.setTouchable(Touchable.enabled);
 
             Table header = new Table();
             Label nameLabel = new SingleLineText(p.getName(), skin);
@@ -135,12 +140,7 @@ public class PlayersListHUD extends Table {
                     nestedPlaneLists.add(singlePlaneExpand);
 
                     Table ptContent = singlePlaneExpand.getContentTable();
-                    addPlaneStat(ptContent, "Fuel", String.valueOf(pt.fuel));
-                    addPlaneStat(ptContent, "Stations", String.valueOf(pt.stations));
-                    addPlaneStat(ptContent, "Luxury", String.valueOf(pt.luxury));
-                    addPlaneStat(ptContent, "Capacity", String.valueOf(pt.capacity));
-                    addPlaneStat(ptContent, "Gate Range", formatInterval(pt.gateRange.getFrom(), pt.gateRange.getTo()));
-                    addPlaneStat(ptContent, "Dist Range", formatInterval(pt.distRange.getFrom(), pt.distRange.getTo()));
+                    PlaneDetailsWidget.fill(ptContent, skin, pt);
 
                     singlePlaneExpand.setCallbacks(
                         () -> {
@@ -181,18 +181,6 @@ public class PlayersListHUD extends Table {
 
             contentTable.add(playerRow).width(FIXED_WIDTH).padBottom(10).left().row();
         }
-    }
-
-    private void addPlaneStat(Table table, String label, String value) {
-        Label statLabel = new SingleLineText(label + ": " + value, skin);
-        statLabel.setColor(Color.LIGHT_GRAY);
-        table.add(statLabel).left().padLeft(PLANE_STAT_LEFT_PADDING).padBottom(3).row();
-    }
-
-    private <T> String formatInterval(T from, T to) {
-        String left = from == null ? "-inf" : from.toString();
-        String right = to == null ? "+inf" : to.toString();
-        return "[" + left + ", " + right + "]";
     }
 
     @Override

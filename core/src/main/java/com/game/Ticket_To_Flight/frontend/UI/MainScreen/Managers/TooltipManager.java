@@ -19,6 +19,7 @@ import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.T
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.Tooltips.MapTooltipWindow;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.MapInput.MapSelectionState;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.game.Ticket_To_Flight.frontend.components.windows.BaseHoverTooltip;
 import com.game.Ticket_To_Flight.frontend.components.subsidiary.ComponentHover;
 
 public class TooltipManager {
@@ -33,7 +34,7 @@ public class TooltipManager {
 
     private MapTooltipWindow currentTooltip;
     private Airline currentClickAirline;
-    private Window hoverTooltip;
+    private BaseHoverTooltip hoverTooltip;
     private Airport hoverAirport;
     private Airline hoverAirline;
 
