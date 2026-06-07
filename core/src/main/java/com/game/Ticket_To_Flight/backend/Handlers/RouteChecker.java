@@ -32,13 +32,21 @@ public class RouteChecker {
         for(Integer lineId : dto.getLines()){
 
             Airport cur = rt.getCurrentAirport();
-            for(Map.Entry<Integer, Integer> e : dto.getPassengers().get(cur.getId()).entrySet()){
-                PassengerType type = StaticGameData.passengerTypes.get(e.getKey());
-                if(type == null) {rt = null; return false;}
-                for(int i=0;i<e.getValue();++i){
-                    if(rt.addPassenger(type)!=null) {
-                        rt = null;
-                        return false;
+            if(cur!=null) {
+                Map<Integer, Integer> bardingMap = dto.getPassengers().get(cur.getId());
+                if (bardingMap != null) {
+                    for (Map.Entry<Integer, Integer> e : bardingMap.entrySet()) {
+                        PassengerType type = StaticGameData.passengerTypes.get(e.getKey());
+                        if (type == null) {
+                            rt = null;
+                            return false;
+                        }
+                        for (int i = 0; i < e.getValue(); ++i) {
+                            if (rt.addPassenger(type) != null) {
+                                rt = null;
+                                return false;
+                            }
+                        }
                     }
                 }
             }

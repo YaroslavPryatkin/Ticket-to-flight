@@ -64,12 +64,12 @@ public class AirportPassengerTableWidget extends AbstractPassengerTableWidget {
             selectBtn.setDisabled(true);
             selectBtn.getLabel().setColor(Color.DARK_GRAY);
         } else if (route != null) {
-            boolean canAdd;
-            try {
-                canAdd = (route.checkPassengerAdding(passengerType, selectedPassengers) == null);
-            } catch (Exception e) {
-                canAdd = false;
-            }
+            boolean canAdd = true;
+//            try {
+//                canAdd = (route.checkPassengerAdding(passengerType, selectedPassengers) == null);
+//            } catch (Exception e) {
+//                canAdd = false;
+//            }
 
             if (!canAdd) {
                 selectBtn.setDisabled(true);
@@ -113,12 +113,12 @@ public class AirportPassengerTableWidget extends AbstractPassengerTableWidget {
         for (ButtonRecord record : buttonRecords) {
             if (record.isSelected) continue;
 
-            boolean canAdd;
-            try {
-                canAdd = (route.checkPassengerAdding(record.passengerType, selectedPassengers) == null);
-            } catch (Exception e) {
-                canAdd = false;
-            }
+            boolean canAdd = true;
+//            try {
+//                canAdd = (route.checkPassengerAdding(record.passengerType, selectedPassengers) == null);
+//            } catch (Exception e) {
+//                canAdd = false;
+//            }
 
             if (!canAdd) {
                 record.button.setDisabled(true);

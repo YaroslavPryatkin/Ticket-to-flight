@@ -11,7 +11,6 @@ import com.game.Ticket_To_Flight.Utilities.MapHolder;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airport;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.PassengerType;
 import com.game.Ticket_To_Flight.commonFrontAndBack.Route;
-import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.Flights.MainFlightController;
 import com.game.Ticket_To_Flight.frontend.components.buttons.SelectButton;
 import com.game.Ticket_To_Flight.frontend.components.tables.expandable.ExpandableListWidget;
 import com.game.Ticket_To_Flight.frontend.components.tables.passenger.PassengerTableWidget;
@@ -19,6 +18,7 @@ import com.game.Ticket_To_Flight.frontend.components.tables.flight.AbstractFligh
 import com.game.Ticket_To_Flight.frontend.components.texts.SingleLineText;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -34,8 +34,9 @@ public class BoardingHUD extends AbstractFlightPanel {
     private float currentTopY = 0;
     private Airport currentAirport;
     private Route currentRoute;
-    private List<MainFlightController.ChosenGroup> currentGroups;
+    private MapHolder<PassengerType, Integer> currentGroups;
     private Consumer<PassengerType> onPassengerSelected;
+
 
     public BoardingHUD(Skin skin) {
         super(skin);
@@ -64,18 +65,16 @@ public class BoardingHUD extends AbstractFlightPanel {
         this.onPassengerSelected = onPassengerSelected;
     }
 
-    public void updateData(Airport airport, Route route, List<MainFlightController.ChosenGroup> chosenGroups) {
-        this.currentGroups = chosenGroups;
+    public void updateData(Airport airport, Route route) {
+        if(route.renderingUpdate()) {
+            this.currentGroups = route.getSuitablePassengers();
+            //System.out.println("Updated rendering");
+            this.currentAirport = airport;
+            this.currentRoute = route;
+            this.isInitialized = true;
 
-        if (this.currentAirport == airport && this.currentRoute == route && this.isInitialized) {
-            return;
+            renderContent();
         }
-
-        this.currentAirport = airport;
-        this.currentRoute = route;
-        this.isInitialized = true;
-
-        renderContent();
     }
 
     public void forceUpdate() {
@@ -91,36 +90,24 @@ public class BoardingHUD extends AbstractFlightPanel {
         add(buildHeader(headerTitle)).fillX().expandX().row();
 
         if (!isCollapsed && currentAirport != null) {
-            Iterator<Map.Entry<PassengerType, Integer>> iterator = MapHolder.viewAsEntrySet(currentAirport.getGuests());
             List<ExpandableListWidget> activeLists = new ArrayList<>();
+            //System.out.println("Curret airport = " + (currentAirport ==  null ? "null" : currentAirport.airportName) + " amount of pass = " + currentGroups.size());
+            Iterator<Map.Entry<PassengerType, Integer>> iterator = MapHolder.viewAsEntrySet(currentGroups);
+            Map.Entry<PassengerType, Integer> e;
             boolean hasPassengers = false;
+            while((e=iterator.next())!=null){
+                hasPassengers=true;
+                PassengerType type = e.getKey();
+                Integer amount = e.getValue();
 
-            while (iterator.hasNext()) {
-                Map.Entry<PassengerType, Integer> entry = iterator.next();
-                if (entry == null || entry.getValue() <= 0) continue;
+                PassengerTableWidget passengerWidget = new PassengerTableWidget(type);
 
-                PassengerType passenger = entry.getKey();
-
-                int takenAmount = 0;
-                if (currentGroups != null) {
-                    for (MainFlightController.ChosenGroup group : currentGroups) {
-                        if (group.airport.equals(currentAirport) && group.passengerType.equals(passenger)) {
-                            takenAmount++;
-                        }
-                    }
-                }
-
-                int remaining = entry.getValue() - takenAmount;
-                if (remaining <= 0) continue;
-
-                hasPassengers = true;
-                PassengerTableWidget passengerWidget = new PassengerTableWidget(passenger);
-
-                ExpandableListWidget passengerList = new ExpandableListWidget(passengerWidget.passengerClass() + " (x" + remaining + ")", skin);
+                ExpandableListWidget passengerList = new ExpandableListWidget(
+                    passengerWidget.passengerClass() + " (x" + amount + ")", skin);
                 passengerList.setPreferredWidth(CONTENT_WIDTH);
                 activeLists.add(passengerList);
 
-                SelectButton selectButton = createSelectButton(passenger);
+                SelectButton selectButton = createSelectButton(type);
                 passengerList.addHeaderActor(selectButton, 160f, 55f);
 
                 Table passengerContent = passengerList.getContentTable();
@@ -140,12 +127,10 @@ public class BoardingHUD extends AbstractFlightPanel {
                         scrollPane.layout();
                     }
                 );
-
                 contentTable.add(passengerList).width(CONTENT_WIDTH).fillX().expandX().padTop(8).row();
             }
-
             if (!hasPassengers) {
-                contentTable.add(new SingleLineText("No passengers waiting here", skin)).left().pad(15).row();
+                contentTable.add(new SingleLineText("No passenger groups suit all conditions to be boarded.", skin)).left().pad(15).row();
             }
 
             add(scrollPane).width(CONTENT_WIDTH).height(CONTENT_HEIGHT).padTop(10).row();
@@ -164,7 +149,7 @@ public class BoardingHUD extends AbstractFlightPanel {
     @Override
     protected void recalculatePosition() {
         pack();
-        setWidth(Math.max(getWidth(), 820)); // Выравниваем ширину с GroupHUD
+        setWidth(Math.max(getWidth(), 820));
         float x = screenWidth - getWidth() - 20;
         float y = currentTopY - getHeight() - 14;
         x = Math.max(20, x);
@@ -177,7 +162,7 @@ public class BoardingHUD extends AbstractFlightPanel {
             if (onPassengerSelected != null) onPassengerSelected.accept(passenger);
         });
 
-        boolean canAdd = currentRoute != null && currentRoute.checkPassengerAdding(passenger) == null;
+        boolean canAdd = currentRoute != null && currentRoute.checkPassengerAdding(passenger, 1) == null;
         button.setDisabled(!canAdd);
         button.getLabel().setColor(canAdd ? Color.WHITE : Color.DARK_GRAY);
         return button;
