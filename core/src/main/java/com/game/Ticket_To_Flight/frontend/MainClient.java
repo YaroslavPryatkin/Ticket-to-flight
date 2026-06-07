@@ -70,19 +70,33 @@ public class MainClient {
                 }
             } else if (gameData.currentState == GameData.State.PLANES && llh.getMyId() == gameData.currentPlayer) {
                 if (llh.getCurrentStateState() == Flags.CurrentStateState.PLAYER_STAGE) {
-                    if (worldMapRenderer.drawPlaneWindow()) {
+                    if (gameData.players.get(gameData.currentPlayer).actionPoints <= 0) {
+                        llh.sendPlanePass();
+                        worldMapRenderer.drawSuccessWindow("You are out of Action Points.\n You can not buy a plane.\nAutomatically Passing");
+                        llh.setWaitingForPlayerChoiceFlag();
+                    }
+                    else if(worldMapRenderer.drawPlaneWindow()) {
                         llh.setWaitingForPlayerChoiceFlag();
                     }
                 }
             } else if (gameData.currentState == GameData.State.AIRLINES && llh.getMyId() == gameData.currentPlayer) {
                 if (llh.getCurrentStateState() == Flags.CurrentStateState.PLAYER_STAGE) {
-                    worldMapRenderer.drawSuccessWindow("Your turn. Buy the airline.");
+                    if (gameData.players.get(gameData.currentPlayer).actionPoints <= 0) {
+                        llh.sendAirlinePass();
+                        worldMapRenderer.drawSuccessWindow("You are out of Action Points.\n You can not buy an airline.\nAutomatically Passing");
+                    }
+                    else
+                        worldMapRenderer.drawSuccessWindow("Your turn. Buy the airline.");
                     llh.setWaitingForPlayerChoiceFlag();
                 }
             } else if (gameData.currentState == GameData.State.EVENT && llh.getMyId() == gameData.currentPlayer) {
                 //mainDrawer.eventWindow();
             } else if (gameData.currentState == GameData.State.FLIGHTS && llh.getMyId() == gameData.currentPlayer) {
                 if (llh.getCurrentStateState() == Flags.CurrentStateState.PLAYER_STAGE) {
+                    if (gameData.players.get(gameData.currentPlayer).actionPoints <= 0) {
+                        llh.sendRoutePass();
+                        worldMapRenderer.drawSuccessWindow("You are out of Action Points.\n You can not make a route.\nAutomatically Passing");
+                    }
                     llh.setWaitingForPlayerChoiceFlag();
                 }
             } else if (gameData.currentState == GameData.State.INCOME_AND_TAXES && llh.getMyId() == gameData.currentPlayer) {

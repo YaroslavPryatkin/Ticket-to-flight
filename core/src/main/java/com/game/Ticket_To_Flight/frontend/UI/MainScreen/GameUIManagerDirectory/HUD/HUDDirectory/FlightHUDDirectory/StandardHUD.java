@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.game.Ticket_To_Flight.Utilities.MapHolder;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Player;
 import com.game.Ticket_To_Flight.commonFrontAndBack.Route;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.Flights.MainFlightController;
@@ -40,7 +41,7 @@ public class StandardHUD extends Table {
         finishBtn = new RoundedButton("Finish Flight", skin);
         finishAndPassBtn = new RoundedButton("Finish Flight and Pass", skin);
 
-        passBtn.getLabel().setColor(Color.RED);
+        passBtn.setColor(Color.RED);
 
         addActor(summaryTable);
         addActor(passBtn);
@@ -74,9 +75,9 @@ public class StandardHUD extends Table {
         });
     }
 
-    public void updateData(MainFlightController.Step step, Route route) {
+    public void updateData(Integer currentPlayer, MainFlightController.Step step, Route route) {
         summaryTable.clearChildren();
-        summaryTable.add(new SingleLineText("Possible Income: " + formatPossibleIncome(route), skin)).right().padBottom(15).row();
+        summaryTable.add(new SingleLineText("Possible Income: " + formatPossibleIncome(currentPlayer, route), skin)).right().padBottom(15).row();
         summaryTable.add(new SingleLineText("Step: " + getStepText(step), skin)).right().padBottom(15).row();
 
         boolean selectingPlane = step == MainFlightController.Step.SELECT_PLANE;
@@ -140,16 +141,13 @@ public class StandardHUD extends Table {
         return summaryTable.getY();
     }
 
-    private String formatPossibleIncome(Route route) {
+    private String formatPossibleIncome(Integer currentPlayer, Route route) {
         if (route == null) return "$0";
 
         int total = 0;
-        Iterator<Map.Entry<Player, Integer>> iterator = route.getIncomeChangeIterator();
-        Map.Entry<Player, Integer> entry;
-        while ((entry = iterator.next()) != null) {
-            total += entry.getValue();
-        }
-        return "$" + total;
+        MapHolder<Player, Integer> mp = route.getIncomeChange();
+        Integer k = mp.get(currentPlayer);
+        return "$" + ((k == null) ? 0 : k);
     }
 
     private String getStepText(MainFlightController.Step step) {

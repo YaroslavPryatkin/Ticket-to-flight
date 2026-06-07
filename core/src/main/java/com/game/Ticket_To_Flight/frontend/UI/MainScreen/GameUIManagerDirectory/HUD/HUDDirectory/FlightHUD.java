@@ -8,6 +8,7 @@ import java.util.function.Consumer;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airport; // Не забудьте импорт, если используете переменную
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.PlaneType;
+import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
 import com.game.Ticket_To_Flight.commonFrontAndBack.Route;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.Flights.MainFlightController;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.HUD.HUDDirectory.FlightHUDDirectory.BoardingHUD;
@@ -51,10 +52,9 @@ public class FlightHUD extends Table {
         groupHUD.forceUpdate();
     }
 
-    public void updateData(MainFlightController.Step step, PlaneType plane, Route route) {
-        standardHUD.updateData(step, route);
+    public void updateData(Integer playerId, MainFlightController.Step step, PlaneType plane, Route route) {
+        standardHUD.updateData(playerId, step, route);
         planeHUD.updateData(plane, route);
-        System.out.println("Updating" + step);
         if(step == MainFlightController.Step.IN_FLIGHT) {
             groupHUD.updateData(route);
             Airport currentAirport = route.getCurrentAirport();

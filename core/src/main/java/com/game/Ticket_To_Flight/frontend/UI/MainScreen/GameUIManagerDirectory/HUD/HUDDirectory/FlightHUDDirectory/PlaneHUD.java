@@ -12,13 +12,35 @@ public class PlaneHUD extends AbstractFlightPanel {
     private float currentTopY = 0;
     private Route route;
 
+    private double lastFuel = -1;
+    private int lastStations = -1;
+    private int lastCapacity = -1;
+
     public PlaneHUD(Skin skin) {
         super(skin);
     }
 
     public void updateData(PlaneType plane, Route route) {
-        this.route = route;
+        double currentFuel = route != null ? route.getRemainingFuel() : -1;
+        int currentStations = route != null ? route.getRemainingStations() : -1;
+        int currentCapacity = route != null ? route.getRemainingCapacity() : -1;
+
+        if (this.currentPlane == plane &&
+            this.route == route &&
+            this.lastFuel == currentFuel &&
+            this.lastStations == currentStations &&
+            this.lastCapacity == currentCapacity &&
+            this.isInitialized) {
+            return;
+        }
+
         this.currentPlane = plane;
+        this.route = route;
+        this.lastFuel = currentFuel;
+        this.lastStations = currentStations;
+        this.lastCapacity = currentCapacity;
+        this.isInitialized = true;
+
         renderContent();
     }
 

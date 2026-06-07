@@ -13,7 +13,7 @@ import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.PassengerTy
 import com.game.Ticket_To_Flight.frontend.components.tables.expandable.ExpandableListWidget;
 import com.game.Ticket_To_Flight.frontend.components.tables.passenger.PassengerTableWidget;
 import com.game.Ticket_To_Flight.frontend.components.subsidiary.ComponentHover;
-import com.game.Ticket_To_Flight.frontend.components.texts.SingleLineText;
+import com.game.Ticket_To_Flight.frontend.components.texts.WrappedText;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 public class AirportHoverTooltip extends Window {
-    private static final float CONTENT_WIDTH = 650f;
+    private static final float CONTENT_WIDTH = 600f;
     private static final float CONTENT_MAX_HEIGHT = 430f;
     private final ScrollPane scrollPane;
 
@@ -37,15 +37,15 @@ public class AirportHoverTooltip extends Window {
         content.top().left();
         content.defaults().left().padBottom(8);
 
-        Label cityLabel = new SingleLineText(airport.getCityName(), skin);
+        Label cityLabel = new WrappedText(airport.getCityName(), skin, CONTENT_WIDTH);
         cityLabel.setColor(Color.CYAN);
-        content.add(cityLabel).left().row();
+        content.add(cityLabel).width(CONTENT_WIDTH).left().row();
 
         AirportType type = airport.type;
-        addRow(content, skin, "City type", type.getCityType());
-        addRow(content, skin, "Description", type.description);
-        addRow(content, skin, "Cost", "$" + type.cost);
-        addRow(content, skin, "Available gates", String.valueOf(airport.getFreeGates()) + "/" + String.valueOf(type.gateAmount));
+        addRow(content, skin, "City type", type.getCityType(), CONTENT_WIDTH);
+        addRow(content, skin, "Description", type.description, CONTENT_WIDTH);
+        addRow(content, skin, "Cost", "$" + type.cost, CONTENT_WIDTH);
+        addRow(content, skin, "Available gates", String.valueOf(airport.getFreeGates()) + "/" + String.valueOf(type.gateAmount), CONTENT_WIDTH);
 
         scrollPane = new ScrollPane(content, skin);
         scrollPane.setFadeScrollBars(false);
@@ -62,6 +62,8 @@ public class AirportHoverTooltip extends Window {
         List<ExpandableListWidget> activeLists = new ArrayList<>();
         boolean hasPassengers = false;
 
+        float passengerListWidth = CONTENT_WIDTH - 30f;
+
         while (iterator.hasNext()) {
             Map.Entry<PassengerType, Integer> entry = iterator.next();
             if (entry == null || entry.getValue() <= 0) continue;
@@ -70,13 +72,21 @@ public class AirportHoverTooltip extends Window {
             PassengerType passenger = entry.getKey();
             PassengerTableWidget passengerWidget = new PassengerTableWidget(passenger);
             ExpandableListWidget passengerList = new ExpandableListWidget(passengerWidget.passengerClass() + " (x" + entry.getValue() + ")", skin);
-            passengerList.setPreferredWidth(CONTENT_WIDTH - 30f);
+            passengerList.setPreferredWidth(passengerListWidth);
             activeLists.add(passengerList);
 
             Table passengerContent = passengerList.getContentTable();
-            addRow(passengerContent, skin, "To", passengerWidget.cityTo());
-            addRow(passengerContent, skin, "Persons", passengerWidget.persons());
-            addRow(passengerContent, skin, "Reward", passengerWidget.reward());
+
+            addRow(passengerContent, skin, "To", passengerWidget.cityTo(), passengerListWidth);
+            addRow(passengerContent, skin, "Persons", passengerWidget.persons(), passengerListWidth);
+            addRow(passengerContent, skin, "Reward", passengerWidget.reward(), passengerListWidth);
+
+            addRow(passengerContent, skin, "Solvency", String.valueOf(passenger.solvency), passengerListWidth);
+            addRow(passengerContent, skin, "Luxury range", formatInterval(passenger.luxuryRange.getFrom(), passenger.luxuryRange.getTo()), passengerListWidth);
+            addRow(passengerContent, skin, "Yield range", formatInterval(passenger.yieldRange.getFrom(), passenger.yieldRange.getTo()), passengerListWidth);
+            addRow(passengerContent, skin, "Capacity range", formatInterval(passenger.capacityRange.getFrom(), passenger.capacityRange.getTo()), passengerListWidth);
+            addRow(passengerContent, skin, "Stations range", formatInterval(passenger.stationsRange.getFrom(), passenger.stationsRange.getTo()), passengerListWidth);
+            addRow(passengerContent, skin, "Description", passenger.description, passengerListWidth);
 
             addExtraPassengerUI(passengerContent, passenger, skin);
 
@@ -92,18 +102,24 @@ public class AirportHoverTooltip extends Window {
                 }
             );
 
-            table.add(passengerList).width(CONTENT_WIDTH - 30f).fillX().expandX().padTop(8).row();
+            table.add(passengerList).width(passengerListWidth).fillX().expandX().padTop(8).row();
         }
 
         if (!hasPassengers) {
-            table.add(new SingleLineText("No passengers", skin)).left().padLeft(15).row();
+            table.add(new WrappedText("No passengers", skin, passengerListWidth)).width(passengerListWidth).left().padLeft(15).row();
         }
     }
 
-    private void addRow(Table table, Skin skin, String label, String value) {
-        Label row = new SingleLineText(label + ": " + value, skin);
+    private void addRow(Table table, Skin skin, String label, String value, float width) {
+        Label row = new WrappedText(label + ": " + value, skin, width);
         row.setColor(Color.LIGHT_GRAY);
-        table.add(row).left().padBottom(4).row();
+        table.add(row).width(width).left().padBottom(4).row();
+    }
+
+    private <T> String formatInterval(T from, T to) {
+        String left = from == null ? "-inf" : from.toString();
+        String right = to == null ? "+inf" : to.toString();
+        return "[" + left + ", " + right + "]";
     }
 
     @Override
