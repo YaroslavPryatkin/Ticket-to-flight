@@ -43,10 +43,12 @@ public class MapSelectionState {
         selectedAirportId = null;
         selectedAirlineId = null;
         selectedPassengerTypeId = null;
-        if (activeFlightAirportId == firstFlightAirport) {
-            firstFlightAirport = null;
-            activeFlightAirportId = null;
-        }
+    }
+
+    public void clearRouteHighlights() {
+        clearFlightSelection();
+        firstFlightAirport = null;
+        activeFlightAirportId = null;
     }
 
     public Integer getSelectedAirportId() {

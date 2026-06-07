@@ -22,6 +22,7 @@ public class AirlineClickTooltip extends BaseGameWindow implements MapTooltipWin
         final Airline airline,
         final double playerMoney,
         final boolean playerAP,
+        final boolean isAvailable,
         boolean canBuyDuringCurrentStage,
         final LowLevelHandlerFront llh
     ) {
@@ -42,7 +43,7 @@ public class AirlineClickTooltip extends BaseGameWindow implements MapTooltipWin
         if (airline.getPlayer() != null) {
             table.add(new SingleLineText("Owned by: " + airline.getPlayer().getName(), skin)).colspan(2).row();
         } else {
-            boolean canAfford = playerMoney >= airline.getPrice() && playerAP;
+            boolean canAfford = playerMoney >= airline.getPrice() && playerAP && isAvailable;
             boolean canBuyNow = canBuyDuringCurrentStage && canAfford;
 
             TextButton buyButton = new RoundedButton("Buy", skin, "default");
@@ -90,11 +91,6 @@ public class AirlineClickTooltip extends BaseGameWindow implements MapTooltipWin
 
         llh.sendAirlineResponse(airline, finishStage);
         uiManager.removeTooltip();
-        uiManager.showSuccessWindow(
-            finishStage
-                ? "Airline was bought and airlines stage is finished for you."
-                : "Airline was bought successfully!"
-        );
     }
 
     private String routeTitle(Airline airline) {

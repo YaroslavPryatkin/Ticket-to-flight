@@ -59,10 +59,11 @@ public class TooltipManager {
 
         double currentPlayerMoney = gameData.players.get(llh.getMyId()).getMoney();
         boolean currentPlayerAP = gameData.players.get(llh.getMyId()).actionPoints > 0;
+        boolean isAvailable = airline.portA.getFreeGates()>=airline.type.gateA && airline.portB.getFreeGates() >= airline.type.gateB;
         boolean canBuyDuringCurrentStage = gameData.currentState == GameData.State.AIRLINES;
         if (!canBuyDuringCurrentStage) return;
 
-        currentTooltip = new AirlineClickTooltip(skin, facade, airline, currentPlayerMoney, currentPlayerAP, canBuyDuringCurrentStage, llh);
+        currentTooltip = new AirlineClickTooltip(skin, facade, airline, currentPlayerMoney, currentPlayerAP, isAvailable, canBuyDuringCurrentStage, llh);
         currentClickAirline = airline;
         uiStageHUD.addActor(currentTooltip.asWindow());
         updateTooltipPosition();

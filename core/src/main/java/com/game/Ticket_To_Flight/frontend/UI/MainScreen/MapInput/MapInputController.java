@@ -133,7 +133,9 @@ public class MapInputController extends InputAdapter {
         camera.unproject(worldClick);
 
         if (uiManager.isWindowOpen()) {
-            showTooltipOnly(worldClick.x, worldClick.y);
+            if (!uiManager.isPointerOverWindow()) {
+                showTooltipOnly(worldClick.x, worldClick.y);
+            }
             return true;
         }
 

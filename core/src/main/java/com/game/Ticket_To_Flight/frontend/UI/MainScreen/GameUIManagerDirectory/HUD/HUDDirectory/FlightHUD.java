@@ -43,14 +43,22 @@ public class FlightHUD extends Table {
         standardHUD.setCallbacks(onReset, onBack, onFinish);
     }
 
-    public void setPassengerCallbacks(Consumer<PassengerType> onPassengerSelected) {
-        boardingHUD.setCallbacks(onPassengerSelected);
+    public void setPassengerCallbacks(Consumer<PassengerType> onSelect, Consumer<PassengerType> onRemove) {
+        boardingHUD.setCallbacks(onSelect);
+        groupHUD.setCallbacks(onRemove);
+    }
+
+    public void forcePassengerUpdate() {
+        boardingHUD.forceUpdate();
+        groupHUD.forceUpdate();
     }
 
     public void updateData(MainFlightController.Step step, PlaneType plane, Route route, List<MainFlightController.ChosenGroup> chosenGroups) {
         standardHUD.updateData(step, route);
         planeHUD.updateData(plane);
-        groupHUD.updateData(chosenGroups);
+
+        // ВАЖНО: передаем route сюда
+        groupHUD.updateData(chosenGroups, route);
 
         Airport currentAirport = (route != null) ? route.getCurrentAirport() : null;
         boardingHUD.updateData(currentAirport, route);

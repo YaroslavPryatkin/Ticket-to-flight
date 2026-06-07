@@ -74,6 +74,10 @@ public class BoardingHUD extends AbstractFlightPanel {
         renderContent();
     }
 
+    public void forceUpdate() {
+        renderContent();
+    }
+
     @Override
     protected void renderContent() {
         clearChildren();
