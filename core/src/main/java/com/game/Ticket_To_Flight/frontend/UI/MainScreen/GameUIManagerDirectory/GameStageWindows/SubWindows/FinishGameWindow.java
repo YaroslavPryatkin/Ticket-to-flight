@@ -76,7 +76,7 @@ public class FinishGameWindow extends BaseGameWindow {
         okButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                MainMenuClient mainMenuClient = new MainMenuClient(llh.getMainClient().getMyGame());
+                llh.finishTheGame();
             }
         });
 

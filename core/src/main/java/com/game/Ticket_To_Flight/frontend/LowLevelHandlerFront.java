@@ -9,6 +9,7 @@ import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
 import com.game.Ticket_To_Flight.commonFrontAndBack.LowLevelHandler;
 import com.game.Ticket_To_Flight.commonFrontAndBack.RatingRecord;
 import com.game.Ticket_To_Flight.commonFrontAndBack.Route;
+import com.game.Ticket_To_Flight.frontend.UI.MainMenuScreen.MainMenuClient;
 import com.game.Ticket_To_Flight.network.Network;
 
 import java.util.List;
@@ -23,7 +24,7 @@ public class LowLevelHandlerFront extends LowLevelHandler {
     private final GameClient gameClient = new GameClient(this);
     private Connection serverCon = null;
     private Integer myId = null;
-    private final MainClient mainClient;
+    private MainClient mainClient;
 
     public class Flags{
         public enum GamePreparationsState{
@@ -423,8 +424,9 @@ public class LowLevelHandlerFront extends LowLevelHandler {
         return serverCon!=null && serverCon.isConnected();
     }
 
-    public MainClient getMainClient() {
-        return mainClient;
+    public void finishTheGame() {
+        new MainMenuClient(mainClient.getMyGame());
+        mainClient = null;
     }
     //------------------------------------- for use from MainClient
 }

@@ -12,7 +12,9 @@ import com.game.Ticket_To_Flight.frontend.components.texts.SingleLineText;
 public class MainMenuUI {
     private final Table mainTable;
     private final MainMenuClient mainMenuClient;
-    private TextButton createServerBtn, connectServerBtn;
+    private TextButton createServerBtn, connectServerBtn, blurMusicBtn;
+
+    private Runnable onBlurMusicClicked;
 
 
     public MainMenuUI(Skin skin, MainMenuClient mainMenuClient) {
@@ -24,6 +26,10 @@ public class MainMenuUI {
         buildUI(skin);
     }
 
+    public void setOnBlurMusicClicked(Runnable onBlurMusicClicked) {
+        this.onBlurMusicClicked = onBlurMusicClicked;
+    }
+
     public void buildUI(Skin skin) {
         Label titleLabel = new SingleLineText("Ticket to Flight", skin);
         titleLabel.setFontScale(2.5f);
@@ -31,11 +37,11 @@ public class MainMenuUI {
 
         createServerBtn = new RoundedButton("Create server", skin);
         connectServerBtn = new RoundedButton("Connect to server", skin);
+        blurMusicBtn = new RoundedButton("Blur the music", skin);
 
         createServerBtn.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                //System.out.println("Create server clicked");
                 if (mainMenuClient.createMainLogic()) {
                     MainMenuMessageDialog dialog = new MainMenuMessageDialog("Server", "Server was created succesfully", skin);
                     dialog.show(mainTable.getStage());
@@ -53,8 +59,20 @@ public class MainMenuUI {
             }
         });
 
+        blurMusicBtn.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                if (onBlurMusicClicked != null) {
+                    onBlurMusicClicked.run();
+                }
+            }
+        });
+
+
+
         mainTable.add(createServerBtn).width(500).height(150).padBottom(20).row();
-        mainTable.add(connectServerBtn).width(500).height(150);
+        mainTable.add(connectServerBtn).width(500).height(150).padBottom(20).row();
+        mainTable.add(blurMusicBtn).width(500).height(150);
     }
 
     public Table getTable() {

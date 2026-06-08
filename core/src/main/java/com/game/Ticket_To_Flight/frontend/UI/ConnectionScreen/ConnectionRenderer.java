@@ -3,6 +3,7 @@ package com.game.Ticket_To_Flight.frontend.UI.ConnectionScreen;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
@@ -10,8 +11,11 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.game.Ticket_To_Flight.frontend.LowLevelHandlerFront;
 import com.game.Ticket_To_Flight.frontend.MainClient;
 import com.game.Ticket_To_Flight.frontend.UI.ConnectionScreen.ConnectionScreenRenderer.StyleFactoryConnection;
+import com.game.Ticket_To_Flight.frontend.UI.MainMenuScreen.MainMenuRenderer;
+import com.game.Ticket_To_Flight.frontend.components.background.Background;
 
 public class ConnectionRenderer extends ScreenAdapter {
+    private Music backgroundMusic;
     private final Game game;
     private final LowLevelHandlerFront llh;
     private final MainClient mainClient;
@@ -32,11 +36,17 @@ public class ConnectionRenderer extends ScreenAdapter {
         this.uiManager = new ConnectionUIManager(skin, llh);
 
         this.uiStage.addActor(uiManager);
+        if (MainMenuRenderer.isMusic == true && backgroundMusic != null) {
+            this.backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("Presets/Preset1/audio/music/Satisfactory_music.mp3"));
+            this.backgroundMusic.setLooping(true);
+            this.backgroundMusic.setVolume(0.5f);
+        }
     }
 
     @Override
     public void show() {
         Gdx.input.setInputProcessor(uiStage);
+        backgroundMusic.play();
     }
 
     public void showLoadingScreen(String message) {
@@ -77,5 +87,10 @@ public class ConnectionRenderer extends ScreenAdapter {
     public void dispose() {
         uiStage.dispose();
         skin.dispose();
+    }
+
+    @Override
+    public void hide() {
+        backgroundMusic.pause();
     }
 }

@@ -3,6 +3,7 @@ package com.game.Ticket_To_Flight.frontend.UI.MainScreen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.ScreenAdapter;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
@@ -10,9 +11,11 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
 import com.game.Ticket_To_Flight.commonFrontAndBack.RatingRecord;
 import com.game.Ticket_To_Flight.frontend.MainClient;
+import com.game.Ticket_To_Flight.frontend.UI.MainMenuScreen.MainMenuRenderer;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.MapInput.MapInputController;
 
 public class WorldMapRenderer extends ScreenAdapter {
+    private Music backgroundMusic;
     private final MainClient client;
     private final GameData gameData;
 
@@ -29,6 +32,7 @@ public class WorldMapRenderer extends ScreenAdapter {
         stage.getViewport().apply();
         stage.act(delta);
         stage.draw();
+
     }
 
     public WorldMapRenderer(MainClient client) {
@@ -47,6 +51,12 @@ public class WorldMapRenderer extends ScreenAdapter {
         multiplexer.addProcessor(uiStageWindow);
         multiplexer.addProcessor(uiStageHUD);
         multiplexer.addProcessor(inputCtrl);
+
+        if (MainMenuRenderer.isMusic == true) {
+            this.backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("Presets/Preset1/audio/music/Satisfactory_music.mp3"));
+            this.backgroundMusic.setLooping(true);
+            this.backgroundMusic.setVolume(0.5f);
+        }
     }
 
     public GameUIManager getGameUiManager(){return uiManager;}
@@ -54,6 +64,12 @@ public class WorldMapRenderer extends ScreenAdapter {
     @Override
     public void show() {
         Gdx.input.setInputProcessor(multiplexer);
+        backgroundMusic.play();
+    }
+
+    @Override
+    public void hide() {
+        backgroundMusic.pause();
     }
 
     @Override

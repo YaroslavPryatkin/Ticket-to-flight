@@ -2,12 +2,15 @@ package com.game.Ticket_To_Flight.frontend.UI.MainMenuScreen;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
 public class MainMenuRenderer extends ScreenAdapter {
+    public static boolean isMusic = true;
+    private Music backgroundMusic;
     private final Stage stage;
     private final Skin skin;
     private final MainMenuClient mainMenuClient;
@@ -20,11 +23,22 @@ public class MainMenuRenderer extends ScreenAdapter {
 
         this.mainMenuUI = new MainMenuUI(skin, mainMenuClient);
         stage.addActor(mainMenuUI.getTable());
-    }
 
-    @Override
-    public void show() {
-        Gdx.input.setInputProcessor(stage);
+        this.backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("Presets/Preset1/audio/music/Satisfactory_music.mp3"));
+        this.backgroundMusic.setLooping(true);
+        this.backgroundMusic.setVolume(0.5f);
+
+        this.mainMenuUI.setOnBlurMusicClicked(() -> {
+            isMusic = !isMusic;
+
+            if (backgroundMusic != null) {
+                if (isMusic) {
+                    backgroundMusic.play();
+                } else {
+                    backgroundMusic.pause();
+                }
+            }
+        });
     }
 
     @Override
@@ -49,5 +63,17 @@ public class MainMenuRenderer extends ScreenAdapter {
     public void dispose() {
         stage.dispose();
         skin.dispose();
+        backgroundMusic.dispose();
+    }
+
+    @Override
+    public void hide() {
+        backgroundMusic.pause();
+    }
+
+    @Override
+    public void show() {
+        Gdx.input.setInputProcessor(stage);
+        backgroundMusic.play();
     }
 }
