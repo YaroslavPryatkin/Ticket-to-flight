@@ -165,4 +165,8 @@ public class MainClient {
     public LowLevelHandlerFront getLlh() {
         return this.llh;
     }
+
+    public Game getMyGame() {
+        return myGame;
+    }
 }

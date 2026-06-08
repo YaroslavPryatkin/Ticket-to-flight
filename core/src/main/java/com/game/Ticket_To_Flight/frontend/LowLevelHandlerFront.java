@@ -422,5 +422,9 @@ public class LowLevelHandlerFront extends LowLevelHandler {
     public boolean isConnected(){
         return serverCon!=null && serverCon.isConnected();
     }
+
+    public MainClient getMainClient() {
+        return mainClient;
+    }
     //------------------------------------- for use from MainClient
 }
