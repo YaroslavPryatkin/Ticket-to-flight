@@ -16,7 +16,6 @@ import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.A
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.Flights.MainFlightController;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.HUD.HUDDirectory.StandardHUDDirectory.PlayersListHUD;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.HUD.HUDOverlay;
-import com.game.Ticket_To_Flight.frontend.UI.MainScreen.Managers.FinishGameManager;
 import com.game.Ticket_To_Flight.frontend.components.tables.flight.AbstractFlightPanel;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.Skins.WorldMapStyleFactory;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.Managers.LeftDownCornerTooltipManager;
@@ -31,7 +30,6 @@ public class GameUIManager {
     private final HUDOverlay hudOverlay;
     private final MainFlightController mainFlightController;
     private final AirlinesControls airlinesControls;
-    private FinishGameManager finishGameManager;
     private final Stage uiStageHUD;
     private final Stage uiStageWindow;
     private final GameData gameData;

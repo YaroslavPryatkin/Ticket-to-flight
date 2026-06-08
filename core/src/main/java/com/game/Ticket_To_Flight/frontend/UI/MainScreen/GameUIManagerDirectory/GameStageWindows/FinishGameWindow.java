@@ -1,5 +1,6 @@
-package com.game.Ticket_To_Flight.frontend.UI.MainScreen.Managers;
+package com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.GameStageWindows;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -13,17 +14,18 @@ import com.game.Ticket_To_Flight.backend.gameLogicEntities.Player;
 import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
 import com.game.Ticket_To_Flight.commonFrontAndBack.RatingRecord;
 import com.game.Ticket_To_Flight.frontend.LowLevelHandlerFront;
+import com.game.Ticket_To_Flight.frontend.UI.MainMenuScreen.MainMenuClient;
+import com.game.Ticket_To_Flight.frontend.UI.MainMenuScreen.MainMenuRenderer;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManager;
 import com.game.Ticket_To_Flight.frontend.components.buttons.RoundedButton;
 import com.game.Ticket_To_Flight.frontend.components.texts.SingleLineText;
 import com.game.Ticket_To_Flight.frontend.components.windows.BaseGameWindow;
 
-import java.util.Comparator;
 import java.util.List;
 
-public class FinishGameManager extends BaseGameWindow {
+public class FinishGameWindow extends BaseGameWindow {
 
-    public FinishGameManager(Skin skin, GameData gameData, GameUIManager uiManager, LowLevelHandlerFront llh, Stage uiStageWindow) {
+    public FinishGameWindow(Skin skin, GameData gameData, LowLevelHandlerFront llh) {
         super("Game Results", skin, 700, 600);
 
         this.setColor(new Color(0.2f, 0.6f, 0.95f, 0.95f));
@@ -52,7 +54,7 @@ public class FinishGameManager extends BaseGameWindow {
                 Player player = record.getPlayer(gameData);
                 String playerName = (player != null) ? player.getName() : "Unknown Player";
 
-                SingleLineText rankText = new SingleLineText("#" + place, skin);
+                SingleLineText rankText = new SingleLineText("#" + (place+1), skin);
                 SingleLineText nameText = new SingleLineText(playerName, skin);
                 SingleLineText scoreText = new SingleLineText(String.valueOf(record.getRating()), skin);
 
@@ -74,7 +76,7 @@ public class FinishGameManager extends BaseGameWindow {
         okButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                Gdx.app.exit();
+                MainMenuClient mainMenuClient = new MainMenuClient(llh.getMainClient().getMyGame());
             }
         });
 
@@ -82,12 +84,5 @@ public class FinishGameManager extends BaseGameWindow {
         this.add(okButton).width(200).height(70);
 
         this.pack();
-
-        float x = (uiStageWindow.getWidth() - this.getWidth())/2;
-
-        float y = (uiStageWindow.getHeight() - this.getHeight())/2;
-
-        uiStageWindow.addActor(this);
-        this.setPosition(x,y);
     }
 }
