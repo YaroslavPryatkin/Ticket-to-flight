@@ -29,10 +29,7 @@ public class GroupHUD extends AbstractFlightPanel {
 
     private float currentTopY = 0;
     private Route currentRoute;
-    private Consumer<PassengerType> onPassengerRemoved;
-
-    private Airport lastAirport;
-    private int lastPassCount = -1;
+    private Consumer<Integer> onPassengerRemoved;
 
     public GroupHUD(Skin skin) {
         super(skin);
@@ -56,25 +53,12 @@ public class GroupHUD extends AbstractFlightPanel {
         });
     }
 
-    public void setCallbacks(Consumer<PassengerType> onPassengerRemoved) {
+    public void setCallbacks(Consumer<Integer> onPassengerRemoved) {
         this.onPassengerRemoved = onPassengerRemoved;
     }
 
     public void updateData( Route route) {
-        Airport routeAirport = (route != null) ? route.getCurrentAirport() : null;
-        int passCount = route!=null ? (route.getPassengers() != null) ? route.getPassengers().size() : 0 : 0;
-
-        if (this.currentRoute == route &&
-            this.lastAirport == routeAirport &&
-            this.lastPassCount == passCount &&
-            isInitialized) {
-            return;
-        }
-
         this.currentRoute = route;
-        this.lastAirport = routeAirport;
-        this.lastPassCount = passCount;
-        this.isInitialized = true;
         renderContent();
     }
 
@@ -90,64 +74,50 @@ public class GroupHUD extends AbstractFlightPanel {
         add(buildHeader("Passengers on Board")).fillX().expandX().row();
 
         if (!isCollapsed) {
-            Map<PassengerType, Integer> passengerCounts = new LinkedHashMap<>();
-            Map<PassengerType, Boolean> canRemoveMap = new HashMap<>();
-
-            if (currentRoute != null) {
-                List<Route.BoarderPassenger> routePassengers = currentRoute.getPassengers();
-                for (int i = 0; i < routePassengers.size(); i++) {
-                    Route.BoarderPassenger passenger = routePassengers.get(i);
-                    if (passenger.isFinished()) continue;
-
-                    PassengerType pt = passenger.getType();
-                    if (pt == null) continue;
-
-                    passengerCounts.put(pt, passengerCounts.getOrDefault(pt, 0) + 1);
-                    if (passenger.canBeRemoved()) {
-                        canRemoveMap.put(pt, true);
-                    }
-                }
-            }
-
-            List<ExpandableListWidget> activeLists = new ArrayList<>();
-            boolean hasPassengers = false;
-
-            for (Map.Entry<PassengerType, Integer> entry : passengerCounts.entrySet()) {
-                hasPassengers = true;
-                PassengerType pt = entry.getKey();
-                int count = entry.getValue();
-                boolean canRemove = canRemoveMap.getOrDefault(pt, false);
-
-                PassengerTableWidget ptWidget = new PassengerTableWidget(pt);
-                ExpandableListWidget listWidget = new ExpandableListWidget(ptWidget.passengerClass() + " (x" + count + ")", skin);
-                listWidget.setPreferredWidth(CONTENT_WIDTH);
-                activeLists.add(listWidget);
-
-                SelectButton deleteBtn = createDeleteButton(pt, canRemove);
-                listWidget.addHeaderActor(deleteBtn, 160f, 55f);
-
-                Table passengerContent = listWidget.getContentTable();
-                PassengerDetailsWidget.fill(passengerContent, skin, pt);
-
-                listWidget.setCallbacks(
-                    () -> { for (ExpandableListWidget other : activeLists) if (other != listWidget) other.collapse(); },
-                    () -> { invalidateHierarchy(); contentTable.layout(); scrollPane.layout(); }
-                );
-
-                contentTable.add(listWidget).width(CONTENT_WIDTH).fillX().expandX().padTop(8).row();
-            }
-
-            if (!hasPassengers) {
+            if (currentRoute == null || currentRoute.getPassengers().isEmpty()) {
                 contentTable.add(new SingleLineText("Plane is empty", skin)).left().pad(15).row();
             }
+            else {
+                List<Route.BoarderPassenger> routePassengers = currentRoute.getPassengers();
+                List<ExpandableListWidget> activeLists = new ArrayList<>();
 
+                for (int i = 0; i < routePassengers.size(); ++i) {
+                    Route.BoarderPassenger bp = routePassengers.get(i);
+                    if (bp.isFinished()) continue;
+
+                    PassengerType pt = bp.getType();
+                    PassengerTableWidget ptWidget = new PassengerTableWidget(pt);
+                    ExpandableListWidget listWidget = new ExpandableListWidget(ptWidget.passengerClass(), skin);
+                    listWidget.setPreferredWidth(CONTENT_WIDTH);
+                    activeLists.add(listWidget);
+
+                    SelectButton deleteBtn = createDeleteButton(i, bp.canBeRemoved());
+                    listWidget.addHeaderActor(deleteBtn, 160f, 55f);
+
+                    Table passengerContent = listWidget.getContentTable();
+                    PassengerDetailsWidget.fill(passengerContent, skin, pt);
+
+                    listWidget.setCallbacks(
+                        () -> {
+                            for (ExpandableListWidget other : activeLists) if (other != listWidget) other.collapse();
+                        },
+                        () -> {
+                            invalidateHierarchy();
+                            contentTable.layout();
+                            scrollPane.layout();
+                        }
+                    );
+
+                    contentTable.add(listWidget).width(CONTENT_WIDTH).fillX().expandX().padTop(8).row();
+                }
+            }
             add(scrollPane).width(CONTENT_WIDTH).height(CONTENT_HEIGHT).padTop(10).row();
         }
 
         if (screenWidth > 0 && currentTopY > 0) recalculatePosition();
     }
 
-    private SelectButton createDeleteButton(PassengerType passenger, boolean canRemove) {
+    private SelectButton createDeleteButton(int passenger, boolean canRemove) {
         SelectButton button = new SelectButton("Delete", skin, () -> {
             if (onPassengerRemoved != null) onPassengerRemoved.accept(passenger);
         });

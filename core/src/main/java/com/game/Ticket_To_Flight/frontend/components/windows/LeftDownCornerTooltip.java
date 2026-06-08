@@ -3,8 +3,8 @@ package com.game.Ticket_To_Flight.frontend.components.windows;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Align;
 
-public abstract class BaseHoverTooltip extends BaseGameWindow {
-    protected BaseHoverTooltip(String title, Skin skin) {
+public abstract class LeftDownCornerTooltip extends BaseGameWindow {
+    protected LeftDownCornerTooltip(String title, Skin skin) {
         super(title, skin);
         top().left();
         getColor().a = 0.85f;

@@ -226,7 +226,7 @@ public class LowLevelHandlerBack extends LowLevelHandler {
         flags.currentPlayerState = Flags.CurrentPlayerState.GOOD_RESPONSE;
     }
 
-    //temporary. When route handling is added, should be deleted
+    //generally should not be used
     public void setWaitingForResponseFlag(){
         flags.currentPlayerState = Flags.CurrentPlayerState.WAITING_FOR_RESPONSE;
     }

@@ -7,12 +7,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airline;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.AirlineType;
 import com.game.Ticket_To_Flight.frontend.components.texts.WrappedText;
-import com.game.Ticket_To_Flight.frontend.components.windows.BaseHoverTooltip;
+import com.game.Ticket_To_Flight.frontend.components.windows.LeftDownCornerTooltip;
 
-public class AirlineHoverTooltip extends BaseHoverTooltip {
+public class AirlineLeftDownCornerTooltip extends LeftDownCornerTooltip {
     private static final float CONTENT_WIDTH = 580f;
 
-    public AirlineHoverTooltip(Skin skin, Airline airline) {
+    public AirlineLeftDownCornerTooltip(Skin skin, Airline airline) {
         super("Airline", skin);
 
         Table content = new Table();

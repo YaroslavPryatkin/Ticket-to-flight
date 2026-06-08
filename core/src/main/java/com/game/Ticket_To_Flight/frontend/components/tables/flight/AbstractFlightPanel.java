@@ -16,7 +16,6 @@ public abstract class AbstractFlightPanel extends Table {
     protected float screenHeight = 0;
 
     protected boolean isCollapsed = false;
-    protected boolean isInitialized = false;
     protected Runnable onToggle;
 
     public AbstractFlightPanel(Skin skin) {

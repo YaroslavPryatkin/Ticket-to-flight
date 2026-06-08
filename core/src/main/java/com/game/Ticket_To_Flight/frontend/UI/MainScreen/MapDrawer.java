@@ -14,7 +14,6 @@ import com.game.Ticket_To_Flight.PresetPaths;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airline;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airport;
 import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
-import com.game.Ticket_To_Flight.frontend.UI.MainScreen.MapInput.MapSelectionState;
 
 public class MapDrawer {
     private final SpriteBatch batch;
@@ -27,13 +26,14 @@ public class MapDrawer {
     private final Viewport viewport;
     private final float WORLD_WIDTH;
     private final float WORLD_HEIGHT;
-    private final MapSelectionState selectionState;
 
-    public MapDrawer(MapSelectionState selectionState, GameData gameData) {
+    private final GameUIManager gameUIManager;
+
+
+    public MapDrawer(GameData gameData, OrthographicCamera camera, GameUIManager gameUIManager) {
         this.gameData = gameData;
-
+        this.gameUIManager = gameUIManager;
         this.batch = new SpriteBatch();
-        this.selectionState = selectionState;
         this.mapTexture = new Texture(Gdx.files.internal(PresetPaths.presetPaths.get(1) + "map.png"));
 
         this.WORLD_WIDTH = 2750f;
@@ -53,7 +53,7 @@ public class MapDrawer {
         this.airlineTexture = new Texture(linePixmap);
         linePixmap.dispose();
 
-        this.camera = new OrthographicCamera();
+        this.camera = camera;
         this.viewport = new ExtendViewport(WORLD_WIDTH, WORLD_HEIGHT, camera);
     }
 
@@ -76,15 +76,19 @@ public class MapDrawer {
 
     private void addAirportsOnTheMap(GameData gameData) {
         for (Airport airport : gameData.airports) {
-            batch.setColor(airport.getColor());
+            batch.setColor(Color.WHITE);
             float currentRadius = 15f;
 
-            if (selectionState.isAirportSelected(airport)) {
+            if (gameUIManager.getMainFlightController().isCurrentAirport(airport)) {
+                batch.setColor(Color.GOLD);
                 currentRadius *= 1.8f;
             }
-
-            if (selectionState.isAirportFirst(airport)) {
+            else if (gameUIManager.getMainFlightController().isFirstAirport(airport)) {
                 batch.setColor(Color.ROYAL);
+                currentRadius *= 1.8f;
+            }
+            else if (gameUIManager.isCurrentClickedAirport(airport)) {
+                currentRadius *= 1.8f;
             }
 
             float diameter = currentRadius * 2f;
@@ -104,9 +108,18 @@ public class MapDrawer {
             } else {
                 airlineColor = Color.LIGHT_GRAY;
             }
-            if (selectionState.isAirlineSelected(airline) || selectionState.isAirlineInRoute(airline)) {
-                airlineColor = new Color(airlineColor.r, airlineColor.g, airlineColor.b, 0.4f);
+
+            if(gameUIManager.isCurrentClickedAirline(airline)){
+                airlineColor = new Color(airlineColor.r, airlineColor.g, airlineColor.b, 1.0f);
             }
+            else if(gameUIManager.getMainFlightController().isAirlineInRoute(airline)){
+                airlineColor = new Color(airlineColor.r, airlineColor.g, airlineColor.b, 0.6f);
+            }
+            else{
+                airlineColor = new Color(airlineColor.r, airlineColor.g, airlineColor.b, 0.3f);
+            }
+
+
             batch.setColor(airlineColor);
 
             Airport a = airline.getPortA();
@@ -149,9 +162,6 @@ public class MapDrawer {
         viewport.update(width, height, true);
     }
 
-    public OrthographicCamera getCamera() {
-        return camera;
-    }
 
     public void dispose() {
         batch.dispose();

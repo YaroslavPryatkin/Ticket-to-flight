@@ -14,11 +14,9 @@ import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.F
 import com.game.Ticket_To_Flight.frontend.components.buttons.RoundedButton;
 import com.game.Ticket_To_Flight.frontend.components.texts.SingleLineText;
 
-import java.util.Iterator;
-import java.util.Map;
 import java.util.function.Consumer;
 
-public class StandardHUD extends Table {
+public class FlightHudCenterDownButtons extends Table {
     private final Skin skin;
     private final Table summaryTable;
     private final TextButton passBtn;
@@ -27,7 +25,7 @@ public class StandardHUD extends Table {
     private final TextButton finishBtn;
     private final TextButton finishAndPassBtn;
 
-    public StandardHUD(Skin skin) {
+    public FlightHudCenterDownButtons(Skin skin) {
         this.skin = skin;
         setFillParent(true);
         setTouchable(Touchable.childrenOnly);

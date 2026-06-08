@@ -13,55 +13,101 @@ import com.game.Ticket_To_Flight.frontend.LowLevelHandlerFront;
 import com.game.Ticket_To_Flight.frontend.MainClient;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.Airlines.AirlinesControls;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.Flights.MainFlightController;
-import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.Flights.PassengerSelectionListener;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.HUD.HUDDirectory.StandardHUDDirectory.PlayersListHUD;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.HUD.HUDOverlay;
 import com.game.Ticket_To_Flight.frontend.components.tables.flight.AbstractFlightPanel;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.Skins.WorldMapStyleFactory;
-import com.game.Ticket_To_Flight.frontend.UI.MainScreen.Managers.TooltipManager;
+import com.game.Ticket_To_Flight.frontend.UI.MainScreen.Managers.LeftDownCornerTooltipManager;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.Managers.WindowManager;
-import com.game.Ticket_To_Flight.frontend.UI.MainScreen.MapInput.MapSelectionState;
 
 public class GameUIManager {
 
     private final WindowManager windowManager;
-    private final TooltipManager tooltipManager;
-    private final HUDOverlay hud;
-    private final MainFlightController flightController;
+    private final LeftDownCornerTooltipManager leftDownCornerTooltipManager;
+    private final HUDOverlay hudOverlay;
+    private final MainFlightController mainFlightController;
     private final AirlinesControls airlinesControls;
     private final Stage uiStageHUD;
+    private final GameData gameData;
+    private final LowLevelHandlerFront llh;
 
-    public GameUIManager(Stage uiStageWindow, Stage uiStageHUD, MainClient client, MapSelectionState selectionState, OrthographicCamera mapCamera) {
+    private Airport currentClickedAirport;
+    private Airline currentClickedAirline;
+
+    public MainFlightController getMainFlightController() {
+        return mainFlightController;
+    }
+
+    public boolean isCurrentClickedAirline(Airline line) {
+        if (line == null) return false;
+        return line.equals(currentClickedAirline);
+    }
+
+    public boolean isCurrentClickedAirport(Airport port) {
+        if (port == null) return false;
+        return port.equals(currentClickedAirport);
+    }
+
+    public GameUIManager(Stage uiStageWindow, Stage uiStageHUD, MainClient client, OrthographicCamera mapCamera) {
         this.uiStageHUD = uiStageHUD;
-
         WorldMapStyleFactory styleFactory = new WorldMapStyleFactory();
         Skin defaultSkin = styleFactory.createBasicWindow();
         Skin investSkin = styleFactory.createInvestWindow();
-        GameData gameData = client.getGameData();
-        LowLevelHandlerFront llh = client.getLlh();
+        gameData = client.getGameData();
+        llh = client.getLlh();
 
         this.windowManager = new WindowManager(uiStageWindow, defaultSkin, investSkin, this, gameData, llh);
-        this.hud = new HUDOverlay(uiStageHUD, defaultSkin, gameData, llh);
-        this.flightController = new MainFlightController(uiStageHUD, defaultSkin, gameData, llh, this, hud.getFlightHUD(), selectionState);
-        this.tooltipManager = new TooltipManager(uiStageHUD, defaultSkin, this, gameData, llh, selectionState, mapCamera, flightController);
-        this.airlinesControls = new AirlinesControls(uiStageHUD, defaultSkin, gameData, llh, this);
+        this.hudOverlay = new HUDOverlay(uiStageHUD, defaultSkin, gameData, llh);
+        this.mainFlightController = new MainFlightController(uiStageHUD, defaultSkin, gameData, llh, this, hudOverlay.getFlightHUD());
+        this.leftDownCornerTooltipManager = new LeftDownCornerTooltipManager(uiStageHUD, defaultSkin);
+        this.airlinesControls = new AirlinesControls(uiStageHUD, defaultSkin, gameData, llh, this, mapCamera);
     }
 
-    public boolean showAuctionWindow() { return windowManager.showAuctionWindow(); }
-    public boolean showInvestWindow() { return windowManager.showInvestWindow(); }
-    public void showSuccessWindow(String message) { windowManager.showSuccessWindow(message); }
-    public boolean showAbilitiesWindow() { return windowManager.showAbilitiesWindow(); }
-    public boolean showPlaneWindow() { return windowManager.showPlaneWindow(); }
-    public void setWindowOpen(boolean windowOpen) { windowManager.setWindowOpen(windowOpen); }
-    public boolean isWindowOpen() { return windowManager.isWindowOpen(); }
-    public boolean isPointerOverWindow() { return windowManager.isPointerOverCurrentWindow(); }
+    public boolean showAuctionWindow() {
+        return windowManager.showAuctionWindow();
+    }
 
-    public void showAirportTooltip(Airport airport) { tooltipManager.showAirportTooltip(airport); }
+    public boolean showInvestWindow() {
+        return windowManager.showInvestWindow();
+    }
 
-    public void showAirlineTooltip(Airline airline) { tooltipManager.showAirlineTooltip(airline); }
+    public void showNotificationWindow(String message) {
+        windowManager.showNotificationWindow(message);
+    }
 
-    public void removeTooltip() { tooltipManager.removeTooltip(); }
-    public boolean isPointerOverTooltip() { return tooltipManager.isPointerOverTooltip(); }
+    public boolean showAbilitiesWindow() {
+        return windowManager.showAbilitiesWindow();
+    }
+
+    public boolean showPlaneWindow() {
+        return windowManager.showPlaneWindow();
+    }
+
+    public void setWindowOpen(boolean windowOpen) {
+        windowManager.setWindowOpen(windowOpen);
+    }
+
+    public boolean isWindowOpen() {
+        return windowManager.isWindowOpen();
+    }
+
+    public boolean canClickAndScrollMap() {
+        return !windowManager.isPointerOverCurrentWindow() &&
+            !isPointerOverHudActor() &&
+            !leftDownCornerTooltipManager.isPointerOverTooltip() &&
+            !airlinesControls.isPointerOverTooltip();
+    }
+
+    private boolean canChooseAirline() {
+        return gameData.currentState == GameData.State.AIRLINES &&
+            gameData.currentPlayer == llh.getMyId() &&
+            llh.getCurrentStateState() != LowLevelHandlerFront.Flags.CurrentStateState.WAITING_FOR_SERVER_RESPONSE;
+    }
+
+    private boolean canChooseFlight() {
+        return gameData.currentState == GameData.State.FLIGHTS && gameData.currentPlayer == llh.getMyId();
+    }
+
     public boolean isPointerOverHudActor() {
         Vector2 stageCoords = uiStageHUD.screenToStageCoordinates(new Vector2(Gdx.input.getX(), Gdx.input.getY()));
         Actor hitActor = uiStageHUD.hit(stageCoords.x, stageCoords.y, true);
@@ -76,25 +122,79 @@ public class GameUIManager {
         }
         return false;
     }
-    public void handleFlightAirportClick(Airport airport) { flightController.handleAirportClick(airport); }
-    public void handleFlightAirlineClick(Airline airline) { flightController.handleAirlineClick(airline); }
 
-    public void updateHUDData() { hud.updateStandardHUD(null); }
+    public void handleAirportClick(Airport airport) {
+        if (!airport.equals(currentClickedAirport))
+            setCurrentClickedAirport(airport);
+
+        if (canChooseFlight())
+            mainFlightController.handleAirportClick(airport);
+
+        if (canChooseAirline())
+            airlinesControls.removeTooltip();
+    }
+
+    public void handleAirlineClick(Airline airline) {
+        if (!airline.equals(currentClickedAirline))
+            setCurrentClickedAirline(airline);
+
+        if (canChooseFlight())
+            mainFlightController.handleAirlineClick(airline);
+
+
+        if (canChooseAirline())
+            airlinesControls.showTooltip(airline);
+    }
+
+    public void handleEmptyMapClick() {
+        currentClickedAirport = null;
+        currentClickedAirline = null;
+        leftDownCornerTooltipManager.removeTooltip();
+        airlinesControls.removeTooltip();
+    }
+
+    private void setCurrentClickedAirport(Airport port) {
+        leftDownCornerTooltipManager.showAirportTooltip(port);
+        currentClickedAirport = port;
+        currentClickedAirline = null;
+    }
+
+    private void setCurrentClickedAirline(Airline line) {
+        leftDownCornerTooltipManager.showAirlineTooltip(line);
+        currentClickedAirline = line;
+        currentClickedAirport = null;
+    }
+
+    public void updateHUDData() {
+        if (canChooseAirline())
+            airlinesControls.setActive();
+        if (canChooseFlight())
+            mainFlightController.setActive();
+
+        hudOverlay.updateStandardHUD(null);
+    }
 
     public void updateDynamicControls() {
-        flightController.update();
-        airlinesControls.update();
-        tooltipManager.updateTooltipPosition();
+        if (canChooseFlight()) {
+            mainFlightController.update();
+        } else {
+            mainFlightController.setInactive();
+        }
+
+        if (canChooseAirline()) {
+            airlinesControls.updatePassButton();
+            airlinesControls.updateTooltip(currentClickedAirline);
+        } else {
+            airlinesControls.setInactive();
+        }
+
+        leftDownCornerTooltipManager.update();
     }
 
-    public void resize(int width, int height) {
+    public void resize() {
         windowManager.centerCurrentWindow();
-        hud.resize();
-        flightController.position();
-        airlinesControls.position();
-    }
-
-    public MainFlightController getFlightController() {
-        return flightController;
+        hudOverlay.resize();
+        mainFlightController.positionPlaneWindow();
+        airlinesControls.positionPassButton();
     }
 }

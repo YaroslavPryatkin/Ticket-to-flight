@@ -28,7 +28,7 @@ public class InvestWindow extends BaseInvestWindow {
             public void clicked(InputEvent event, float x, float y) {
                 llh.sendInvestmentResponse(getSliderValue());
                 remove();
-                uiManager.showSuccessWindow("Your request was sent to server");
+                uiManager.showNotificationWindow("Your request was sent to server");
             }
         });
 

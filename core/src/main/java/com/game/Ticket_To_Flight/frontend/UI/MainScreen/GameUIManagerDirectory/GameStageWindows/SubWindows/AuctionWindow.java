@@ -25,7 +25,7 @@ public class AuctionWindow extends BaseInvestWindow {
             public void clicked(InputEvent event, float x, float y) {
                 llh.sendAuctionPass();
                 remove();
-                uiManager.showSuccessWindow("You left the auction. Wait when other players finish it.");
+                uiManager.showNotificationWindow("You left the auction. Wait when other players finish it.");
             }
         });
 
@@ -42,7 +42,7 @@ public class AuctionWindow extends BaseInvestWindow {
                 public void clicked(InputEvent event, float x, float y) {
                     llh.sendAuctionResponse(getSliderValue());
                     remove();
-                    uiManager.showSuccessWindow("Your bet was sent to server");
+                    uiManager.showNotificationWindow("Your bet was sent to server");
                 }
             });
 

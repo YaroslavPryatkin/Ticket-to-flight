@@ -30,22 +30,6 @@ public class Airport extends Identifiable {
         this.takenGates = takenGates;
     }
 
-    public Color getColor() {
-        if (this.type.id == 1) {
-            return Color.WHITE;
-        }
-        if (this.type.id == 2) {
-            return Color.BLUE;
-        }
-        if (this.type.id == 3) {
-            return Color.GREEN;
-        }
-        if (this.type.id == 4) {
-            return Color.RED;
-        }
-        return Color.WHITE;
-    }
-
     public Float getX() {
         return position.x;
     }

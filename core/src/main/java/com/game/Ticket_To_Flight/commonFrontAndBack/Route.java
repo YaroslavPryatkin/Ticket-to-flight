@@ -194,6 +194,8 @@ public class Route {
      * @return error string if error occurred
      */
     private String checkAddLine(Airline line) {
+        if(line.player == null)
+            return "The line should be purchased by some player to be used in routes.";
         if(lines.contains(line))
             return "This line is already a part of the route";
         if(lines.size() >= plane.stations + 2)
@@ -337,9 +339,6 @@ public class Route {
         return res;
     }
 
-    public int getLinesCount() {
-        return lines.size();
-    }
 
     public boolean canFinishRoute(){
         for(BoarderPassenger psg : passengers){
@@ -383,4 +382,10 @@ public class Route {
     public int getRemainingCapacity(){
         return plane.capacity - currentTakenCapacity;
     }
+
+    public Airport getStartingPort(){return startingPort;}
+
+    public PlaneType getPlane(){return plane;}
+
+    public boolean isInStartingAirport(){return startingPort.equals(current);}
 }

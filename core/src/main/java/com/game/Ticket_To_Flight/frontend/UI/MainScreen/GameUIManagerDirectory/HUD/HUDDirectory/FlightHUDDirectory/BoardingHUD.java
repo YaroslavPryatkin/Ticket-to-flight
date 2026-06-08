@@ -66,15 +66,19 @@ public class BoardingHUD extends AbstractFlightPanel {
         this.onPassengerSelected = onPassengerSelected;
     }
 
-    public void updateData(Airport airport, Route route) {
-        if (route.renderingUpdate()) {
+    public void updateData(Route route) {
+        if(route!=null) {
             this.currentGroups = route.getSuitablePassengers();
-            this.currentAirport = airport;
+            this.currentAirport = route.getCurrentAirport();
             this.currentRoute = route;
-            this.isInitialized = true;
-
-            renderContent();
         }
+        else{
+            this.currentGroups = null;
+            this.currentAirport = null;
+            this.currentRoute = null;
+        }
+
+        renderContent();
     }
 
     public void forceUpdate() {

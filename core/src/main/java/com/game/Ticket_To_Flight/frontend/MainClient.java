@@ -51,20 +51,19 @@ public class MainClient {
                 this.myGame.setScreen(this.worldMapRenderer);
             } else if (gameData.currentState == GameData.State.INVESTMENTS && llh.getMyId() == gameData.currentPlayer) {
                 if (llh.getCurrentStateState() == Flags.CurrentStateState.PLAYER_STAGE) {
-                    if (worldMapRenderer.drawInvestmentWindow()) {
+                    if (worldMapRenderer.getGameUiManager().showInvestWindow()) {
                         llh.setWaitingForPlayerChoiceFlag();
                     }
                 }
             } else if (gameData.currentState == GameData.State.AUCTION && llh.getMyId() == gameData.currentPlayer) {
                 if (llh.getCurrentStateState() == Flags.CurrentStateState.PLAYER_STAGE) {
-                    if (worldMapRenderer.drawAuctionWindow()) {
+                    if (worldMapRenderer.getGameUiManager().showAuctionWindow()) {
                         llh.setWaitingForPlayerChoiceFlag();
                     }
                 }
-                worldMapRenderer.drawAuctionWindow();
             } else if (gameData.currentState == GameData.State.ABILITIES && llh.getMyId() == gameData.currentPlayer) {
                 if (llh.getCurrentStateState() == Flags.CurrentStateState.PLAYER_STAGE) {
-                    if (worldMapRenderer.drawAbilitiesWindow()) {
+                    if (worldMapRenderer.getGameUiManager().showAbilitiesWindow()) {
                         llh.setWaitingForPlayerChoiceFlag();
                     }
                 }
@@ -72,10 +71,10 @@ public class MainClient {
                 if (llh.getCurrentStateState() == Flags.CurrentStateState.PLAYER_STAGE) {
                     if (gameData.players.get(gameData.currentPlayer).actionPoints <= 0) {
                         llh.sendPlanePass();
-                        worldMapRenderer.drawSuccessWindow("You are out of Action Points.\n You can not buy a plane.\nAutomatically Passing");
+                        worldMapRenderer.getGameUiManager().showNotificationWindow("You are out of Action Points.\n You can not buy a plane.\nAutomatically Passing");
                         llh.setWaitingForPlayerChoiceFlag();
                     }
-                    else if(worldMapRenderer.drawPlaneWindow()) {
+                    else if(worldMapRenderer.getGameUiManager().showPlaneWindow()) {
                         llh.setWaitingForPlayerChoiceFlag();
                     }
                 }
@@ -83,10 +82,12 @@ public class MainClient {
                 if (llh.getCurrentStateState() == Flags.CurrentStateState.PLAYER_STAGE) {
                     if (gameData.players.get(gameData.currentPlayer).actionPoints <= 0) {
                         llh.sendAirlinePass();
-                        worldMapRenderer.drawSuccessWindow("You are out of Action Points.\n You can not buy an airline.\nAutomatically Passing");
+                        worldMapRenderer.getGameUiManager().showNotificationWindow("You are out of Action Points.\n You can not buy an airline.\nAutomatically Passing");
                     }
                     else
-                        worldMapRenderer.drawSuccessWindow("Your turn. Buy the airline.");
+                        worldMapRenderer.getGameUiManager().showNotificationWindow("Your turn. Buy the airline.");
+
+
                     llh.setWaitingForPlayerChoiceFlag();
                 }
             } else if (gameData.currentState == GameData.State.EVENT && llh.getMyId() == gameData.currentPlayer) {
@@ -95,8 +96,9 @@ public class MainClient {
                 if (llh.getCurrentStateState() == Flags.CurrentStateState.PLAYER_STAGE) {
                     if (gameData.players.get(gameData.currentPlayer).actionPoints <= 0) {
                         llh.sendRoutePass();
-                        worldMapRenderer.drawSuccessWindow("You are out of Action Points.\n You can not make a route.\nAutomatically Passing");
+                        worldMapRenderer.getGameUiManager().showNotificationWindow("You are out of Action Points.\n You can not make a route.\nAutomatically Passing");
                     }
+
                     llh.setWaitingForPlayerChoiceFlag();
                 }
             } else if (gameData.currentState == GameData.State.INCOME_AND_TAXES && llh.getMyId() == gameData.currentPlayer) {
@@ -111,7 +113,7 @@ public class MainClient {
     }
 
     public void gameDataWasUpdated(){
-        worldMapRenderer.updateHUDData();
+        worldMapRenderer.getGameUiManager().updateHUDData();
     }
 
     public void mainPreparationCycle(float delta) {

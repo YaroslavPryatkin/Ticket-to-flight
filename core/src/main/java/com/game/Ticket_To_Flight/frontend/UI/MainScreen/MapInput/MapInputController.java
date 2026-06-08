@@ -1,6 +1,5 @@
 package com.game.Ticket_To_Flight.frontend.UI.MainScreen.MapInput;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector2;
@@ -11,10 +10,6 @@ import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
 import com.game.Ticket_To_Flight.frontend.LowLevelHandlerFront;
 import com.game.Ticket_To_Flight.frontend.MainClient;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManager;
-import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.Flights.MainFlightController;
-import com.game.Ticket_To_Flight.frontend.UI.MainScreen.MapStrategies.DefaultInteractionStrategy;
-import com.game.Ticket_To_Flight.frontend.UI.MainScreen.MapStrategies.FlightInteractionStrategy;
-import com.game.Ticket_To_Flight.frontend.UI.MainScreen.MapStrategies.MapInteractionStrategy;
 
 public class MapInputController extends InputAdapter {
     private final OrthographicCamera camera;
@@ -22,29 +17,13 @@ public class MapInputController extends InputAdapter {
     private final GameUIManager uiManager;
     private final Vector3 lastMousePos = new Vector3();
     private final float clickTolerance = 10f;
-    private final MapInteractionStrategy defaultStrategy;
-    private final MapInteractionStrategy flightStrategy;
+    private final LowLevelHandlerFront llh;
 
-    private MapInteractionStrategy currentStrategy;
-    private MapSelectionState selectionState;
-    private boolean touchDownHandledThisFrame = false;
-
-    public MapInputController(OrthographicCamera camera, GameData gameData, GameUIManager uiManager, MainClient client, MapSelectionState selectionState, MainFlightController flightController) {
+    public MapInputController(OrthographicCamera camera, GameData gameData, GameUIManager uiManager, MainClient client) {
         this.camera = camera;
         this.gameData = gameData;
         this.uiManager = uiManager;
-        this.selectionState = selectionState;
-        LowLevelHandlerFront llh = client.getLlh();
-        this.defaultStrategy = new DefaultInteractionStrategy(uiManager);
-        this.flightStrategy = new FlightInteractionStrategy(gameData, uiManager, llh, selectionState, flightController);
-        this.currentStrategy = defaultStrategy;
-    }
-
-    public void reset() {
-        if (selectionState != null) {
-            selectionState.clearFlightSelection();
-        }
-        uiManager.removeTooltip();
+        llh = client.getLlh();
     }
 
     private float distanceToSegment(float px, float py, float x1, float y1, float x2, float y2) {
@@ -96,89 +75,34 @@ public class MapInputController extends InputAdapter {
         return null;
     }
 
-    public void updateCurrentStrategy() {
-        currentStrategy = gameData.currentState == GameData.State.FLIGHTS ? flightStrategy : defaultStrategy;
-    }
-
-    public void updateWindowClickTooltip() {
-        if (!uiManager.isWindowOpen() || !Gdx.input.justTouched()) {
-            touchDownHandledThisFrame = false;
-            return;
-        }
-
-        if (touchDownHandledThisFrame || uiManager.isPointerOverWindow() || uiManager.isPointerOverHudActor()) {
-            touchDownHandledThisFrame = false;
-            return;
-        }
-
-        Vector3 worldClick = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
-        camera.unproject(worldClick);
-        showTooltipOnly(worldClick.x, worldClick.y);
-        touchDownHandledThisFrame = false;
-    }
-
-    public void setCurrentStrategy(MapInteractionStrategy currentStrategy) {
-        this.currentStrategy = currentStrategy;
-    }
-
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        touchDownHandledThisFrame = true;
+        if (uiManager.canClickAndScrollMap()) {
+            Vector3 worldClick = new Vector3(screenX, screenY, 0);
+            camera.unproject(worldClick);
 
-        if (uiManager.isPointerOverHudActor() || uiManager.isPointerOverTooltip()) {
-            return true;
-        }
+            lastMousePos.set(screenX, screenY, 0);
 
-        Vector3 worldClick = new Vector3(screenX, screenY, 0);
-        camera.unproject(worldClick);
-
-        if (uiManager.isWindowOpen()) {
-            if (!uiManager.isPointerOverWindow()) {
-                showTooltipOnly(worldClick.x, worldClick.y);
+            Airport clickedAirport = findAirportAt(worldClick.x, worldClick.y);
+            if (clickedAirport != null) {
+                uiManager.handleAirportClick(clickedAirport);
+                return true;
             }
+
+            Airline clickedAirline = findAirlineAt(worldClick.x, worldClick.y);
+            if (clickedAirline != null) {
+                uiManager.handleAirlineClick(clickedAirline);
+                return true;
+            }
+
+            uiManager.handleEmptyMapClick();
             return true;
         }
-
-        Airport clickedAirport = findAirportAt(worldClick.x, worldClick.y);
-        if (clickedAirport != null) {
-            currentStrategy.onAirportClicked(clickedAirport);
-            return true;
-        }
-
-        Airline clickedAirline = findAirlineAt(worldClick.x, worldClick.y);
-        if (clickedAirline != null) {
-            currentStrategy.onAirlineClicked(clickedAirline);
-            return true;
-        }
-
-        currentStrategy.onEmptyMapClicked(worldClick.x, worldClick.y);
-        reset();
-        lastMousePos.set(screenX, screenY, 0);
-        return true;
-    }
-
-    private void showTooltipOnly(float worldX, float worldY) {
-        Airport clickedAirport = findAirportAt(worldX, worldY);
-        if (clickedAirport != null) {
-            uiManager.showAirportTooltip(clickedAirport);
-            return;
-        }
-
-        Airline clickedAirline = findAirlineAt(worldX, worldY);
-        if (clickedAirline != null) {
-            uiManager.showAirlineTooltip(clickedAirline);
-            return;
-        }
-
-        uiManager.removeTooltip();
+        return false;
     }
 
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
-        if (uiManager.isWindowOpen() || uiManager.isPointerOverHudActor() || uiManager.isPointerOverTooltip()) {
-            return true;
-        }
-
         float deltaX = lastMousePos.x - screenX;
         float deltaY = screenY - lastMousePos.y;
 
@@ -189,10 +113,10 @@ public class MapInputController extends InputAdapter {
 
     @Override
     public boolean scrolled(float amountX, float amountY) {
-        if (uiManager.isWindowOpen()) return true;
-        if (uiManager.isPointerOverTooltip() || uiManager.isPointerOverHudActor()) return true;
-
-        camera.zoom += amountY * 0.1f;
-        return true;
+        if (uiManager.canClickAndScrollMap()) {
+            camera.zoom += amountY * 0.1f;
+            return true;
+        }
+        return false;
     }
 }

@@ -67,7 +67,7 @@ public class AbilitiesWindow extends BaseGameWindow {
                 llh.sendAbilityResponse(selectedAbilityId);
 
                 remove();
-                uiManager.showSuccessWindow("Ability selected successfully!");
+                uiManager.showNotificationWindow("Ability selected successfully!");
             }
         });
 

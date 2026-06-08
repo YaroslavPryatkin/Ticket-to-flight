@@ -3,14 +3,13 @@ package com.game.Ticket_To_Flight.frontend.UI.MainScreen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.ScreenAdapter;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
 import com.game.Ticket_To_Flight.frontend.MainClient;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.MapInput.MapInputController;
-import com.game.Ticket_To_Flight.frontend.UI.MainScreen.MapInput.MapSelectionState;
-import com.game.Ticket_To_Flight.frontend.UI.MainScreen.MapStrategies.MapInteractionStrategy;
 
 public class WorldMapRenderer extends ScreenAdapter {
     private final MainClient client;
@@ -34,16 +33,14 @@ public class WorldMapRenderer extends ScreenAdapter {
     public WorldMapRenderer(MainClient client) {
         this.client = client;
         this.gameData = client.getGameData();
-
-        MapSelectionState selectionState = new MapSelectionState();
-        this.mapDrawer = new MapDrawer(selectionState, gameData);
-
         this.uiStageWindow = new Stage(new FitViewport(2750, 1536));
         this.uiStageHUD = new Stage(new ExtendViewport(2750, 1536));
 
-        this.uiManager = new GameUIManager(uiStageWindow, uiStageHUD, client, selectionState, mapDrawer.getCamera());
+        OrthographicCamera mainCamera = new OrthographicCamera();
+        this.uiManager = new GameUIManager(uiStageWindow, uiStageHUD, client,  mainCamera);
 
-        this.inputCtrl = new MapInputController(mapDrawer.getCamera(), gameData, uiManager, client, selectionState, uiManager.getFlightController());
+        this.mapDrawer = new MapDrawer(gameData, mainCamera, uiManager);
+        this.inputCtrl = new MapInputController(mainCamera, gameData, uiManager, client);
 
         this.multiplexer = new InputMultiplexer();
         multiplexer.addProcessor(uiStageWindow);
@@ -51,19 +48,7 @@ public class WorldMapRenderer extends ScreenAdapter {
         multiplexer.addProcessor(inputCtrl);
     }
 
-    public void updateHUDData() {
-        uiManager.updateHUDData();
-    }
-
-    public boolean drawInvestmentWindow() { return uiManager.showInvestWindow(); }
-    public boolean drawAuctionWindow() { return uiManager.showAuctionWindow(); }
-    public boolean drawPlaneWindow() { return uiManager.showPlaneWindow(); }
-    public boolean drawAbilitiesWindow() { return uiManager.showAbilitiesWindow(); }
-    public void drawSuccessWindow(String message) { uiManager.showSuccessWindow(message); }
-
-    public void setMapCurrentStrategy(MapInteractionStrategy currentStrategy) {
-        inputCtrl.setCurrentStrategy(currentStrategy);
-    }
+    public GameUIManager getGameUiManager(){return uiManager;}
 
     @Override
     public void show() {
@@ -76,9 +61,6 @@ public class WorldMapRenderer extends ScreenAdapter {
     }
 
     public void renderNoLogic(float delta) {
-        inputCtrl.updateCurrentStrategy();
-        inputCtrl.updateWindowClickTooltip();
-
         Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
         mapDrawer.render(delta);
@@ -94,7 +76,7 @@ public class WorldMapRenderer extends ScreenAdapter {
         mapDrawer.resize(width, height);
         uiStageWindow.getViewport().update(width, height, true);
         uiStageHUD.getViewport().update(width, height, true);
-        uiManager.resize(width, height);
+        uiManager.resize();
     }
 
     @Override

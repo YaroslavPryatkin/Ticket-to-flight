@@ -143,13 +143,13 @@ public class PlaneWindow extends BaseGameWindow {
                 if (buttonGroup.getChecked() == null) return;
                 if (player.actionPoints == 0) {
                     llh.sendPlanePass();
-                    uiManager.showSuccessWindow("You have not got more AP");
+                    uiManager.showNotificationWindow("You have not got more AP");
                     return;
                 }
                 int selectedPlaneId = (int) buttonGroup.getChecked().getUserObject();
 
                 llh.sendPlaneResponse(selectedPlaneId, false);
-                uiManager.showSuccessWindow("Plane successfully bought!");
+                uiManager.showNotificationWindow("Plane successfully bought!");
             }
         });
 
@@ -159,13 +159,13 @@ public class PlaneWindow extends BaseGameWindow {
                 if (buttonGroup.getChecked() == null) return;
                 if (player.actionPoints == 0) {
                     llh.sendPlanePass();
-                    uiManager.showSuccessWindow("You have not got more AP");
+                    uiManager.showNotificationWindow("You have not got more AP");
                     return;
                 }
                 int selectedPlaneId = (int) buttonGroup.getChecked().getUserObject();
 
                 llh.sendPlaneResponse(selectedPlaneId, true);
-                uiManager.showSuccessWindow("Plane bought and turn finished!");
+                uiManager.showNotificationWindow("Plane bought and turn finished!");
             }
         });
 
@@ -173,7 +173,7 @@ public class PlaneWindow extends BaseGameWindow {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 llh.sendPlanePass();
-                uiManager.showSuccessWindow("Skipped plane purchase.");
+                uiManager.showNotificationWindow("Skipped plane purchase.");
             }
         });
 

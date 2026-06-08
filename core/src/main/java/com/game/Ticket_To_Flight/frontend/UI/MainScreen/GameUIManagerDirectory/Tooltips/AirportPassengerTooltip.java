@@ -10,7 +10,7 @@ import com.game.Ticket_To_Flight.frontend.components.buttons.SelectButton;
 
 import java.util.function.Consumer;
 
-public class AirportPassengerTooltip extends AirportHoverTooltip {
+public class AirportPassengerTooltip extends AirportLeftDownCornerTooltip {
 
     private final Route currentRoute;
     private final Consumer<PassengerType> onPassengerSelected;

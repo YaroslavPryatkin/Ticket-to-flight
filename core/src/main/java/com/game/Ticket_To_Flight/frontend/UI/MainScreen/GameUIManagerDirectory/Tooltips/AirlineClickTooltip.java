@@ -94,7 +94,6 @@ public class AirlineClickTooltip extends BaseGameWindow implements MapTooltipWin
         if (!canBuyNow) return;
 
         llh.sendAirlineResponse(airline, finishStage);
-        uiManager.removeTooltip();
     }
 
     private String routeTitle(Airline airline) {

@@ -68,7 +68,7 @@ public class WindowManager {
         return true;
     }
 
-    public void showSuccessWindow(String message) {
+    public void showNotificationWindow(String message) {
         closeCurrentWindow();
         currentWindow = new SuccessWindow(defaultSkin, facade, message);
         openWindow(currentWindow);

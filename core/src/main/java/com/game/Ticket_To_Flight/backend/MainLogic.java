@@ -248,6 +248,4 @@ public class MainLogic extends MainLoopBack {
             llh.sendUnknownMessageError();
         }
     }
-
-
 }

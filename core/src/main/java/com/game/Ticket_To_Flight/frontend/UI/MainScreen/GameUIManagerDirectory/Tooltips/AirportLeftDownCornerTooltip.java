@@ -11,18 +11,18 @@ import com.game.Ticket_To_Flight.frontend.components.details.PassengerDetailsWid
 import com.game.Ticket_To_Flight.frontend.components.tables.expandable.ExpandableListWidget;
 import com.game.Ticket_To_Flight.frontend.components.tables.passenger.PassengerTableWidget;
 import com.game.Ticket_To_Flight.frontend.components.texts.WrappedText;
-import com.game.Ticket_To_Flight.frontend.components.windows.BaseHoverTooltip;
+import com.game.Ticket_To_Flight.frontend.components.windows.LeftDownCornerTooltip;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-public class AirportHoverTooltip extends BaseHoverTooltip {
+public class AirportLeftDownCornerTooltip extends LeftDownCornerTooltip {
     private static final float CONTENT_WIDTH = 600f;
     private static final float CONTENT_MAX_HEIGHT = 430f;
 
-    public AirportHoverTooltip(Skin skin, Airport airport) {
+    public AirportLeftDownCornerTooltip(Skin skin, Airport airport) {
         super("Airport", skin);
 
         Table content = new Table();
