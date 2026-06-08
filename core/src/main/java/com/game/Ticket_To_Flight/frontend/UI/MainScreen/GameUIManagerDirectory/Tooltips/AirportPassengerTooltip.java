@@ -21,7 +21,7 @@ public class AirportPassengerTooltip extends AirportLeftDownCornerTooltip {
         this.onPassengerSelected = onPassengerSelected;
 
         getTitleLabel().setColor(Color.ORANGE);
-        getTitleLabel().setText("Boarding: " + airport.getCityName());
+        getTitleLabel().setText("Boarding: " + airport.getAirportName());
     }
 
     @Override

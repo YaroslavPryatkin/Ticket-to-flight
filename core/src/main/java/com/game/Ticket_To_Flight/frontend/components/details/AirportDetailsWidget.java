@@ -20,9 +20,7 @@ public final class AirportDetailsWidget {
     public static void fill(Table table, Skin skin, Airport airport, float wrapWidth) {
         if (airport == null || airport.type == null) return;
 
-        addRow(table, skin, "City type", airport.type.getCityType(), wrapWidth);
         addRow(table, skin, "Description", airport.type.description, wrapWidth);
-        addRow(table, skin, "Cost", "$" + airport.type.cost, wrapWidth);
         addRow(
             table,
             skin,
@@ -35,9 +33,11 @@ public final class AirportDetailsWidget {
     public static void addCityHeader(Table table, Skin skin, Airport airport, float wrapWidth) {
         if (airport == null) return;
 
+        String str = airport.getAirportName() + " : " + airport.type.getCityType();
+
         Label cityLabel = wrapWidth > 0
-            ? new WrappedText(airport.getCityName(), skin, wrapWidth)
-            : new SingleLineText(airport.getCityName(), skin);
+            ? new WrappedText(str, skin, wrapWidth)
+            : new SingleLineText(str, skin);
         cityLabel.setColor(Color.CYAN);
 
         if (wrapWidth > 0) {

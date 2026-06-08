@@ -11,7 +11,6 @@ import com.game.Ticket_To_Flight.Utilities.MapHolder;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airport;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.PassengerType;
 import com.game.Ticket_To_Flight.commonFrontAndBack.Route;
-import com.game.Ticket_To_Flight.frontend.components.details.AirportDetailsWidget;
 import com.game.Ticket_To_Flight.frontend.components.details.PassengerDetailsWidget;
 import com.game.Ticket_To_Flight.frontend.components.buttons.SelectButton;
 import com.game.Ticket_To_Flight.frontend.components.tables.expandable.ExpandableListWidget;
@@ -90,7 +89,7 @@ public class BoardingHUD extends AbstractFlightPanel {
         clearChildren();
         contentTable.clearChildren();
 
-        String headerTitle = currentAirport != null ? "Boarding: " + currentAirport.getCityName() : "Boarding (No Airport)";
+        String headerTitle = currentAirport != null ? "Boarding: " + currentAirport.getAirportName() : "Boarding (No Airport)";
         add(buildHeader(headerTitle)).fillX().expandX().row();
 
         if (!isCollapsed && currentAirport != null) {

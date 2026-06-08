@@ -35,7 +35,7 @@ public class GameServer {
         start();
     }
 
-    public void start() {
+    void start() {
         try {
             server.bind(Network.TCP_PORT, Network.UDP_PORT);
             server.start();
@@ -44,5 +44,9 @@ public class GameServer {
             System.err.println("FATAL: Failed to start server: " + e.getMessage());
             throw new RuntimeException("Server startup failed", e);
         }
+    }
+
+    public void stop(){
+        server.stop();
     }
 }

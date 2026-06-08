@@ -189,7 +189,7 @@ public class GameUIManager {
         if (canChooseFlight())
             mainFlightController.setActive();
 
-        hudOverlay.updateStandardHUD(null);
+        hudOverlay.updateStandardHUD();
     }
 
     public void updateDynamicControls() {

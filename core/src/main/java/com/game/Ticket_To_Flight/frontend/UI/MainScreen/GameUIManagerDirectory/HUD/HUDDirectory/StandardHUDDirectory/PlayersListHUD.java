@@ -19,7 +19,6 @@ import com.game.Ticket_To_Flight.frontend.components.subsidiary.ComponentHover;
 import com.game.Ticket_To_Flight.frontend.components.background.SolidRectangleBackground;
 import com.game.Ticket_To_Flight.frontend.components.tables.expandable.ExpandableListWidget;
 import com.game.Ticket_To_Flight.frontend.components.texts.SingleLineText;
-import com.game.Ticket_To_Flight.frontend.components.texts.Text;
 import com.game.Ticket_To_Flight.frontend.components.texts.WrappedText;
 
 import java.util.ArrayList;
@@ -32,6 +31,38 @@ public class PlayersListHUD extends Table {
     private static final float INNER_WIDTH = FIXED_WIDTH - 30f;
 
     private static final float MAX_HEIGHT = 550f;
+
+
+
+    private static final float PASSED_DARK_FACTOR = 0.5f;
+    private static final float CURRENT_BRIGHT_FACTOR = 1.3f;
+    private static final float DEFAULT_BORDER_WIDTH = 3.0f;
+    private static final Color GOLD_COLOR = new Color(1.0f, 0.843f, 0.0f, 1.0f);
+
+    private SolidRectangleBackground getPlayerBackgroundRectangle(Player p) {
+        Color baseColor = p.getColor().cpy();
+
+        if (p.hasPassed) {
+            baseColor.mul(PASSED_DARK_FACTOR, PASSED_DARK_FACTOR, PASSED_DARK_FACTOR, 1.0f);
+        }
+        SolidRectangleBackground res = new SolidRectangleBackground(0, 0, 0, 0,
+            baseColor,
+            baseColor.cpy(),
+            baseColor.cpy()
+        );
+
+        if (p.getId() == gameData.currentPlayer) {
+            Color brightBorder = baseColor.cpy().mul(CURRENT_BRIGHT_FACTOR, CURRENT_BRIGHT_FACTOR, CURRENT_BRIGHT_FACTOR, 1.0f).clamp();
+            res.setBorder(brightBorder, DEFAULT_BORDER_WIDTH);
+        }
+
+        if (p.getId() == llh.getMyId()) {
+            res.setBorder(GOLD_COLOR, DEFAULT_BORDER_WIDTH);
+        }
+
+        return res;
+    }
+
 
     private final GameData gameData;
     private final LowLevelHandlerFront llh;
@@ -75,23 +106,22 @@ public class PlayersListHUD extends Table {
         contentTable.clearChildren();
         activeExpandLists.clear();
 
-        for (Player p : gameData.players) {
+        if(gameData.turnOrder == null){
+            contentTable.add(new SingleLineText("No player turn order data available.", skin))
+                .padBottom(10).left().row();
+            return;
+        }
+        for (Player p : gameData.turnOrder) {
             if (p == null) continue;
 
-            boolean isCurrentTurn = (p.getId() == gameData.currentPlayer);
-
-            SolidRectangleBackground playerRow = new SolidRectangleBackground(0, 0, 0, 0,
-                isCurrentTurn ? new Color(0.2f, 0.4f, 0.8f, 0.9f) : new Color(0.15f, 0.15f, 0.15f, 0.8f),
-                new Color(0.25f, 0.45f, 0.85f, 0.9f),
-                new Color(0.2f, 0.4f, 0.8f, 0.9f)
-            );
+            SolidRectangleBackground playerRow = getPlayerBackgroundRectangle(p);
             playerRow.left().pad(15);
 
             playerRow.setTouchable(Touchable.enabled);
 
             Table header = new Table();
             Label nameLabel = new SingleLineText(p.getName(), skin);
-            if (p.getColor() != null) nameLabel.setColor(p.getColor());
+            nameLabel.setColor(Color.WHITE);
 
             header.add(nameLabel).left().expandX();
             header.add(new SingleLineText("AP: " + p.getActionPoints(), skin)).right().top();
@@ -104,12 +134,10 @@ public class PlayersListHUD extends Table {
             moneyRow.add(moneyLabel).left().expandX();
 
             if (gameData.currentState == GameData.State.AUCTION) {
-                boolean isPass = gameData.players.get(gameData.currentPlayer).hasPassed;
-
-                String betText = isPass ? "Pass" : "Bet: $" + p.getAuctionBet();
+                String betText = "Bet: $" + p.getAuctionBet();
                 Label betLabel = new SingleLineText(betText, skin);
 
-                betLabel.setColor(isPass ? Color.GRAY : Color.ORANGE);
+                betLabel.setColor(Color.WHITE);
                 moneyRow.add(betLabel).right();
             }
             playerRow.add(moneyRow).width(INNER_WIDTH).padTop(8).row();

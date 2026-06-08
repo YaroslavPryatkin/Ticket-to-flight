@@ -102,7 +102,6 @@ public class LowLevelHandlerFront extends LowLevelHandler {
             checkedChanges = null;
             gameData.clearGameData();
             if(dataChanges != null) {
-                checkAndShowNotification(dataChanges);
                 gameData.applyChangesUnsafe(dataChanges);
                 changeFlagDependingOnNewState(dataChanges.currentState);
                 mainClient.gameDataWasUpdated();
@@ -111,6 +110,7 @@ public class LowLevelHandlerFront extends LowLevelHandler {
             }
         } catch (Exception e) {
             System.err.println("Error during game data reload. Error " + e.getMessage());
+            e.printStackTrace();
             dataInconsistent();
         } finally {
             gameData.releaseWriteLock();
@@ -127,7 +127,6 @@ public class LowLevelHandlerFront extends LowLevelHandler {
             gameData.acquireWriteLock();
             try {
                 //System.out.println("Applying changes");
-                checkAndShowNotification(checkedChanges);
                 gameData.applyChangesUnsafe(checkedChanges);
                 changeFlagDependingOnNewState(checkedChanges.currentState);
                 mainClient.gameDataWasUpdated();
@@ -172,7 +171,7 @@ public class LowLevelHandlerFront extends LowLevelHandler {
                     }
                 }
 
-                isValid = gameData.checkChanges(change);
+                isValid = gameData.checkChangesDebug(change);
 
                 if (interruptValidator.compareAndSet(true, false)) {
                     return;
@@ -181,7 +180,7 @@ public class LowLevelHandlerFront extends LowLevelHandler {
                 if (isValid) {
                     checkedChanges = change;
                 } else {
-                    System.err.println("Data changes isnt valid");
+                    System.err.println("Data changes isnt valid.");
                     dataInconsistent();
                 }
 
@@ -203,19 +202,6 @@ public class LowLevelHandlerFront extends LowLevelHandler {
         checkedChanges = null;
         changesQueue.clear();
         sendMessageToServer(new Network.ReloadGameDataRequest());
-    }
-
-    private void checkAndShowNotification(GameData.DataChanges dc){
-        if(dc.currentState!=null && dc.currentState!=gameData.currentState){
-            if(gameData.currentPlayer.equals(myId)){
-                //show successfull answer
-            }
-            //show next stage
-            return;
-        }
-        if(dc.currentPlayer!=null && !dc.currentPlayer.equals(gameData.currentPlayer)){
-            //show successfull answer
-        }
     }
 
     private void changeFlagDependingOnNewState(GameData.State st){

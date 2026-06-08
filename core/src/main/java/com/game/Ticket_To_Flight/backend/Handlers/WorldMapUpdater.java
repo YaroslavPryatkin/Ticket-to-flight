@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airport;
 import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
+import com.game.Ticket_To_Flight.commonFrontAndBack.StaticGameData;
 
 import java.io.Reader;
 import java.util.*;
@@ -100,12 +101,14 @@ public class WorldMapUpdater {
         for (JsonNode node : arrayNode) {
             int id = node.get("id").asInt();
             int type = node.get("type").asInt();
-            int x = node.get("x").asInt();
-            int y = node.get("y").asInt();
-            String name = node.get("name").asText();
+            if(StaticGameData.airportTypes.contains(type)) {
+                int x = node.get("x").asInt();
+                int y = node.get("y").asInt();
+                String name = node.get("name").asText();
 
-            dataChangesCreator.addAirport(id, type, x, y, name);
-            newlyAdded.add(id);
+                dataChangesCreator.addAirport(id, type, x, y, name);
+                newlyAdded.add(id);
+            }
         }
     }
 
@@ -113,7 +116,9 @@ public class WorldMapUpdater {
         if (!arrayNode.isArray()) return;
 
         for (JsonNode node : arrayNode) {
-            dataChangesCreator.addAirline(node.get("type").asInt(), node.get("portA").asInt(), node.get("portB").asInt());
+            int type = node.get("type").asInt();
+            if(StaticGameData.airlineTypes.contains(type))
+                dataChangesCreator.addAirline(type, node.get("portA").asInt(), node.get("portB").asInt());
         }
     }
 
@@ -121,7 +126,9 @@ public class WorldMapUpdater {
         if (!arrayNode.isArray()) return;
 
         for (JsonNode node : arrayNode) {
-            dataChangesCreator.addAvailablePlanes(node.get("type").asInt(), node.get("amount").asInt());
+            int type = node.get("type").asInt();
+            if(StaticGameData.planeTypes.contains(type))
+                dataChangesCreator.addAvailablePlanes(type, node.get("amount").asInt());
         }
     }
 

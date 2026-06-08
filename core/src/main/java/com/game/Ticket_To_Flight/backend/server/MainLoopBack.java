@@ -55,6 +55,7 @@ public abstract class MainLoopBack {
     protected synchronized void stop() {
         if (!isRunning) return;
 
+        llh.stopNetworkServer();
         isRunning = false;
         if (gameThread != null) {
             gameThread.interrupt();

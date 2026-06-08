@@ -4,9 +4,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.game.Ticket_To_Flight.Utilities.MapHolder;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.AirportType;
 import com.game.Ticket_To_Flight.Utilities.Identifiable;
-import com.badlogic.gdx.graphics.Color;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.PassengerType;
-import com.game.Ticket_To_Flight.commonFrontAndBack.StaticGameData;
 
 import java.util.Map;
 
@@ -54,7 +52,7 @@ public class Airport extends Identifiable {
         return 6f;
     }
 
-    public String getCityName() {
+    public String getAirportName() {
         return airportName;
     }
 

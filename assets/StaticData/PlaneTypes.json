@@ -14,15 +14,54 @@
   },
   {
     "id": 2,
-    "fuel": 50000000,
+    "fuel": 100000,
     "stations": 10,
-    "luxury": 4,
-    "capacity": 180,
-    "minGate": 4,
-    "maxGate": 4,
-    "minDist": 500.0,
-    "maxDist": 1000000.0,
-    "price": 400,
-    "description": "big plane"
+    "luxury": 1,
+    "capacity": 200,
+    "minGate": null,
+    "maxGate": null,
+    "minDist": null,
+    "maxDist": null,
+    "price": 300,
+    "description": "low fuel cool plane"
+  },
+  {
+    "id": 3,
+    "fuel": 1000000000,
+    "stations": 10,
+    "luxury": 1,
+    "capacity": 200,
+    "minGate": null,
+    "maxGate": null,
+    "minDist": null,
+    "maxDist": null,
+    "price": 300,
+    "description": "another cool plane"
+  },
+  {
+    "id": 4,
+    "fuel": 1000000000,
+    "stations": 10,
+    "luxury": 1,
+    "capacity": 300,
+    "minGate": null,
+    "maxGate": null,
+    "minDist": null,
+    "maxDist": null,
+    "price": 300,
+    "description": "YANDEX cool plane"
+  },
+  {
+    "id": 5,
+    "fuel": 1000000000,
+    "stations": 0,
+    "luxury": 1,
+    "capacity": 500,
+    "minGate": null,
+    "maxGate": null,
+    "minDist": null,
+    "maxDist": null,
+    "price": 300,
+    "description": "very big cool plane"
   }
 ]

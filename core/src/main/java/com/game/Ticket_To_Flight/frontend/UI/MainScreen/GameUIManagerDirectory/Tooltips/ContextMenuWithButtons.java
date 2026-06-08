@@ -123,7 +123,7 @@ public class ContextMenuWithButtons extends BaseGameWindow implements MapTooltip
     }
 
     private String routeTitle(Airline airline) {
-        return airline.getPortA().getCityName() + " - " + airline.getPortB().getCityName();
+        return airline.getPortA().getAirportName() + " - " + airline.getPortB().getAirportName();
     }
 
     @Override

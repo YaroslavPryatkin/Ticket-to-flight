@@ -14,7 +14,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class LowLevelHandlerBack extends LowLevelHandler {
-    private final GameServer gameClient = new GameServer(this);
+    private final GameServer gameServer = new GameServer(this);
     private final MainLoopBack logic;
     public static class Flags {
         public enum GamePreparationsState {
@@ -44,6 +44,9 @@ public class LowLevelHandlerBack extends LowLevelHandler {
     public LowLevelHandlerBack(GameData data,  MainLoopBack logic){super(data); this.logic = logic;}
 
 
+    public void stopNetworkServer(){
+        gameServer.stop();
+    }
     //------------------------------------- messages part
 
     @Override

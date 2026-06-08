@@ -25,7 +25,7 @@ public class PlaneWindow extends BaseGameWindow {
     private final Runnable updateBottomUI;
 
     public PlaneWindow(Skin skin, final GameUIManager uiManager, final LowLevelHandlerFront llh, GameData gameData) {
-        super("Plane Purchase", skin, 1400, 800);
+        super("Plane Purchase", skin, 1300, 800);
 
         Player pl = gameData.players.get(llh.getMyId());
         int playerMoney = pl.money;
@@ -141,11 +141,6 @@ public class PlaneWindow extends BaseGameWindow {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 if (buttonGroup.getChecked() == null) return;
-                if (player.actionPoints == 0) {
-                    llh.sendPlanePass();
-                    uiManager.showNotificationWindow("You have not got more AP");
-                    return;
-                }
                 int selectedPlaneId = (int) buttonGroup.getChecked().getUserObject();
 
                 llh.sendPlaneResponse(selectedPlaneId, false);
@@ -157,11 +152,6 @@ public class PlaneWindow extends BaseGameWindow {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 if (buttonGroup.getChecked() == null) return;
-                if (player.actionPoints == 0) {
-                    llh.sendPlanePass();
-                    uiManager.showNotificationWindow("You have not got more AP");
-                    return;
-                }
                 int selectedPlaneId = (int) buttonGroup.getChecked().getUserObject();
 
                 llh.sendPlaneResponse(selectedPlaneId, true);

@@ -27,8 +27,8 @@ public class AirlineLeftDownCornerTooltip extends LeftDownCornerTooltip {
         addRow(content, skin, "Description", type.description);
         addRow(content, skin, "Price", "$" + type.price);
         addRow(content, skin, "Yield", String.valueOf(type.yield));
-        addRow(content, skin, "Gate A", String.valueOf(type.gateA));
-        addRow(content, skin, "Gate B", String.valueOf(type.gateB));
+        addRow(content, skin, "Gates taken from " + airline.portA.airportName, String.valueOf(type.gateA));
+        addRow(content, skin, "Gates taken from " + airline.portB.airportName, String.valueOf(type.gateB));
         addRow(content, skin, "Luxury range", formatInterval(type.luxuryRange.getFrom(), type.luxuryRange.getTo()));
         addRow(content, skin, "Capacity range", formatInterval(type.capacityRange.getFrom(), type.capacityRange.getTo()));
 
@@ -41,7 +41,7 @@ public class AirlineLeftDownCornerTooltip extends LeftDownCornerTooltip {
     }
 
     private String routeTitle(Airline airline) {
-        return airline.getPortA().getCityName() + " -> " + airline.getPortB().getCityName();
+        return airline.getPortA().getAirportName() + " - " + airline.getPortB().getAirportName();
     }
 
     private void addRow(Table table, Skin skin, String label, String value) {

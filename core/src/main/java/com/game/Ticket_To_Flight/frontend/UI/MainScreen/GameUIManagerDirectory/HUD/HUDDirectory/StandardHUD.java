@@ -17,6 +17,7 @@ import com.game.Ticket_To_Flight.frontend.components.texts.SingleLineText;
 public class StandardHUD extends Table {
     private final GameData gameData;
     private final LowLevelHandlerFront llh;
+    private final Table leftStats;
 
     private final Label roundLabel, stageLabel, timeLabel;
     private final PlayersListHUD playersListHUD;
@@ -33,12 +34,11 @@ public class StandardHUD extends Table {
 
         roundLabel = new SingleLineText("Round: ", skin);
         stageLabel = new SingleLineText("Stage: ", skin);
-        timeLabel = new SingleLineText("Time: ", skin);
-        timeLabel.setColor(Color.ORANGE);
+        timeLabel = new SingleLineText("Current bet: ", skin);
 
         playersListHUD = new PlayersListHUD(gameData, llh, skin);
 
-        Table leftStats = new Table();
+        leftStats = new Table();
         leftStats.top().left();
 
         Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
@@ -51,27 +51,34 @@ public class StandardHUD extends Table {
         leftStats.pad(20);
         leftStats.setTouchable(Touchable.childrenOnly);
 
-        leftStats.add(roundLabel).left().row();
-        leftStats.add(stageLabel).left().padTop(15).row();
-        leftStats.add(timeLabel).left().padTop(15).row();
-
-        leftStats.add(playersListHUD).left().padTop(30).row();
+        addLeftStatsChildren();
 
         this.add(leftStats).left().top().expandY().fillY();
     }
 
-    public void updateHUD(Player chosenPlayer) {
-        String currentStage = gameData.currentState.toString();
-        Player activePlayer = chosenPlayer == null ? gameData.players.get(llh.getMyId()) : chosenPlayer;
-
-        updateGlobalGameStats(currentStage);
-
+    public void updateHUD() {
+        updateGlobalGameStats();
         playersListHUD.updateData();
     }
 
-    private void updateGlobalGameStats(String stage) {
+    private GameData.State lastState = null;
+
+    private void addLeftStatsChildren(){
+        leftStats.add(roundLabel).left().row();
+        leftStats.add(stageLabel).left().padTop(15).row();
+        if(gameData.currentState == GameData.State.AUCTION)
+            leftStats.add(timeLabel).left().padTop(15).row();
+        leftStats.add(playersListHUD).left().padTop(30).row();
+        lastState = gameData.currentState;
+    }
+
+    private void updateGlobalGameStats() {
         roundLabel.setText("Round: " + gameData.roundNumber);
-        stageLabel.setText("Stage: " + stage);
-        timeLabel.setText("Time: 120s");
+        stageLabel.setText("Stage: " + gameData.currentState.toString());
+        timeLabel.setText("Current bet: " + gameData.currentBet);
+        if(lastState!=gameData.currentState){
+            leftStats.clearChildren();
+            addLeftStatsChildren();
+        }
     }
 }

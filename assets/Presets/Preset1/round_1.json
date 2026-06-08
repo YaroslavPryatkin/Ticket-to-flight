@@ -87,6 +87,18 @@
     {
       "type": 2,
       "amount": 2
+    },
+    {
+      "type": 3,
+      "amount": 2
+    },
+    {
+      "type": 4,
+      "amount": 2
+    },
+    {
+      "type": 5,
+      "amount": 2
     }
   ]
 }
