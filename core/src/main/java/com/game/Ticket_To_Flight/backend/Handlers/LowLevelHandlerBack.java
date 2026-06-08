@@ -1,6 +1,7 @@
 package com.game.Ticket_To_Flight.backend.Handlers;
 
 import com.esotericsoftware.kryonet.Connection;
+import com.game.Ticket_To_Flight.backend.MainLogic;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Player;
 import com.game.Ticket_To_Flight.backend.server.GameServer;
 import com.game.Ticket_To_Flight.backend.server.MainLoopBack;
@@ -60,7 +61,7 @@ public class LowLevelHandlerBack extends LowLevelHandler {
         }
 
         if(con2int.isEmpty()){
-            logic.stopServer();
+            MainLogic.stopServer();
         }
 
         if (gameData.currentPlayer != null && gameData.currentPlayer.equals(playerId)) {
@@ -77,8 +78,10 @@ public class LowLevelHandlerBack extends LowLevelHandler {
             if (flags.gamePreparationsState == Flags.GamePreparationsState.RUNNING) {
                 addMessage(con, new Network.JoinGameResponse(Network.JoinGameResponse.Response.GAME_IS_RUNNING));
             }
-            Network.JoinGameRequest req = (Network.JoinGameRequest) message;
-            addMessage(con ,  gameStarter.handleJoinGameRequest(con, req.playerName));
+            else {
+                Network.JoinGameRequest req = (Network.JoinGameRequest) message;
+                addMessage(con, gameStarter.handleJoinGameRequest(con, req.playerName));
+            }
         }
         else if(message instanceof Network.ReloadGameDataRequest){
             if(con2int.containsKey(con) && gameData.currentState != GameData.State.GAME_FINISHED){

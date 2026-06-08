@@ -6,6 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.game.Ticket_To_Flight.backend.MainLogic;
 import com.game.Ticket_To_Flight.frontend.components.buttons.RoundedButton;
 import com.game.Ticket_To_Flight.frontend.components.texts.SingleLineText;
 
@@ -32,6 +33,11 @@ public class MainMenuUI {
         createServerBtn = new RoundedButton("Create server", skin);
         connectServerBtn = new RoundedButton("Connect to server", skin);
 
+        if(MainLogic.isServerExist())
+            connectServerBtn.setText("Server is running");
+        else
+            connectServerBtn.setText("Connect to server");
+
         createServerBtn.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -41,13 +47,16 @@ public class MainMenuUI {
                     dialog.show(mainTable.getStage());
                     createServerBtn.setText("Server is running");
                 }
+                else {
+                    createServerBtn.setText("Connect to server");
+                }
             }
         });
 
         connectServerBtn.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                System.out.println("Connect to server clicked");
+                //System.out.println("Connect to server clicked");
 
                 mainMenuClient.createMainClient();
             }

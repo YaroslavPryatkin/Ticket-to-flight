@@ -25,9 +25,13 @@ public class MainLogic extends MainLoopBack {
         return instance;
     }
 
-    @Override
-    public synchronized void stopServer(){
-        instance.stop();
+    public static boolean isServerExist(){
+        return instance != null;
+    }
+
+    public static synchronized void stopServer(){
+        if(instance!=null)
+            instance.stop();
         instance = null;
     }
 
@@ -48,10 +52,10 @@ public class MainLogic extends MainLoopBack {
         }
         else{
             if(gameData.players.isEmpty()){
-                stopServer();
+                MainLogic.stopServer();
             }
             else if(gameData.currentState == GameData.State.GAME_FINISHED){
-                //do nothing
+                MainLogic.stopServer();
             }
             else if(llh.getCurrentPlayerState() == Flags.CurrentPlayerState.NO_PLAYER_STAGE) {
                 if (gameData.currentState == GameData.State.WORLD_UPDATE) {

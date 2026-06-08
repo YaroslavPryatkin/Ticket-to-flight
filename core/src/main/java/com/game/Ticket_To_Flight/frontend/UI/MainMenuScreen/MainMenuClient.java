@@ -18,11 +18,8 @@ public class MainMenuClient {
     }
 
     public boolean createMainLogic() {
-        if (this.mainLogic == null) {
-            this.mainLogic = MainLogic.getInstance();
-            return true;
-        }
-        return false;
+            MainLogic.getInstance();
+            return MainLogic.isServerExist();
     }
 
     public void createMainClient() {
