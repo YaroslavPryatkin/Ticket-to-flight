@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
+import com.game.Ticket_To_Flight.commonFrontAndBack.RatingRecord;
 import com.game.Ticket_To_Flight.frontend.MainClient;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.MapInput.MapInputController;
 
@@ -37,7 +38,7 @@ public class WorldMapRenderer extends ScreenAdapter {
         this.uiStageHUD = new Stage(new ExtendViewport(2750, 1536));
 
         OrthographicCamera mainCamera = new OrthographicCamera();
-        this.uiManager = new GameUIManager(uiStageWindow, uiStageHUD, client,  mainCamera);
+        this.uiManager = new GameUIManager(uiStageWindow, uiStageHUD, client, mainCamera);
 
         this.mapDrawer = new MapDrawer(gameData, mainCamera, uiManager);
         this.inputCtrl = new MapInputController(mainCamera, gameData, uiManager, client);

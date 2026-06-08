@@ -1,23 +1,25 @@
 package com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.GameStageWindows.SubWindows;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.AbilityType;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManager;
 import com.game.Ticket_To_Flight.frontend.components.windows.BaseGameWindow;
 import com.game.Ticket_To_Flight.frontend.components.buttons.RoundedButton;
 import com.game.Ticket_To_Flight.frontend.components.texts.SingleLineText;
 
-public class SuccessWindow extends BaseGameWindow {
-    public SuccessWindow(Skin skin, final GameUIManager uiManager, String message) {
+public class NotificationWindow extends BaseGameWindow {
+    public NotificationWindow(Skin skin, final GameUIManager uiManager, String message) {
         super("Notification", skin);
-        this.setModal(true);
 
         this.pad(60);
-
-        this.padTop(120);
+        this.pad(120,10,10,10);
 
         Label messageLabel = new SingleLineText(message, skin);
+        this.setWidth(messageLabel.getWidth() + 20);
+
 
         TextButton closeBtn = new RoundedButton("Close", skin);
         closeBtn.addListener(new ClickListener() {

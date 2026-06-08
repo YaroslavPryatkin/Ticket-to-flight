@@ -53,53 +53,48 @@ public class WindowManager {
     }
 
     public boolean showAuctionWindow() {
-        if (isWindowOpen) return false;
-
-        currentWindow = new AuctionWindow(investSkin, facade, llh, gameData);
-        openWindow(currentWindow);
+        openWindow(new AuctionWindow(investSkin, facade, llh, gameData));
         return true;
     }
 
     public boolean showInvestWindow() {
-        if (isWindowOpen) return false;
-
-        currentWindow = new InvestWindow(investSkin, facade, llh, gameData);
-        openWindow(currentWindow);
+        openWindow(new InvestWindow(investSkin, facade, llh, gameData));
         return true;
     }
 
     public void showNotificationWindow(String message) {
-        closeCurrentWindow();
-        currentWindow = new SuccessWindow(defaultSkin, facade, message);
-        openWindow(currentWindow);
+        openWindow(new NotificationWindow(defaultSkin, facade, message));
     }
 
     public boolean showAbilitiesWindow() {
-        if (isWindowOpen) return false;
-
-        currentWindow = new AbilitiesWindow(investSkin, facade, llh, gameData);
-        openWindow(currentWindow);
+        openWindow(new AbilitiesWindow(investSkin, facade, llh, gameData));
         return true;
     }
 
     public boolean showPlaneWindow() {
-        if (isWindowOpen) return false;
+        openWindow(new PlaneWindow(investSkin, facade, llh, gameData));
+        return true;
+    }
 
-        currentWindow = new PlaneWindow(investSkin, facade, llh, gameData);
-        openWindow(currentWindow);
+    public boolean showFinishWindow() {
+        openWindow(new FinishGameWindow(investSkin, gameData, llh));
         return true;
     }
 
     private void openWindow(Window window) {
+        closeCurrentWindow();
+        isWindowOpen = true;
+        currentWindow = window;
         uiStageWindow.addActor(window);
         centerCurrentWindow();
         isWindowOpen = true;
     }
 
+
+
     public void setWindowOpen(boolean windowOpen) {
         if (!windowOpen) {
             closeCurrentWindow();
-            return;
         }
         this.isWindowOpen = windowOpen;
     }
@@ -112,6 +107,10 @@ public class WindowManager {
         if (currentWindow == null) return false;
 
         Vector2 stageCoords = uiStageWindow.screenToStageCoordinates(new Vector2(Gdx.input.getX(), Gdx.input.getY()));
+//        if(currentWindow instanceof SuccessWindow) {
+//            System.out.println("min x = " + currentWindow.getX() + " x = " + stageCoords.x + " max x = " + currentWindow.getX() + currentWindow.getWidth());
+//            System.out.println("min y = " + currentWindow.getY() + " y = " + stageCoords.y + " max y = " + currentWindow.getY() + currentWindow.getHeight());
+//        }
         return stageCoords.x >= currentWindow.getX() &&
             stageCoords.x <= currentWindow.getX() + currentWindow.getWidth() &&
             stageCoords.y >= currentWindow.getY() &&

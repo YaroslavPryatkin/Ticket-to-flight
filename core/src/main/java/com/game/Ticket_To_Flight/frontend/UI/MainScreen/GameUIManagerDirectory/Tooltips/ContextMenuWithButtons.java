@@ -15,10 +15,13 @@ import com.game.Ticket_To_Flight.frontend.components.buttons.RoundedButton;
 import com.game.Ticket_To_Flight.frontend.components.texts.WrappedText;
 import com.game.Ticket_To_Flight.frontend.components.windows.BaseGameWindow;
 
-public class AirlineClickTooltip extends BaseGameWindow implements MapTooltipWindow {
+public class ContextMenuWithButtons extends BaseGameWindow implements MapTooltipWindow {
     private static final float CONTENT_WIDTH = 570f;
+    private static final float flightTooltipButtonWidth = 300;
+    private static final float flightTooltipButtonHeight = 60;
 
-    public AirlineClickTooltip(
+    //for buying
+    public ContextMenuWithButtons(
         Skin skin,
         final GameUIManager uiManager,
         final Airline airline,
@@ -28,10 +31,11 @@ public class AirlineClickTooltip extends BaseGameWindow implements MapTooltipWin
         boolean canBuyDuringCurrentStage,
         final LowLevelHandlerFront llh
     ) {
-        super("Route Details", skin, 600, 320);
-        pad(35);
-        padTop(110);
-        defaults().pad(8);
+        super("", skin, 600, 320);
+        this.getTitleTable().remove();
+        this.padTop(10);
+        this.setMovable(false);
+        defaults().pad(10);
 
         Table table = new Table();
         table.defaults().pad(10);
@@ -76,6 +80,28 @@ public class AirlineClickTooltip extends BaseGameWindow implements MapTooltipWin
         add(table);
         pack();
         setSize(Math.max(getWidth(), 600), Math.max(getHeight(), 320));
+    }
+
+    public ContextMenuWithButtons(Skin skin, Runnable rn){
+        super("", skin, flightTooltipButtonWidth + 20, flightTooltipButtonHeight + 20);
+        this.getTitleTable().remove();
+        this.padTop(10);
+        this.setMovable(false);
+        TextButton okButton = new RoundedButton("Choose this", skin);
+        okButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                if (rn != null) {
+                    rn.run();
+                }
+            }
+        });
+
+        this.add(okButton).width(flightTooltipButtonWidth).height(flightTooltipButtonHeight).center();
+
+        this.pack();
+
+        this.setSize(600, 320);
     }
 
     private void configureBuyButton(TextButton button, boolean canBuyDuringCurrentStage, boolean canAfford) {

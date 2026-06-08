@@ -91,14 +91,12 @@ public class Route {
     private final SetHolder<Airport> usedPorts = new SetHolder<>();
     private final MapHolder<Player, Integer> incomeChange = new MapHolder<>();
     private final List<Airline> lines = new ArrayList<>();
-    private boolean hasBeenUpdated = false;
 
     public Route(PlaneType plane, GameData gameData, Airport startAirport) {
         this.plane = plane;
         this.current = startAirport;
         this.startingPort = startAirport;
         usedPorts.add(startAirport);
-        hasBeenUpdated=true;
     }
 
 
@@ -239,7 +237,6 @@ public class Route {
         String error = checkPassengerAdding(type, 1);
         if (error == null) {
             unsafeAddPassenger(type);
-            hasBeenUpdated=true;
             return null;
         }
         else return error;
@@ -255,7 +252,6 @@ public class Route {
             currentTakenCapacity -= type.size;
             boardedPerPort.get(current).compute(type.getId(), (k, v) -> { if (--v == 0) return null; else return v; });
             passengers.remove(ind);
-            hasBeenUpdated=true;
             return true;
         }
         else return false;
@@ -276,7 +272,6 @@ public class Route {
         current = next;
         fuelSpent += line.getDistance();
         lines.add(line);
-        hasBeenUpdated=true;
         return null;
     }
 
@@ -292,7 +287,6 @@ public class Route {
         returnToPreviousAirportPassengers(lineBack);
         current = lineBack.getAnotherEnd(current);
         fuelSpent -= lineBack.getDistance();
-        hasBeenUpdated=true;
         return true;
     }
 
@@ -362,14 +356,6 @@ public class Route {
     }
 
     public MapHolder<Player, Integer> getIncomeChange(){return incomeChange;}
-
-    public boolean renderingUpdate(){
-        if(hasBeenUpdated){
-            hasBeenUpdated=false;
-            return true;
-        }
-        return false;
-    }
 
     public double getRemainingFuel(){
         return plane.fuel-fuelSpent;

@@ -6,7 +6,6 @@ import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.PassengerTy
 
 import java.util.function.Consumer;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airport; // Не забудьте импорт, если используете переменную
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.PlaneType;
 import com.game.Ticket_To_Flight.commonFrontAndBack.Route;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.Flights.MainFlightController;
@@ -46,25 +45,34 @@ public class FlightHUD extends Table {
         groupHUD.setCallbacks(onRemove);
     }
 
+
+    private boolean hasBeenUpdated= true;
+    private boolean shouldUpdateOnThisFrame(){
+        if(hasBeenUpdated){
+            hasBeenUpdated=false;
+            return true;
+        }
+        return false;
+    }
+    public void updateHudOnNextFrame(){
+        hasBeenUpdated = true;
+    }
+
     public void updateData(PlaneType selectedPlane, Integer playerId, MainFlightController.Step step, Route route) {
-        if(step == MainFlightController.Step.SELECT_PLANE){
-            planeHUD.updateData(null, null);
-            flightHudCenterDownButtons.updateData(playerId, step, null);
-            groupHUD.updateData(null);
-            boardingHUD.updateData(null);
-
-            layoutChildren();
-        }
-        else if(step == MainFlightController.Step.CHOOSING_STARTING_AIRPORT){
-            planeHUD.updateData(selectedPlane, null);
-            flightHudCenterDownButtons.updateData(playerId, step, null);
-            groupHUD.updateData(null);
-            boardingHUD.updateData(null);
-
-            layoutChildren();
-        }
-        else{
-            if (route.renderingUpdate()) {
+        if(shouldUpdateOnThisFrame()) {
+            if (step == MainFlightController.Step.SELECT_PLANE) {
+                planeHUD.updateData(null, null);
+                flightHudCenterDownButtons.updateData(playerId, step, null);
+                groupHUD.updateData(null);
+                boardingHUD.updateData(null);
+                layoutChildren();
+            } else if (step == MainFlightController.Step.CHOOSING_STARTING_AIRPORT) {
+                planeHUD.updateData(selectedPlane, null);
+                flightHudCenterDownButtons.updateData(playerId, step, null);
+                groupHUD.updateData(null);
+                boardingHUD.updateData(null);
+                layoutChildren();
+            } else {
                 planeHUD.updateData(route.getPlane(), route);
                 flightHudCenterDownButtons.updateData(playerId, step, route);
                 groupHUD.updateData(route);

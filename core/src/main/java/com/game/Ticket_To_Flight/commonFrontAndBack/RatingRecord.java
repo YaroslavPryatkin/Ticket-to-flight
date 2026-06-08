@@ -19,7 +19,7 @@ public class RatingRecord implements Comparable<RatingRecord> {
     }
     public RatingRecord(Player player){
         this.player = player.getId();
-        this.rating = player.income + player.money/2;
+        this.rating = player.income;
     }
 
     @Override

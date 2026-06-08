@@ -9,16 +9,20 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airline;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airport;
 import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
+import com.game.Ticket_To_Flight.commonFrontAndBack.RatingRecord;
 import com.game.Ticket_To_Flight.frontend.LowLevelHandlerFront;
 import com.game.Ticket_To_Flight.frontend.MainClient;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.Airlines.AirlinesControls;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.Flights.MainFlightController;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.HUD.HUDDirectory.StandardHUDDirectory.PlayersListHUD;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.HUD.HUDOverlay;
+import com.game.Ticket_To_Flight.frontend.UI.MainScreen.Managers.FinishGameManager;
 import com.game.Ticket_To_Flight.frontend.components.tables.flight.AbstractFlightPanel;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.Skins.WorldMapStyleFactory;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.Managers.LeftDownCornerTooltipManager;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.Managers.WindowManager;
+
+import java.util.List;
 
 public class GameUIManager {
 
@@ -27,9 +31,14 @@ public class GameUIManager {
     private final HUDOverlay hudOverlay;
     private final MainFlightController mainFlightController;
     private final AirlinesControls airlinesControls;
+    private FinishGameManager finishGameManager;
     private final Stage uiStageHUD;
+    private final Stage uiStageWindow;
     private final GameData gameData;
     private final LowLevelHandlerFront llh;
+    private List<RatingRecord> ratingRecords;
+    private final Skin defaultSkin;
+    private final Skin investSkin;
 
     private Airport currentClickedAirport;
     private Airline currentClickedAirline;
@@ -50,15 +59,16 @@ public class GameUIManager {
 
     public GameUIManager(Stage uiStageWindow, Stage uiStageHUD, MainClient client, OrthographicCamera mapCamera) {
         this.uiStageHUD = uiStageHUD;
+        this.uiStageWindow = uiStageWindow;
         WorldMapStyleFactory styleFactory = new WorldMapStyleFactory();
-        Skin defaultSkin = styleFactory.createBasicWindow();
-        Skin investSkin = styleFactory.createInvestWindow();
+        defaultSkin = styleFactory.createBasicWindow();
+        investSkin = styleFactory.createInvestWindow();
         gameData = client.getGameData();
         llh = client.getLlh();
 
         this.windowManager = new WindowManager(uiStageWindow, defaultSkin, investSkin, this, gameData, llh);
         this.hudOverlay = new HUDOverlay(uiStageHUD, defaultSkin, gameData, llh);
-        this.mainFlightController = new MainFlightController(uiStageHUD, defaultSkin, gameData, llh, this, hudOverlay.getFlightHUD());
+        this.mainFlightController = new MainFlightController(uiStageHUD, defaultSkin, gameData, llh, this, hudOverlay.getFlightHUD(), mapCamera);
         this.leftDownCornerTooltipManager = new LeftDownCornerTooltipManager(uiStageHUD, defaultSkin);
         this.airlinesControls = new AirlinesControls(uiStageHUD, defaultSkin, gameData, llh, this, mapCamera);
     }
@@ -83,6 +93,10 @@ public class GameUIManager {
         return windowManager.showPlaneWindow();
     }
 
+    public boolean showFinishWindow() {
+        return windowManager.showFinishWindow();
+    }
+
     public void setWindowOpen(boolean windowOpen) {
         windowManager.setWindowOpen(windowOpen);
     }
@@ -95,7 +109,8 @@ public class GameUIManager {
         return !windowManager.isPointerOverCurrentWindow() &&
             !isPointerOverHudActor() &&
             !leftDownCornerTooltipManager.isPointerOverTooltip() &&
-            !airlinesControls.isPointerOverTooltip();
+            !airlinesControls.isPointerOverTooltip() &&
+            !mainFlightController.isPointerOverTooltip();
     }
 
     private boolean canChooseAirline() {
@@ -127,8 +142,9 @@ public class GameUIManager {
         if (!airport.equals(currentClickedAirport))
             setCurrentClickedAirport(airport);
 
-        if (canChooseFlight())
-            mainFlightController.handleAirportClick(airport);
+        if (canChooseFlight()) {
+            mainFlightController.showTooltip(currentClickedAirline, airport);
+        }
 
         if (canChooseAirline())
             airlinesControls.removeTooltip();
@@ -138,8 +154,9 @@ public class GameUIManager {
         if (!airline.equals(currentClickedAirline))
             setCurrentClickedAirline(airline);
 
-        if (canChooseFlight())
-            mainFlightController.handleAirlineClick(airline);
+        if (canChooseFlight()) {
+            mainFlightController.showTooltip(airline, currentClickedAirport);
+        }
 
 
         if (canChooseAirline())
@@ -151,6 +168,7 @@ public class GameUIManager {
         currentClickedAirline = null;
         leftDownCornerTooltipManager.removeTooltip();
         airlinesControls.removeTooltip();
+        mainFlightController.removeTooltip();
     }
 
     private void setCurrentClickedAirport(Airport port) {
@@ -176,7 +194,8 @@ public class GameUIManager {
 
     public void updateDynamicControls() {
         if (canChooseFlight()) {
-            mainFlightController.update();
+            mainFlightController.updateHud();
+            mainFlightController.updateTooltip(currentClickedAirline, currentClickedAirport);
         } else {
             mainFlightController.setInactive();
         }
