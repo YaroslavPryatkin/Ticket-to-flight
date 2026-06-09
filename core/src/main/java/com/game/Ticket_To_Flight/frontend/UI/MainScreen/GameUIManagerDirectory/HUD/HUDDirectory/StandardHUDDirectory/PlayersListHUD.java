@@ -165,23 +165,25 @@ public class PlayersListHUD extends Table {
                     int amount = entry.getValue();
 
 
-                    TextButton planeButton = new RoundedButton(pt.description + " (x" + amount + ")", skin);
-                    TextButton.TextButtonStyle uniqueStyle = new TextButton.TextButtonStyle(planeButton.getStyle());
+                    TextButton nameButton = new RoundedButton(pt.description + " (x" + amount + ")", skin);
+                    TextButton.TextButtonStyle infoStyle = new TextButton.TextButtonStyle(nameButton.getStyle());
+                    infoStyle.down = infoStyle.up;
+                    infoStyle.over = infoStyle.up;
+                    infoStyle.checked = infoStyle.up;
+                    infoStyle.focused = infoStyle.up;
 
-                    uniqueStyle.downFontColor = uniqueStyle.fontColor;
-                    uniqueStyle.checkedFontColor = uniqueStyle.fontColor;
-                    uniqueStyle.down = uniqueStyle.up;
-                    uniqueStyle.checked = uniqueStyle.up;
+                    infoStyle.downFontColor = infoStyle.fontColor;
+                    infoStyle.checkedFontColor = infoStyle.fontColor;
+                    infoStyle.overFontColor = infoStyle.fontColor;
+                    nameButton.setStyle(infoStyle);
 
-                    planeButton.setStyle(uniqueStyle);
-
-                    planeButton.addListener(new ClickListener() {
+                    nameButton.addListener(new ClickListener() {
                         @Override
                         public void clicked(InputEvent event, float x, float y) {
                             uiManager.handlePlaneClick(pt);
                         }
                     });
-                    innerContent.add(planeButton).width(INNER_WIDTH).padTop(5).row();
+                    innerContent.add(nameButton).width(INNER_WIDTH).padTop(5).row();
                     hasPlanes = true;
                 }
             }

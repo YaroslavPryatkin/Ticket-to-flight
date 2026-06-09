@@ -13,6 +13,7 @@ import com.badlogic.gdx.utils.Align;
 
 public abstract class BaseGameWindow extends Window {
     private ScrollPane scrollFocusPane;
+    private Float desiredTopPadding = null;
 
     public BaseGameWindow(String title, Skin skin, float width, float height) {
         super(title, skin);
@@ -67,6 +68,35 @@ public abstract class BaseGameWindow extends Window {
         });
 
         updateScrollFocusUnderMouse();
+    }
+
+
+    public void setTopPadding(float padding) {
+        this.desiredTopPadding = padding;
+        applyPosition();
+    }
+
+    @Override
+    protected void setStage(com.badlogic.gdx.scenes.scene2d.Stage stage) {
+        super.setStage(stage);
+        applyPosition();
+    }
+
+    @Override
+    public void layout() {
+        super.layout();
+
+        if (desiredTopPadding != null) {
+            applyPosition();
+        }
+    }
+
+    protected void applyPosition() {
+        if (getStage() != null && desiredTopPadding != null) {
+            float newX = (getStage().getWidth() - this.getWidth()) / 2f;
+            float newY = getStage().getHeight() - this.getHeight() - desiredTopPadding;
+            this.setPosition(newX, newY);
+        }
     }
 
     public void updateScrollFocusUnderMouse() {

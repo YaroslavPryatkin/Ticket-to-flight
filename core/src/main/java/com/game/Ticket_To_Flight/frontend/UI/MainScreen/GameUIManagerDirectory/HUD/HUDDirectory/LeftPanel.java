@@ -8,24 +8,21 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-import com.game.Ticket_To_Flight.backend.gameLogicEntities.Player;
 import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
 import com.game.Ticket_To_Flight.frontend.LowLevelHandlerFront;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManager;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.HUD.HUDDirectory.StandardHUDDirectory.PlayersListHUD;
 import com.game.Ticket_To_Flight.frontend.components.texts.SingleLineText;
 
-public class StandardHUD extends Table {
+public class LeftPanel extends Table {
     private final GameData gameData;
-    private final LowLevelHandlerFront llh;
     private final Table leftStats;
 
     private final Label roundLabel, stageLabel, timeLabel;
     private final PlayersListHUD playersListHUD;
 
-    public StandardHUD(Skin skin, GameData gameData, GameUIManager uiManager, LowLevelHandlerFront llh) {
+    public LeftPanel(Skin skin, GameData gameData, GameUIManager uiManager, LowLevelHandlerFront llh) {
         this.gameData = gameData;
-        this.llh = llh;
 
         this.setFillParent(true);
         this.top().left();

@@ -36,9 +36,6 @@ public class GameUIManager {
     private final Stage uiStageWindow;
     private final GameData gameData;
     private final LowLevelHandlerFront llh;
-    private List<RatingRecord> ratingRecords;
-    private final Skin defaultSkin;
-    private final Skin investSkin;
 
     private Airport currentClickedAirport;
     private Airline currentClickedAirline;
@@ -62,8 +59,8 @@ public class GameUIManager {
         this.uiStageHUD = uiStageHUD;
         this.uiStageWindow = uiStageWindow;
         WorldMapStyleFactory styleFactory = new WorldMapStyleFactory();
-        defaultSkin = styleFactory.createBasicWindow();
-        investSkin = styleFactory.createInvestWindow();
+        Skin defaultSkin = styleFactory.createBasicWindow();
+        Skin investSkin = styleFactory.createInvestWindow();
         gameData = client.getGameData();
         llh = client.getLlh();
 

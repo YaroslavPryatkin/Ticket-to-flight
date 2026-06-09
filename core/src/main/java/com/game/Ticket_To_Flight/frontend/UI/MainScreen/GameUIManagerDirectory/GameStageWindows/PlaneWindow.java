@@ -65,13 +65,13 @@ public class PlaneWindow extends BaseGameWindow {
             if (e == null) continue;
 
             PlaneType plane = e.getKey();
-            Integer num = e.getValue();
+            Integer amount = e.getValue();
             int planeId = plane.getId();
 
-            if (num <= 0) continue;
+            if (amount <= 0) continue;
 
             Table singlePlaneTable = new Table();
-            TextButton nameButton = new TextButton(plane.description, skin);
+            TextButton nameButton = new TextButton(plane.description + " (x" + amount + ")", skin);
 
             TextButton.TextButtonStyle infoStyle = new TextButton.TextButtonStyle(nameButton.getStyle());
             infoStyle.down = infoStyle.up;
