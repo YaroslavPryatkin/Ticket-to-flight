@@ -6,43 +6,35 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airline;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.AirlineType;
+import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.PlaneType;
 import com.game.Ticket_To_Flight.frontend.components.texts.WrappedText;
 import com.game.Ticket_To_Flight.frontend.components.windows.LeftDownCornerTooltip;
 
-public class AirlineLeftDownCornerTooltip extends LeftDownCornerTooltip {
+public class PlaneLeftDownCornerTooltip  extends LeftDownCornerTooltip {
     private static final float CONTENT_WIDTH = 590f;
     private static final float CONTENT_MAX_HEIGHT = 430f;
 
-    public AirlineLeftDownCornerTooltip(Skin skin, Airline airline) {
-        super("Airline", skin);
+    public PlaneLeftDownCornerTooltip(Skin skin, PlaneType plane)  {
+        super("Plane", skin);
 
         Table content = new Table();
         content.top().left();
         content.defaults().left().padBottom(8);
 
-        Label title = new WrappedText(routeTitle(airline), skin, CONTENT_WIDTH);
+        Label title = new WrappedText(plane.description, skin, CONTENT_WIDTH);
         title.setColor(Color.CYAN);
         content.add(title).width(CONTENT_WIDTH).left().row();
 
-        AirlineType type = airline.type;
-        addRow(content, skin, "Description", type.description);
-        addRow(content, skin, "Price", "$" + type.price);
-        addRow(content, skin, "Yield", String.valueOf(type.yield));
-        addRow(content, skin, "Gates taken from " + airline.portA.airportName, String.valueOf(type.gateA));
-        addRow(content, skin, "Gates taken from " + airline.portB.airportName, String.valueOf(type.gateB));
-        addRow(content, skin, "Luxury range", formatInterval(type.luxuryRange.getFrom(), type.luxuryRange.getTo()));
-        addRow(content, skin, "Capacity range", formatInterval(type.capacityRange.getFrom(), type.capacityRange.getTo()));
+        addRow(content, skin, "Price", "$" + plane.price);
+        addRow(content, skin, "Luxury", String.valueOf(plane.luxury));
+        addRow(content, skin, "Stations", String.valueOf(plane.stations));
+        addRow(content, skin, "Fuel", String.valueOf(plane.fuel));
+        addRow(content, skin, "Gate Range", formatInterval(plane.gateRange.getFrom(), plane.gateRange.getTo()));
+        addRow(content, skin, "Dist Range", formatInterval(plane.distRange.getFrom(), plane.distRange.getTo()));
 
-        if (airline.getPlayer() != null) {
-            addRow(content, skin, "Owned by", airline.getPlayer().getName());
-        }
 
         add(content).width(CONTENT_WIDTH).maxHeight(CONTENT_MAX_HEIGHT);
         pack();
-    }
-
-    private String routeTitle(Airline airline) {
-        return airline.getPortA().getAirportName() + " - " + airline.getPortB().getAirportName();
     }
 
     private void addRow(Table table, Skin skin, String label, String value) {

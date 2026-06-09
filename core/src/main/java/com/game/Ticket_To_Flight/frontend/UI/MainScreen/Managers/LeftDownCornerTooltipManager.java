@@ -5,8 +5,10 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airline;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airport;
+import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.PlaneType;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.Tooltips.AirlineLeftDownCornerTooltip;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.Tooltips.AirportLeftDownCornerTooltip;
+import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.Tooltips.PlaneLeftDownCornerTooltip;
 import com.game.Ticket_To_Flight.frontend.components.windows.LeftDownCornerTooltip;
 import com.game.Ticket_To_Flight.frontend.components.subsidiary.ComponentHover;
 
@@ -32,6 +34,13 @@ public class LeftDownCornerTooltipManager {
     public void showAirlineTooltip(Airline airline) {
         removeTooltip();
         leftDownCornerTooltip = new AirlineLeftDownCornerTooltip(skin, airline);
+        uiStageHUD.addActor(leftDownCornerTooltip);
+        updatePosition();
+    }
+
+    public void showPlaneTooltip(PlaneType plane){
+        removeTooltip();
+        leftDownCornerTooltip = new PlaneLeftDownCornerTooltip(skin, plane);
         uiStageHUD.addActor(leftDownCornerTooltip);
         updatePosition();
     }
@@ -71,7 +80,7 @@ public class LeftDownCornerTooltipManager {
         Actor scrollFocus = uiStageHUD.getScrollFocus();
         if (scrollFocus == null || isPointerOverTooltip()) return;
 
-        if (scrollFocus != null && leftDownCornerTooltip != null &&
+        if (leftDownCornerTooltip != null &&
             (scrollFocus == leftDownCornerTooltip || leftDownCornerTooltip.isAscendantOf(scrollFocus))) {
             uiStageHUD.setScrollFocus(null);
         }

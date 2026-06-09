@@ -8,8 +8,10 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airline;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airport;
+import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.PlaneType;
 import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
 import com.game.Ticket_To_Flight.commonFrontAndBack.RatingRecord;
+import com.game.Ticket_To_Flight.commonFrontAndBack.StaticGameData;
 import com.game.Ticket_To_Flight.frontend.LowLevelHandlerFront;
 import com.game.Ticket_To_Flight.frontend.MainClient;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.Airlines.AirlinesControls;
@@ -40,6 +42,7 @@ public class GameUIManager {
 
     private Airport currentClickedAirport;
     private Airline currentClickedAirline;
+    private PlaneType currentClickedPlane;
 
     public MainFlightController getMainFlightController() {
         return mainFlightController;
@@ -156,14 +159,19 @@ public class GameUIManager {
             mainFlightController.showTooltip(airline, currentClickedAirport);
         }
 
-
         if (canChooseAirline())
             airlinesControls.showTooltip(airline);
+    }
+
+    public void handePlaneClick(PlaneType plane){
+        if(!plane.equals(currentClickedPlane))
+            setCurrentClickedPlane(plane);
     }
 
     public void handleEmptyMapClick() {
         currentClickedAirport = null;
         currentClickedAirline = null;
+        currentClickedPlane = null;
         leftDownCornerTooltipManager.removeTooltip();
         airlinesControls.removeTooltip();
         mainFlightController.removeTooltip();
@@ -173,12 +181,21 @@ public class GameUIManager {
         leftDownCornerTooltipManager.showAirportTooltip(port);
         currentClickedAirport = port;
         currentClickedAirline = null;
+        currentClickedPlane = null;
     }
 
     private void setCurrentClickedAirline(Airline line) {
         leftDownCornerTooltipManager.showAirlineTooltip(line);
         currentClickedAirline = line;
         currentClickedAirport = null;
+        currentClickedPlane = null;
+    }
+
+    private void setCurrentClickedPlane(PlaneType plane) {
+        leftDownCornerTooltipManager.showPlaneTooltip(plane);
+        currentClickedAirline = null;
+        currentClickedAirport = null;
+        currentClickedPlane = plane;
     }
 
     public void updateHUDData() {

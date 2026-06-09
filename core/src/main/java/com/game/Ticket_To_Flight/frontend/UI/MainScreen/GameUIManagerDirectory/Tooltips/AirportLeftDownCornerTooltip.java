@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 public class AirportLeftDownCornerTooltip extends LeftDownCornerTooltip {
-    private static final float CONTENT_WIDTH = 600f;
+    private static final float CONTENT_WIDTH = 590f;
     private static final float CONTENT_MAX_HEIGHT = 430f;
 
     public AirportLeftDownCornerTooltip(Skin skin, Airport airport) {

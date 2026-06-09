@@ -28,7 +28,7 @@ public class StandardHUD extends Table {
 
         this.setFillParent(true);
         this.top().left();
-        this.pad(20, 20, 20, 20);
+        //this.pad(20, 20, 20, 20);
 
         this.setTouchable(Touchable.childrenOnly);
 
