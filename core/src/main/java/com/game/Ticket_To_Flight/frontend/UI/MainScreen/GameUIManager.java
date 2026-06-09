@@ -164,7 +164,8 @@ public class GameUIManager {
     }
 
     public void handlePlaneClick(PlaneType plane){
-        setCurrentClickedPlane(plane);
+        if(!plane.equals(currentClickedPlane))
+            setCurrentClickedPlane(plane);
     }
 
     public void handleEmptyMapClick() {
@@ -191,14 +192,8 @@ public class GameUIManager {
     }
 
     private void setCurrentClickedPlane(PlaneType plane) {
-        if (plane.equals(currentClickedPlane)) {
-            leftDownCornerTooltipManager.removeTooltip();
-            currentClickedPlane = null;
-        }
-        else {
-            leftDownCornerTooltipManager.showPlaneTooltip(plane);
-            currentClickedPlane = plane;
-        }
+        leftDownCornerTooltipManager.showPlaneTooltip(plane);
+        currentClickedPlane = plane;
         currentClickedAirline = null;
         currentClickedAirport = null;
     }

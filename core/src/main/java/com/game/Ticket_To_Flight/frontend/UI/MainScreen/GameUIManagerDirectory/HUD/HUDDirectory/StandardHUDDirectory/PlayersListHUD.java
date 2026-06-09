@@ -155,7 +155,6 @@ public class PlayersListHUD extends Table {
             activeExpandLists.add(planesList);
             Table innerContent = planesList.getContentTable();
 
-            List<ExpandableListWidget> nestedPlaneLists = new ArrayList<>();
             Iterator<Map.Entry<PlaneType, Integer>> it = MapHolder.viewAsEntrySet(p.planes);
             boolean hasPlanes = false;
 
@@ -165,12 +164,16 @@ public class PlayersListHUD extends Table {
                     PlaneType pt = entry.getKey();
                     int amount = entry.getValue();
 
-                    Table planeRowTable = new Table();
 
-                    Label planeLabel = new Label(pt.description + " (x" + amount + ")", skin);
+                    TextButton planeButton = new RoundedButton(pt.description + " (x" + amount + ")", skin);
+                    TextButton.TextButtonStyle uniqueStyle = new TextButton.TextButtonStyle(planeButton.getStyle());
 
-                    TextButton planeButton = new RoundedButton("Info", skin);
-                    planeButton.setWidth(250);
+                    uniqueStyle.downFontColor = uniqueStyle.fontColor;
+                    uniqueStyle.checkedFontColor = uniqueStyle.fontColor;
+                    uniqueStyle.down = uniqueStyle.up;
+                    uniqueStyle.checked = uniqueStyle.up;
+
+                    planeButton.setStyle(uniqueStyle);
 
                     planeButton.addListener(new ClickListener() {
                         @Override
@@ -178,10 +181,7 @@ public class PlayersListHUD extends Table {
                             uiManager.handlePlaneClick(pt);
                         }
                     });
-
-                    planeRowTable.add(planeLabel).expandX().left();
-                    planeRowTable.add(planeButton).width(140).height(55).padLeft(15);
-                    innerContent.add(planeRowTable).width(INNER_WIDTH).padTop(5).row();
+                    innerContent.add(planeButton).width(INNER_WIDTH).padTop(5).row();
                     hasPlanes = true;
                 }
             }

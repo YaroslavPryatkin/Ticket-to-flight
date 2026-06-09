@@ -71,8 +71,7 @@ public class PlaneWindow extends BaseGameWindow {
             if (num <= 0) continue;
 
             Table singlePlaneTable = new Table();
-            Label nameLabel = new Label(plane.description, skin);
-            TextButton nameButton = new TextButton("Info", skin);
+            TextButton nameButton = new TextButton(plane.description, skin);
 
             TextButton.TextButtonStyle infoStyle = new TextButton.TextButtonStyle(nameButton.getStyle());
             infoStyle.down = infoStyle.up;
@@ -103,8 +102,6 @@ public class PlaneWindow extends BaseGameWindow {
             } else {
                 buttonGroup.add(priceBtn);
             }
-
-            singlePlaneTable.add(nameLabel).padBottom(20).row();
             singlePlaneTable.add(nameButton).padBottom(20).row();
             singlePlaneTable.add(priceBtn).width(250).height(80);
 

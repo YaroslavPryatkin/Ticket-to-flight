@@ -397,8 +397,8 @@ public class GameData {
             return false;
         }
         if (!playersTmp.checkChangeAsStruct(Player::getActionPoints, changes.playerActionPointsChange,
-            (o, n) -> o + n >= 0 && o + n <= StaticGameData.maxActionsPerTurn)) {
-            System.err.println("Validation failed: playerActionPointsChange went out of bounds [0, maxActionsPerTurn].");
+            (o, n) -> o + n >= 0 && o + n <= StaticGameData.maxActionsPerTurn  + StaticGameData.abilityActionPointsIncrease)) {
+            System.err.println("Validation failed: playerActionPointsChange went out of bounds [0, maxActionsPerTurn + abilityActionPointsIncrease].");
             return false;
         }
 
