@@ -25,7 +25,7 @@ public class PlaneWindow extends BaseGameWindow {
     private final Runnable updateBottomUI;
 
     public PlaneWindow(Skin skin, final GameUIManager uiManager, final LowLevelHandlerFront llh, GameData gameData) {
-        super("Plane Purchase", skin, 1300, 800);
+        super("", skin, 1300, 800);
 
         Player pl = gameData.players.get(llh.getMyId());
         int playerMoney = pl.money;
@@ -71,8 +71,26 @@ public class PlaneWindow extends BaseGameWindow {
             if (num <= 0) continue;
 
             Table singlePlaneTable = new Table();
-            Label nameLabel = new SingleLineText(plane.description, skin);
-            Label numLabel = new SingleLineText("Left: " + num, skin);
+            Label nameLabel = new Label(plane.description, skin);
+            TextButton nameButton = new TextButton("Info", skin);
+
+            TextButton.TextButtonStyle infoStyle = new TextButton.TextButtonStyle(nameButton.getStyle());
+            infoStyle.down = infoStyle.up;
+            infoStyle.over = infoStyle.up;
+            infoStyle.checked = infoStyle.up;
+            infoStyle.focused = infoStyle.up;
+
+            infoStyle.downFontColor = infoStyle.fontColor;
+            infoStyle.checkedFontColor = infoStyle.fontColor;
+            infoStyle.overFontColor = infoStyle.fontColor;
+            nameButton.setStyle(infoStyle);
+
+            nameButton.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    uiManager.handlePlaneClick(plane);
+                }
+            });
 
             boolean canAfford = playerMoney >= plane.price;
 
@@ -87,7 +105,7 @@ public class PlaneWindow extends BaseGameWindow {
             }
 
             singlePlaneTable.add(nameLabel).padBottom(20).row();
-            singlePlaneTable.add(numLabel).padBottom(20).row();
+            singlePlaneTable.add(nameButton).padBottom(20).row();
             singlePlaneTable.add(priceBtn).width(250).height(80);
 
             planesTable.add(singlePlaneTable).pad(30);

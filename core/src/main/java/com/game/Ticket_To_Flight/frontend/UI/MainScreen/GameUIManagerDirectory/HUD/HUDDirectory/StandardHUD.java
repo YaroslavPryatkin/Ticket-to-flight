@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Player;
 import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
 import com.game.Ticket_To_Flight.frontend.LowLevelHandlerFront;
+import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManager;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.HUD.HUDDirectory.StandardHUDDirectory.PlayersListHUD;
 import com.game.Ticket_To_Flight.frontend.components.texts.SingleLineText;
 
@@ -22,7 +23,7 @@ public class StandardHUD extends Table {
     private final Label roundLabel, stageLabel, timeLabel;
     private final PlayersListHUD playersListHUD;
 
-    public StandardHUD(Skin skin, GameData gameData, LowLevelHandlerFront llh) {
+    public StandardHUD(Skin skin, GameData gameData, GameUIManager uiManager, LowLevelHandlerFront llh) {
         this.gameData = gameData;
         this.llh = llh;
 
@@ -36,7 +37,7 @@ public class StandardHUD extends Table {
         stageLabel = new SingleLineText("Stage: ", skin);
         timeLabel = new SingleLineText("Current bet: ", skin);
 
-        playersListHUD = new PlayersListHUD(gameData, llh, skin);
+        playersListHUD = new PlayersListHUD(gameData, llh, uiManager, skin);
 
         leftStats = new Table();
         leftStats.top().left();

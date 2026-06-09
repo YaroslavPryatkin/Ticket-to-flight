@@ -5,15 +5,15 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.game.Ticket_To_Flight.Utilities.MapHolder;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Player;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.PlaneType;
 import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
 import com.game.Ticket_To_Flight.frontend.LowLevelHandlerFront;
+import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManager;
+import com.game.Ticket_To_Flight.frontend.components.buttons.RoundedButton;
 import com.game.Ticket_To_Flight.frontend.components.details.PlaneDetailsWidget;
 import com.game.Ticket_To_Flight.frontend.components.subsidiary.ComponentHover;
 import com.game.Ticket_To_Flight.frontend.components.background.SolidRectangleBackground;
@@ -67,16 +67,18 @@ public class PlayersListHUD extends Table {
     private final GameData gameData;
     private final LowLevelHandlerFront llh;
     private final Skin skin;
+    private final GameUIManager uiManager;
 
     private final List<ExpandableListWidget> activeExpandLists = new ArrayList<>();
 
     private final Table contentTable;
     private final ScrollPane scrollPane;
 
-    public PlayersListHUD(GameData gameData, LowLevelHandlerFront llh, Skin skin) {
+    public PlayersListHUD(GameData gameData, LowLevelHandlerFront llh, GameUIManager uiManager, Skin skin) {
         this.gameData = gameData;
         this.llh = llh;
         this.skin = skin;
+        this.uiManager = uiManager;
         top().left();
 
         contentTable = new Table();
@@ -163,27 +165,23 @@ public class PlayersListHUD extends Table {
                     PlaneType pt = entry.getKey();
                     int amount = entry.getValue();
 
-                    ExpandableListWidget singlePlaneExpand = new ExpandableListWidget(pt.description + " (x" + amount + ")", skin);
-                    singlePlaneExpand.setPreferredWidth(INNER_WIDTH);
-                    nestedPlaneLists.add(singlePlaneExpand);
+                    Table planeRowTable = new Table();
 
-                    Table ptContent = singlePlaneExpand.getContentTable();
-                    PlaneDetailsWidget.fill(ptContent, skin, pt);
+                    Label planeLabel = new Label(pt.description + " (x" + amount + ")", skin);
 
-                    singlePlaneExpand.setCallbacks(
-                        () -> {
-                            for (ExpandableListWidget other : nestedPlaneLists) {
-                                if (other != singlePlaneExpand) other.collapse();
-                            }
-                        },
-                        () -> {
-                            invalidateHierarchy();
-                            contentTable.layout();
-                            scrollPane.layout();
+                    TextButton planeButton = new RoundedButton("Info", skin);
+                    planeButton.setWidth(250);
+
+                    planeButton.addListener(new ClickListener() {
+                        @Override
+                        public void clicked(InputEvent event, float x, float y) {
+                            uiManager.handlePlaneClick(pt);
                         }
-                    );
+                    });
 
-                    innerContent.add(singlePlaneExpand).width(INNER_WIDTH).padTop(5).row();
+                    planeRowTable.add(planeLabel).expandX().left();
+                    planeRowTable.add(planeButton).width(140).height(55).padLeft(15);
+                    innerContent.add(planeRowTable).width(INNER_WIDTH).padTop(5).row();
                     hasPlanes = true;
                 }
             }

@@ -2,6 +2,7 @@ package com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Airline;
@@ -37,7 +38,12 @@ public class AirlineLeftDownCornerTooltip extends LeftDownCornerTooltip {
             addRow(content, skin, "Owned by", airline.getPlayer().getName());
         }
 
-        add(content).width(CONTENT_WIDTH).maxHeight(CONTENT_MAX_HEIGHT);
+        ScrollPane scrollPane = new ScrollPane(content, skin);
+        scrollPane.setScrollingDisabled(true, false);
+        scrollPane.setFadeScrollBars(false);
+        add(scrollPane).width(CONTENT_WIDTH).maxHeight(CONTENT_MAX_HEIGHT);
+
+        registerScrollFocus(scrollPane);
         pack();
     }
 

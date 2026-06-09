@@ -68,7 +68,7 @@ public class GameUIManager {
         llh = client.getLlh();
 
         this.windowManager = new WindowManager(uiStageWindow, defaultSkin, investSkin, this, gameData, llh);
-        this.hudOverlay = new HUDOverlay(uiStageHUD, defaultSkin, gameData, llh);
+        this.hudOverlay = new HUDOverlay(uiStageHUD, defaultSkin, gameData, this, llh);
         this.mainFlightController = new MainFlightController(uiStageHUD, defaultSkin, gameData, llh, this, hudOverlay.getFlightHUD(), mapCamera);
         this.leftDownCornerTooltipManager = new LeftDownCornerTooltipManager(uiStageHUD, defaultSkin);
         this.airlinesControls = new AirlinesControls(uiStageHUD, defaultSkin, gameData, llh, this, mapCamera);
@@ -163,9 +163,8 @@ public class GameUIManager {
             airlinesControls.showTooltip(airline);
     }
 
-    public void handePlaneClick(PlaneType plane){
-        if(!plane.equals(currentClickedPlane))
-            setCurrentClickedPlane(plane);
+    public void handlePlaneClick(PlaneType plane){
+        setCurrentClickedPlane(plane);
     }
 
     public void handleEmptyMapClick() {
@@ -192,10 +191,16 @@ public class GameUIManager {
     }
 
     private void setCurrentClickedPlane(PlaneType plane) {
-        leftDownCornerTooltipManager.showPlaneTooltip(plane);
+        if (plane.equals(currentClickedPlane)) {
+            leftDownCornerTooltipManager.removeTooltip();
+            currentClickedPlane = null;
+        }
+        else {
+            leftDownCornerTooltipManager.showPlaneTooltip(plane);
+            currentClickedPlane = plane;
+        }
         currentClickedAirline = null;
         currentClickedAirport = null;
-        currentClickedPlane = plane;
     }
 
     public void updateHUDData() {

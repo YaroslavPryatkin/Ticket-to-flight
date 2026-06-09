@@ -5,6 +5,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.game.Ticket_To_Flight.backend.gameLogicEntities.Player;
 import com.game.Ticket_To_Flight.commonFrontAndBack.GameData;
 import com.game.Ticket_To_Flight.frontend.LowLevelHandlerFront;
+import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManager;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.HUD.HUDDirectory.FlightHUD;
 import com.game.Ticket_To_Flight.frontend.UI.MainScreen.GameUIManagerDirectory.HUD.HUDDirectory.StandardHUD;
 
@@ -12,8 +13,8 @@ public class HUDOverlay {
     private final StandardHUD standardHUD;
     private final FlightHUD flightHUD;
 
-    public HUDOverlay(Stage uiStageHUD, Skin skin, GameData gameData, LowLevelHandlerFront llh) {
-        this.standardHUD = new StandardHUD(skin, gameData, llh);
+    public HUDOverlay(Stage uiStageHUD, Skin skin, GameData gameData, GameUIManager uiManager, LowLevelHandlerFront llh) {
+        this.standardHUD = new StandardHUD(skin, gameData, uiManager, llh);
         this.flightHUD = new FlightHUD(skin);
 
         uiStageHUD.addActor(standardHUD);
