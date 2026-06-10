@@ -1,0 +1,20 @@
+{
+  "amountOfAirportsToAddPassengers": 10,
+
+  "airports": [
+  ],
+
+  "airlines": [
+  ],
+
+  "planes": [
+    {
+      "type": 1,
+      "amount": 2
+    },
+    {
+      "type": 2,
+      "amount": 2
+    }
+  ]
+}

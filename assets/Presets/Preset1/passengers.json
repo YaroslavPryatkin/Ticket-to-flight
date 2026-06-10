@@ -2,21 +2,75 @@
   {
     "airportId": 1,
     "passengerProbability": {
-      "1": 0.5,
-      "2": 0.5
+      "1": 0.25,
+      "4": 0.1,
+      "5": 0.1,
+      "6": 0.25,
+      "7": 0.3
     }
   },
   {
     "airportId": 2,
     "passengerProbability": {
-      "1": 0.7,
-      "2": 0.3
+      "1": 0.25,
+      "4": 0.1,
+      "5": 0.1,
+      "6": 0.25,
+      "7": 0.3
     }
   },
   {
     "airportId": 3,
     "passengerProbability": {
-      "2": 1.0
+      "2": 0.25,
+      "3": 0.25,
+      "4": 0.05,
+      "5": 0.05,
+      "8": 0.4
+    }
+  },
+  {
+    "airportId": 4,
+    "passengerProbability": {
+      "4": 0.4,
+      "5": 0.45,
+      "7": 0.15
+    }
+  },
+  {
+    "airportId": 5,
+    "passengerProbability": {
+      "4": 0.1,
+      "5": 0.1,
+      "8": 0.8
+    }
+  },
+  {
+    "airportId": 6,
+    "passengerProbability": {
+      "1": 0.25,
+      "4": 0.1,
+      "5": 0.1,
+      "6": 0.3,
+      "7": 0.25
+    }
+  },
+  {
+    "airportId": 7,
+    "passengerProbability": {
+      "1": 0.25,
+      "4": 0.3,
+      "5": 0.3,
+      "6": 0.15
+    }
+  },
+  {
+    "airportId": 8,
+    "passengerProbability": {
+      "1": 0.25,
+      "4": 0.3,
+      "5": 0.3,
+      "7": 0.15
     }
   }
 ]
