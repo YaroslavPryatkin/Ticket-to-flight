@@ -47,4 +47,6 @@ public class ColorSupplier {
         curColor = (curColor + 1) % colorList.size();
         return color;
     }
+
+    public static void resetCurColor(){curColor = 0;}
 }

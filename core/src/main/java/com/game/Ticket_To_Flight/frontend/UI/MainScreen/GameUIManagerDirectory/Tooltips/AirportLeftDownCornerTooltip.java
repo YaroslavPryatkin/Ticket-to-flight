@@ -57,7 +57,7 @@ public class AirportLeftDownCornerTooltip extends LeftDownCornerTooltip {
             hasPassengers = true;
             PassengerType passenger = entry.getKey();
             PassengerTableWidget passengerWidget = new PassengerTableWidget(passenger);
-            ExpandableListWidget passengerList = new ExpandableListWidget(passengerWidget.passengerClass() + " (x" + entry.getValue() + ")", skin);
+            ExpandableListWidget passengerList = new ExpandableListWidget(passengerWidget.passengerClass() + " (x" + entry.getValue() + ")", skin, passenger);
             passengerList.setPreferredWidth(passengerListWidth);
             activeLists.add(passengerList);
 

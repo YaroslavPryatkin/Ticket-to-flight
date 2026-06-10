@@ -30,6 +30,7 @@ public abstract class LowLevelHandler {
      * called by main thread
      */
     protected abstract void handleIncomingMessage(Connection con, Network.GameMessage message);
+    public boolean isSendQueueEmpty(){return sendMessageQueue.isEmpty();}
 
     protected void addMessage(Connection con, Network.GameMessage mes) {
         if (con != null && con.isConnected()) {
@@ -66,10 +67,8 @@ public abstract class LowLevelHandler {
         MessageAndConnection mc;
         while ((mc = sendMessageQueue.poll()) != null) {
             if(mc.con != null && mc.con.isConnected()) {
-//                System.out.println("Sending message " + mc.message.getClass().getSimpleName());
-//                if(mc.message instanceof Network.DataChangesMessage)
-//                    System.out.println("         cur state is "+ ((Network.DataChangesMessage) mc.message).dc.currentState);
-                mc.con.sendTCP(mc.message);
+                //System.out.println("Sending message " + mc.message.getClass().getSimpleName());
+                 mc.con.sendTCP(mc.message);
             }
             else{
                 res = false;

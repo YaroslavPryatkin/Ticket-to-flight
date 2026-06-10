@@ -37,7 +37,10 @@ public class MainClient {
     private void mainCycle(float delta){
         if(llh.getGamePreparationState() == Flags.GamePreparationsState.RUNNING) {
             if(llh.getCurrentStateState() == Flags.CurrentStateState.SERVER_DISCONNECTED){
-                //stop game and return to connecting screen
+                if(!wroteGameFinished) {
+                    MainMenuClient mainMenuClient = new MainMenuClient(llh.getMainClient().getMyGame());
+                    wroteGameFinished = true;
+                }
             }
             else if(gameData.currentState == GameData.State.GAME_FINISHED && llh.getCurrentStateState() == Flags.CurrentStateState.GAME_FINISHED){
                 //do something with llh.getGameFinishRating();

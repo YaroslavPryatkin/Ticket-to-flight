@@ -74,23 +74,9 @@ public class MapDrawer {
         camera.position.y = MathUtils.clamp(camera.position.y, halfViewHeight, WORLD_HEIGHT - halfViewHeight);
     }
 
-    private Color getColorFromAirport(Airport port){
-        if(port.type.cityType.getId() == 1)
-            return Color.GREEN;
-        if(port.type.cityType.getId() == 2)
-            return Color.RED;
-        if(port.type.cityType.getId() == 3)
-            return Color.GRAY;
-        if(port.type.cityType.getId() == 4)
-            return Color.PINK;
-        if(port.type.cityType.getId() == 5)
-            return Color.MAGENTA;
-        return Color.WHITE;
-    }
-
     private void addAirportsOnTheMap(GameData gameData) {
         for (Airport airport : gameData.airports) {
-            batch.setColor(getColorFromAirport(airport));
+            batch.setColor(airport.type.cityType.getColor());
             float currentRadius = 15f;
 
             if (gameUIManager.getMainFlightController().isCurrentAirport(airport)) {

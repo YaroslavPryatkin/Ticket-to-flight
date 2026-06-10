@@ -41,7 +41,7 @@ public class LowLevelHandlerBack extends LowLevelHandler {
     private final GameStarter gameStarter = new GameStarter();
     private final StateIterator stateIterator = new StateIterator(gameData, dataChangesCreator, flags, this);
 
-    public LowLevelHandlerBack(GameData data,  MainLoopBack logic){super(data); this.logic = logic;}
+    public LowLevelHandlerBack(GameData data,  MainLoopBack logic){super(data); this.logic = logic; ColorSupplier.resetCurColor();}
 
 
     public void stopNetworkServer(){
@@ -64,6 +64,7 @@ public class LowLevelHandlerBack extends LowLevelHandler {
         }
 
         if(con2int.isEmpty()){
+            System.out.println("Stopping server due to all players disconnecting.");
             MainLogic.stopServer();
         }
 
@@ -79,18 +80,24 @@ public class LowLevelHandlerBack extends LowLevelHandler {
     protected void handleIncomingMessage(Connection con, Network.GameMessage message){
         if(message instanceof Network.JoinGameRequest) {
             if (flags.gamePreparationsState == Flags.GamePreparationsState.RUNNING) {
+                MainLogic.canServerBeStopped = false;
                 addMessage(con, new Network.JoinGameResponse(Network.JoinGameResponse.Response.GAME_IS_RUNNING));
             }
             else {
                 Network.JoinGameRequest req = (Network.JoinGameRequest) message;
+                MainLogic.canServerBeStopped = false;
                 addMessage(con, gameStarter.handleJoinGameRequest(con, req.playerName));
             }
         }
         else if(message instanceof Network.ReloadGameDataRequest){
             if(con2int.containsKey(con) && gameData.currentState != GameData.State.GAME_FINISHED){
                 GameData.DataChanges reloadDC = gameData.createDataChangesFromThis();
+                MainLogic.canServerBeStopped = false;
                 addMessage(con, new Network.ReloadGameDataResponse(reloadDC));
             }
+        }
+        else if(message instanceof Network.GameFinishedConfirmation){
+            con.close();
         }
         else{
             if(playerTurnCheck(con)){
@@ -105,6 +112,7 @@ public class LowLevelHandlerBack extends LowLevelHandler {
     private void sendToPlayer( Player pl, Network.GameMessage message){
         Connection con = int2con.get(pl.getId());
         if(con!=null){
+            MainLogic.canServerBeStopped = false;
             addMessage(con, message);
         }
     }
@@ -113,6 +121,7 @@ public class LowLevelHandlerBack extends LowLevelHandler {
         boolean res = true;
         for (Connection con : int2con.values()) {
             if (con != null && con.isConnected()) {
+                MainLogic.canServerBeStopped = false;
                 addMessage(con, message);
             }
             else
@@ -130,11 +139,13 @@ public class LowLevelHandlerBack extends LowLevelHandler {
         Integer player = con2int.get(con);
         if(player == null) return false;
         if(!player.equals(gameData.currentPlayer)){
+            MainLogic.canServerBeStopped = false;
             addMessage(con, Network.ErrorMessage.NOT_YOUR_TURN);
             return false;
         }
         if(flags.currentPlayerState != Flags.CurrentPlayerState.WAITING_FOR_RESPONSE &&
             flags.currentPlayerState != Flags.CurrentPlayerState.BAD_RESPONSE){
+            MainLogic.canServerBeStopped = false;
             addMessage(con, Network.ErrorMessage.ALREADY_ANSWERED);
             return false;
         }
@@ -161,7 +172,7 @@ public class LowLevelHandlerBack extends LowLevelHandler {
         }
         handleAllIncomingMessages();
         sendAllWaitingMessages();
-
+        MainLogic.canServerBeStopped = true;
         return true;
     }
     //------------------------------------- update part
@@ -175,6 +186,7 @@ public class LowLevelHandlerBack extends LowLevelHandler {
                     Integer id = dataChangesCreator.addPlayer(e.getValue());
                     int2con.put(id, e.getKey());
                     con2int.put(e.getKey(), id);
+                    MainLogic.canServerBeStopped = false;
                     addMessage(e.getKey(), new Network.StartGameMessage(id));
                 }
             }
@@ -198,6 +210,7 @@ public class LowLevelHandlerBack extends LowLevelHandler {
         flags.currentPlayerState = Flags.CurrentPlayerState.BAD_RESPONSE;
         Connection con = int2con.get(gameData.currentPlayer);
         if(con!=null){
+            MainLogic.canServerBeStopped = false;
             addMessage(con, new Network.ErrorMessage(error));
         }
     }
@@ -205,6 +218,7 @@ public class LowLevelHandlerBack extends LowLevelHandler {
         flags.currentPlayerState = Flags.CurrentPlayerState.BAD_RESPONSE;
         Connection con = int2con.get(gameData.currentPlayer);
         if(con!=null){
+            MainLogic.canServerBeStopped = false;
             addMessage(con, Network.ErrorMessage.WRONG_STATE);
         }
     }
@@ -212,6 +226,7 @@ public class LowLevelHandlerBack extends LowLevelHandler {
         flags.currentPlayerState = Flags.CurrentPlayerState.BAD_RESPONSE;
         Connection con = int2con.get(gameData.currentPlayer);
         if(con!=null){
+            MainLogic.canServerBeStopped = false;
             addMessage(con, Network.ErrorMessage.UNKNOWN_MESSAGE);
         }
     }

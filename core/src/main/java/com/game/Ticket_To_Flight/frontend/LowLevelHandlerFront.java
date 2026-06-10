@@ -296,7 +296,8 @@ public class LowLevelHandlerFront extends LowLevelHandler {
         else if(message instanceof Network.GameFinishedMessage){
             flags.currentStateState = Flags.CurrentStateState.GAME_FINISHED;
             flags.gameFinishRating = ((Network.GameFinishedMessage) message).playerRating;
-            //System.out.println("Received game finished message");
+            System.out.println("Received game finished message");
+            sendMessageToServer(new Network.GameFinishedConfirmation());
         }
         else if(message instanceof Network.BankruptcyMessage){
             mainClient.bankruptcyMessage();

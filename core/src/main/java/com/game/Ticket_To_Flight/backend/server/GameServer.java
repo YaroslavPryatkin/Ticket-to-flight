@@ -47,6 +47,32 @@ public class GameServer {
     }
 
     public void stop(){
+        long startTime = System.currentTimeMillis();
+
+        while (System.currentTimeMillis() - startTime < Network.timeoutTime) {
+            boolean allBuffersEmpty = true;
+            Connection[] connections = server.getConnections();
+
+            for (Connection conn : connections) {
+                if (conn.isConnected() && conn.getTcpWriteBufferSize() > 0) {
+                    allBuffersEmpty = false;
+                    break;
+                }
+            }
+
+            if (allBuffersEmpty) {
+                break;
+            }
+
+            try {
+                Thread.sleep(15);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                break;
+            }
+        }
+
         server.stop();
     }
+
 }

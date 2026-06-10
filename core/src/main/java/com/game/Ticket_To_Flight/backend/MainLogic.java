@@ -17,6 +17,7 @@ import static com.game.Ticket_To_Flight.network.Network.FinishStatus.*;
 
 public class MainLogic extends MainLoopBack {
     private static MainLogic instance;
+    public static boolean canServerBeStopped = false;
 
     public static synchronized MainLogic getInstance() {
         if (instance == null) {
@@ -55,7 +56,7 @@ public class MainLogic extends MainLoopBack {
                 MainLogic.stopServer();
             }
             else if(gameData.currentState == GameData.State.GAME_FINISHED){
-                MainLogic.stopServer();
+                //do nothing
             }
             else if(llh.getCurrentPlayerState() == Flags.CurrentPlayerState.NO_PLAYER_STAGE) {
                 if (gameData.currentState == GameData.State.WORLD_UPDATE) {

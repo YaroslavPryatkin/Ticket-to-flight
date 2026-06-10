@@ -6,6 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.game.Ticket_To_Flight.backend.gameLogicEntities.templates.PassengerType;
 import com.game.Ticket_To_Flight.frontend.components.buttons.RoundedButton;
 import com.game.Ticket_To_Flight.frontend.components.texts.SingleLineText;
 
@@ -42,7 +43,36 @@ public class ExpandableListWidget extends Table {
             .width(TOGGLE_BUTTON_WIDTH)
             .height(TOGGLE_BUTTON_HEIGHT)
             .padRight(TOGGLE_BUTTON_RIGHT_PADDING);
-        header.add(new SingleLineText(title, skin)).expandX().left();
+        SingleLineText name = new SingleLineText(title, skin);
+        header.add(name).expandX().left();
+
+        contentTable = new Table();
+
+        add(header).expandX().fillX().left().row();
+    }
+
+    public ExpandableListWidget(String title, Skin skin, PassengerType pass) {
+        header = new Table();
+
+        toggleButton = new RoundedButton("+", skin);
+        toggleButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                if (isExpanded) {
+                    collapse();
+                } else {
+                    expand();
+                }
+            }
+        });
+
+        header.add(toggleButton).left()
+            .width(TOGGLE_BUTTON_WIDTH)
+            .height(TOGGLE_BUTTON_HEIGHT)
+            .padRight(TOGGLE_BUTTON_RIGHT_PADDING);
+        SingleLineText name = new SingleLineText(title, skin);
+        name.setColor(pass.typeTo.getColor());
+        header.add(name).expandX().left();
 
         contentTable = new Table();
 
