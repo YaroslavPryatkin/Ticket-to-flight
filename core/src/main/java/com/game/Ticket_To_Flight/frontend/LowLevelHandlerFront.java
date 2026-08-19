@@ -74,7 +74,8 @@ public class LowLevelHandlerFront extends LowLevelHandler {
     }
 
     public LowLevelHandlerFront(GameData data,  MainClient mainClient){
-        super(data); this.mainClient = mainClient;}
+        super(data); this.mainClient = mainClient;
+    }
 
     //------------------------------------- data changes part
     private final ExecutorService validationExecutor = Executors.newSingleThreadExecutor(r -> {

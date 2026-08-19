@@ -51,7 +51,9 @@ public class GameData {
     }
     public Integer roundNumber = 0;
     public State currentState = State.NO_STATE;
-    public Integer currentPlayer = -1; // id of current player. -1 if it is no player turn
+    public Integer currentPlayer = -1;
+
+    // id of current player. -1 if it is no player turn
     public List<Player> turnOrder = null;
     public int currentBet = 0;
 

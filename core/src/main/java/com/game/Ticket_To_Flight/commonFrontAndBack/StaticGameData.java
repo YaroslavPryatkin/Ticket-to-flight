@@ -35,7 +35,7 @@ public class StaticGameData {
     private StaticGameData(){}
 
     private static boolean jsonDownloaded = false;
-    private static String jsonFolder = "assets/StaticData";
+    private static String jsonFolder = "StaticData";
     private static List<SetHolder<? extends Identifiable>> staticHolder = List.of(
         cityTypes,
         airlineTypes,
@@ -67,7 +67,7 @@ public class StaticGameData {
         ObjectMapper mapper = new ObjectMapper();
 
         for (int i = 0; i < jsonNames.size(); i++) {
-            String path = jsonFolder + File.separator + jsonNames.get(i);
+            String path = jsonFolder + "/" + jsonNames.get(i);
             Class<? extends Identifiable> clazz = staticClasses.get(i);
             SetHolder<? extends Identifiable> holder = staticHolder.get(i);
 
@@ -77,16 +77,19 @@ public class StaticGameData {
 
     private static <T extends Identifiable> void loadSingleJson(String path, SetHolder<T> holder, Class<T> clazz, ObjectMapper mapper) {
         try {
-            File file = new File(path);
-            if (!file.exists()) {
+            com.badlogic.gdx.files.FileHandle fileHandle = com.badlogic.gdx.Gdx.files.internal(path);
+
+            if (!fileHandle.exists()) {
                 System.err.println("File not found: [" + path + "]");
                 return;
             }
+
+            String jsonContent = fileHandle.readString();
             CollectionType setType = mapper.getTypeFactory().constructCollectionType(Set.class, clazz);
-            Set<T> loadedData = mapper.readValue(file, setType);
+            Set<T> loadedData = mapper.readValue(jsonContent, setType);
+
             holder.clear();
             holder.addAll(loadedData);
-            // System.out.println("Successfully downloaded json [" + clazz.getSimpleName() + "]: " + holder.size());
 
         } catch (IOException e) {
             System.err.println("Error during json parsing for [" + path + "]: " + e.getMessage());

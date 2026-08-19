@@ -11,4 +11,10 @@ public class TicketToFlight extends Game {
         StaticGameData.loadAllJsons();
         MainMenuClient mainMenuClient = new MainMenuClient(this);
     }
+
+    @Override
+    public void dispose() {
+        super.dispose();
+        System.exit(0);
+    }
 }

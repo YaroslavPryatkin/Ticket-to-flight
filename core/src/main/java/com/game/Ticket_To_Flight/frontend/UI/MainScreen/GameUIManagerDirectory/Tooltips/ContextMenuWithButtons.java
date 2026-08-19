@@ -15,7 +15,7 @@ import com.game.Ticket_To_Flight.frontend.components.buttons.RoundedButton;
 import com.game.Ticket_To_Flight.frontend.components.texts.WrappedText;
 import com.game.Ticket_To_Flight.frontend.components.windows.BaseGameWindow;
 
-public class ContextMenuWithButtons extends BaseGameWindow implements MapTooltipWindow {
+public class ContextMenuWithButtons extends BaseGameWindow {
     private static final float CONTENT_WIDTH = 570f;
     private static final float flightTooltipButtonWidth = 300;
     private static final float flightTooltipButtonHeight = 60;
@@ -126,7 +126,6 @@ public class ContextMenuWithButtons extends BaseGameWindow implements MapTooltip
         return airline.getPortA().getAirportName() + " - " + airline.getPortB().getAirportName();
     }
 
-    @Override
     public Window asWindow() {
         return this;
     }

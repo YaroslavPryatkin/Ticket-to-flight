@@ -37,10 +37,8 @@ public class WorldMapUpdater {
         }
     }
 
-
-
     private void loadPassengerProbabilities() {
-        String filePath = presetsDirectory + "/passengers.json";
+        String filePath = presetsDirectory + "passengers.json";
         try (Reader reader = Gdx.files.internal(filePath).reader("UTF-8")) {
             JsonNode rootArray = mapper.readTree(reader);
 
